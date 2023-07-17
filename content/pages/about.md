@@ -1,0 +1,1 @@
+This blog is going to be about explaining and motivating advanced concepts in machine learning research using practical tools.  Each post will cover a concept or paper that I find interesting and will go through the math details step by step with a focus on highlighting the "tricks" that make the math work.
