@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>Demystifying ML Math - diffusion</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Demystifying ML Math</a></h1>
+                <nav><ul>
+                    <li><a href="/category/blog.html">Blog</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/gaussian-conditional-probability-path.html">Diffusion as Gaussian conditional probability paths</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-07-15T00:00:00-05:00">
+                Published: Sat 15 July 2023
+        </abbr>
+		<br />
+        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
+                Updated: Sat 15 July 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
+        </address>
+<p>In <a href="/category/blog.html">Blog</a>.</p>
+<p>tags: <a href="/tag/diffusion.html">diffusion</a> <a href="/tag/sde.html">sde</a> <a href="/tag/cnf.html">cnf</a> <a href="/tag/conditional-probability-paths.html">conditional probability paths</a> </p>
+</footer><!-- /.post-info --><h1>Relationship between diffusion and flow matching</h1>
+<p>Here we'll go over the relationship between diffusion and flow matching.</p>
+<h2>CNF from an SDE</h2>
+<p>The appendix of the flow matching paper has a section that shows how to go from a stochastic differential equation to vector field that generates its flow.  This is expressed by the Fokker-Planck equation:
+If we have a stochastic differential equation of the form <span class="math">\(dx = f_tdt + g_t dw\)</span>, the its probability path has the form
+</p>
+<div class="math">$$
+\begin{align}
+\frac{\partial p_t}{\partial t} = -\text{Div}(f_tp_t) + \frac{g_t^2}{2}\Delta p_t
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(\Delta\)</span> is the Laplace operator.  If we rearrange terms to match the form of the continuity equation, we have that
+</p>
+<div class="math">$$
+\begin{align}
+\frac{\partial p_t}{\partial t} = -\text{Div}(\underbrace{(f_t - \frac{g_t^2}{2}\nabla \log p_t)}_{w_t}p_t )
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(w_t\)</span> is the vector field that generates the flow of <span class="math">\(p_t\)</span>.  So the vector field that generates the flow of <span class="math">\(p_t\)</span> is given by <span class="math">\(w_t = f_t - \frac{g_t^2}{2}\nabla \log p_t\)</span>.</p>
+<h2>SDE from a CNF</h2>
+<p>Next, we'll go in the reverse direction and show how CNFs that are constructed using conditional probability paths can be expressed as stochastic differential equations.</p>
+<p>Let <span class="math">\(p_t(x_t)\)</span> be the probability path of our CNF and assume that it has the following form:
+</p>
+<div class="math">$$
+p_t(x_t) = \int q(x_1)N(x_t|\mu_t(x_1),\Sigma_t)dx_1
+$$</div>
+<p>
+Gaussian distributions have the special property that the vector field that generates their flow can be written in terms of the score function.</p>
+<h3>Score function and vector field of a Gaussian</h3>
+<p>Recall that we can sample by first sampling <span class="math">\(x_0 \sim N(0,I)\)</span> and then computing <span class="math">\(x_t = \mu_t + \Sigma_t^\frac{1}{2}x_0\)</span> and that the score function of a Gaussian is given by <span class="math">\(\nabla \log N(x_t|\mu_t,\Sigma_t) = \Sigma_t^{-1}(x_t - \mu_t)\)</span>.  We can write the score function in terms of <span class="math">\(x_0\)</span> as follows:
+</p>
+<div class="math">$$
+\begin{align}
+\nabla \log N(x_t|\mu_t,\Sigma_t) &amp;= \Sigma_t^{-1}(x_t - \mu_t) \\
+&amp;= \Sigma_t^{-1}(\mu_t + \Sigma_t^\frac{1}{2}x_0 - \mu_t) \\
+&amp;= \Sigma_t^{-1}\Sigma_t^\frac{1}{2}x_0 \\
+&amp;= \Sigma_t^{-\frac{1}{2}}x_0
+\end{align}
+$$</div>
+<p>
+Next, we can compute the vector field that generates the flow of <span class="math">\(N(x_t|\mu_t,\Sigma_t)\)</span> by taking the time derivative of a sample from <span class="math">\(N(x_t|\mu_t,\Sigma_t)\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+u_t &amp;= \frac{dx_t}{dt} \\
+ &amp;= \frac{d}{dt}(\mu_t + \Sigma_t^\frac{1}{2}x_0) \\
+&amp;= \frac{d \mu_t}{dt} + \frac{d\Sigma_t^\frac{1}{2}}{dt}x_0
+\end{align}
+$$</div>
+<p>
+So by replacing <span class="math">\(x_0\)</span> in terms of the score function, we have our final relationship:
+</p>
+<div class="math">$$
+\begin{align}
+u_t &amp;= \frac{d \mu_t}{dt} + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log N(x_t|\mu_t,\Sigma_t)
+\end{align}
+$$</div>
+<h2>Relationship of marginals</h2>
+<p>Now that we have a relationship between the conditional probability path and the vector field that generates its flow, we can use this to relate the marginal vector field and score function.  The key property that we will exploit is that the score function, like the vector field, can be written as an expectation of the conditional versions over the posterior distribution:
+</p>
+<div class="math">$$
+\begin{align}
+\nabla \log p_t(x_t) &amp;= \int p_t(x_1|x_t)\nabla \log p_t(x_t|x_1)dx_1 \\
+u_t(x_t) &amp;= \int p_t(x_1|x_t)u_t(x_t|x_1)dx_1
+\end{align}
+$$</div>
+<p>
+So we can plug in our expression for the conditional vector field:
+</p>
+<div class="math">$$
+\begin{align}
+u_t(x_t) &amp;= \int p_t(x_1|x_t)u_t(x_t|x_1)dx_1 \\
+&amp;= \int p_t(x_1|x_t)(\frac{d \mu_t(x_1)}{dt} + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log N(x_t|\mu_t(x_1),\Sigma_t))dx_1 \\
+&amp;= \underbrace{\int p_t(x_1|x_t)\frac{d \mu_t(x_1)}{dt}dx_1}_{f_t(x_t)} + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\int p_t(x_1|x_t)\nabla \log N(x_t|\mu_t(x_1),\Sigma_t)dx_1 \\
+&amp;= f_t(x_t) + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log p_t(x_t)
+\end{align}
+$$</div>
+<p>
+Notice that this almost matches the form of the vector field for a diffusion model.</p>
+<h2>Optimal transport conditional paths</h2>
+<p>We can look at the special case where we use the optimal transport conditional path where <span class="math">\(\mu_t(x_1) = tx_1\)</span> and <span class="math">\(\Sigma_t = (1-t)^2I\)</span>.  In this case, we can simplify <span class="math">\(f_t(x_t)\)</span> as follows:
+</p>
+<div class="math">$$
+\begin{align}
+f_t(x_t) &amp;= \int p_t(x_1|x_t)\frac{d \mu_t(x_1)}{dt}dx_1 \\
+&amp;= \int p_t(x_1|x_t)t \mu_t(x_1)dx_1 \\
+&amp;= t \int p_t(x_1|x_t)  \\
+\end{align}
+$$</div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

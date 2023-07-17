@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>Demystifying ML Math - stein discrepancy</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Demystifying ML Math</a></h1>
+                <nav><ul>
+                    <li><a href="/category/blog.html">Blog</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/kernel-stein-discrepancy.html">Kernel Stein Discrepancy</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-07-15T00:00:00-05:00">
+                Published: Sat 15 July 2023
+        </abbr>
+		<br />
+        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
+                Updated: Sat 15 July 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
+        </address>
+<p>In <a href="/category/blog.html">Blog</a>.</p>
+<p>tags: <a href="/tag/stein-discrepancy.html">stein discrepancy</a> <a href="/tag/kernels.html">kernels</a> <a href="/tag/stein-variational-gradient-descent.html">stein variational gradient descent</a> <a href="/tag/rkhs.html">rkhs</a> </p>
+</footer><!-- /.post-info --><p>The Stein discrepancy measure is a way of measuring the distance between two probability distributions.  It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the reverse KL divergence to a target distribution.  In this post, we'll go over the kernel Stein discrepancy as introduced by <a href="https://arxiv.org/pdf/1602.03253.pdf">Liu et al.</a> and the extensions in <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu and Zhu</a>.</p>
+<h1>Motivation</h1>
+<p>Consider the task of minimizing the reverse KL divergence between a target distribution <span class="math">\(p\)</span> and a model distribution <span class="math">\(q\)</span> over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  If we have a probability path as the solution where <span class="math">\(q_t\)</span> where <span class="math">\(q_0\)</span> is arbitrary and <span class="math">\(q_1 = p\)</span>, then we could be interested in seeing how the reverse KL divergence between <span class="math">\(q_t\)</span> and <span class="math">\(p\)</span> changes as <span class="math">\(t\)</span> changes.</p>
+<p>Let <span class="math">\((q_t, V_t)\)</span> be a probability path between <span class="math">\(q_0\)</span> and <span class="math">\(q_1\)</span> where <span class="math">\(V_t\in \mathfrak{X}(\mathcal{M})\)</span> is the vector field that generates the flow of <span class="math">\(q_t\)</span> and let <span class="math">\(dV_g\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the time derivative of the reverse KL divergence is:
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{d}{dt}\text{KL}\left[q_t||p\right] &amp;= \int \frac{d}{dt}q_t\log \frac{q_t}{p}dV_{g} \\
+  &amp;= \int \left((\frac{d q_t}{dt})\log \frac{q_t}{p} + q_t\frac{d \log q}{dt}\right)dV_{g} \\
+  &amp;= \int \left(-\text{Div}(q_t V_t) \log \frac{q_t}{p} + \underbrace{\frac{d q}{dt}}_{\text{$0$ in expectation}}\right)dV_{g} \\
+  &amp;= \int \langle \nabla_x \log \frac{q_t}{p} , q_t V_t\rangle_gdV_{g} \\
+  &amp;= \int q_t\left( \langle \nabla_x \log q_t , V_t\rangle_g - \langle \nabla_x \log p, V_t\rangle_g \right)dV_{g} \\
+  &amp;= \int \langle \nabla_x q_t , V_t\rangle_g dV_g - \int q_t\langle \nabla_x \log p, V_t\rangle_g dV_{g} \\
+  &amp;= -\int q_t \text{Div}(V_t) dV_g - \int q_t\langle \nabla_x \log p, V_t\rangle_g dV_{g} \\
+  &amp;= -\mathbb{E}_{q_t}\left[\langle \nabla_x \log p, V_t \rangle_g + \text{Div}(V_t)\right]
+\end{align}
+$$</div>
+<p>Notice that if <span class="math">\(V_t\)</span> is nonvanishing except when <span class="math">\(\text{KL}\left[q_t||p\right] = 0\)</span>, then <span class="math">\(\text{KL}\left[q_t||p\right] = 0\)</span> if and only if <span class="math">\(\frac{d}{dt}\text{KL}\left[q_t||p\right] = 0\)</span> which only happens at <span class="math">\(t=1\)</span>, which implies that
+</p>
+<div class="math">$$
+\begin{align}
+\mathbb{E}_{p}\left[\langle \nabla_x \log p, V_t \rangle_g + \text{Div}(V_t)\right] = 0
+\end{align}
+$$</div>
+<p>
+This is called the result in theorem 2 of <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu et al.</a>.  The integrand is called the generalized Stein operator:
+</p>
+<div class="math">$$
+\begin{align}
+\mathcal{A}_p V_t = \langle \nabla_x \log p, V_t \rangle_g + \text{Div}(V_t)
+\end{align}
+$$</div>
+<h2>Finding the direction of steepest descent</h2>
+<p>Next we'll show how to construct the <span class="math">\(V_t\)</span> that maximizes the time derivative of the reverse KL divergence.  Specifically, we want to choose a space called <span class="math">\(\mathfrak{X}\)</span> that is equipped with some metric so to find
+</p>
+<div class="math">$$
+\begin{align}
+  \text{Loss}\left(V_t\right) &amp;= \min_{V_t\in \mathfrak{X}} \frac{d}{dt}\text{KL}\left[q_t||p\right] \\
+  &amp;= \min_{V_t\in \mathfrak{X}}-\mathbb{E}_{q_t}\left[\langle \nabla_x \log p, V_t \rangle_g + \text{Div}(V_t)\right] \\
+  &amp;= \max_{V_t\in \mathfrak{X}}\mathbb{E}_{q_t}\left[\langle \nabla_x \log p, V_t \rangle_g + \text{Div}(V_t)\right]
+\end{align}
+$$</div>
+<p><a href="https://arxiv.org/pdf/1711.11216.pdf">Liu et al.</a> proposes looking at the space of vector fields that are the gradient of some function <span class="math">\(f\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  \mathfrak{X} = \left\{V_t = \nabla_x f \mid f \in \mathcal{H}_K \right\}
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(\mathcal{H}_k\)</span> is a reproducing kernel Hilbert space (RKHS) with kernel <span class="math">\(K\)</span>.  Check out my <a href="/content/reproducing_kernel_hilbert_space.md">post on RKHS</a> for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that <span class="math">\(V_t = \nabla_x f_t\)</span>.  Also recall that <span class="math">\(\nabla_x f_t = \langle f_t, \nabla_x  K_x \rangle_{\mathcal{H}_K}\)</span> and <span class="math">\(\text{Div}(\nabla_x f_t) = \langle f_t, \text{Div}(\nabla_x  K_x) \rangle_{\mathcal{H}_K}\)</span>.</p>
+<p>Then we can simplify the objective further by rewriting <span class="math">\(V_t\)</span> in terms of <span class="math">\(f_t\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  \text{Loss}\left(f_t\right) &amp;= \max_{f_t \in \mathcal{H}_K}\mathbb{E}_{q_t}\left[\langle \nabla_x \log p, \nabla_x f_t \rangle_g + \text{Div}(\nabla_x f_t)\right] \\
+  &amp;= \max_{f_t \in \mathcal{H}_K}\mathbb{E}_{q_t}\left[\langle \nabla_x \log p, \langle f_t, \nabla_x  K_x \rangle_{\mathcal{H}_K} \rangle_g + \langle f_t, \text{Div}(\nabla_x  K_x) \rangle_{\mathcal{H}_K}\right] \\
+  &amp;= \max_{f_t \in \mathcal{H}_K}\langle f_t, \mathbb{E}_{q_t}\left[\langle \nabla_x \log p, \nabla_x  K_x \rangle_g \right]\rangle_{\mathcal{H}_K} + \langle f_t, \mathbb{E}_{q_t}\left[\text{Div}(\nabla_x  K_x) \right] \rangle_{\mathcal{H}_K} \\
+  &amp;= \max_{f_t \in \mathcal{H}_K} \langle f_t, \underbrace{\mathbb{E}_{q_t}\left[\langle \nabla_x \log p, \nabla_x  K_x \rangle_g + \text{Div}(\nabla_x  K_x)\right]}_{\hat{f}_t}\rangle_{\mathcal{H}_K} \\
+  &amp;= \max_{f_t \in \mathcal{H}_K} \langle f_t, \hat{f}_t\rangle_{\mathcal{H}_K}
+\end{align}
+$$</div>
+<p>Clearly we obtain best loss when we choose <span class="math">\(f_t = \hat{f}_t\)</span> (up to a scaling constant), so the vector field that minimizes the rate of change of the reverse KL divergence is
+</p>
+<div class="math">$$
+\begin{align}
+  V_t^* &amp;= \nabla_x \hat{f}_t \\
+  &amp;= \nabla_x \mathbb{E}_{q_t}\left[\langle \nabla_x \log p, \nabla_x  K_x \rangle_g + \text{Div}(\nabla_x  K_x)\right]
+\end{align}
+$$</div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
