@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>Demystifying ML Math - Sten VI</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Demystifying ML Math</a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/sten-vi.html">Sten VI</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/flow-maching.html">Flow matching</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-07-15T00:00:00-05:00">
+                Published: Sat 15 July 2023
+        </abbr>
+		<br />
+        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
+                Updated: Sat 15 July 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
+        </address>
+<p>In <a href="/category/sten-vi.html">Sten VI</a>.</p>
+<p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
+</footer><!-- /.post-info --><h1>What problem are we trying to solve?</h1>
+<p>We are interested in learning a parametric approximation of an unknown probability distribution that we can sample from and compute likelihood on.  Given a target probability distribution called $p_\text{data}(x)$, where $x\in \mathcal{X}$, we want to learn a parametric approximation called $p_\text{model}(x;\theta)$.  In our problem setup, we assume that we can sample from $p_\text{data}(x)$ and that $p_\text{data}(x)&gt;0, \forall x\in \mathcal{X}$.  The second assumption ensures that a solution exists, as we will see later.</p>
+<p>Our goals are two fold:
+1. Sample from $p_\text{model}(x;\theta)$.
+2. Compute the probability of a given sample $x$ under $p_\text{model}(x)$.</p>
+<h1>How do we solve this problem?</h1>
+<p>We will learn an invertible function, $f: \mathcal{X}<em>0 \to \mathcal{X}_1$ that is parametrized by $\theta$, and specify a prior probability distribution over $\mathcal{X}_0$ called $p_0$ such that the following model produces a sample $x\sim p</em>\text{model}(x;\theta)$:
+$$
+\begin{align}
+  z &amp;\sim p_0(z) \
+  x &amp;= f(z;\theta)
+\end{align}
+$$</p>
+<p>We can compute the log likelihood of a sample $x$ under $p_\text{model}(x;\theta)$ by applying the change of variables formula:
+$$
+\begin{align}
+  \log p_\text{model}(x;\theta) &amp;= \log p_0(f^{-1}(x;\theta)) + \log\left| \frac{\partial f^{-1}(x;\theta)}{\partial x} \right| \
+  &amp;= \log p_0(z) - \log \left| \frac{\partial f(x;\theta)}{\partial z} \right|^{-1} \text{ where }z=f^{-1}(x;\theta)
+\end{align}
+$$</p>
+<p>The class of models that we just described is called <strong>normalizing flows</strong>.  Under the assumption that $p_\text{data}(x) &gt; 0, \forall x\in \mathcal{X}$, there always exists an $f$ so that $p_\text{model} = p_\text{data}$.  Typically normalizing flows are trained to minimize $\text{KL}\left[p_\text{model}||p_\text{data}\right]$, leading us to one of an infinite number of solutions for $f$.  The specific kinds of flows that we will look at are called <strong>continuous normalizing flows</strong>.</p>
+<h1>Continuous normalizing flows</h1>
+<p>Continuous normalizing flows are a type of normalizing flow where $f$ is a continuous function of $t\in [0,1]$ and $f_1$ is used in the computation of $p_\text{model}(x;\theta)$.  In this setting, we do not parametrize $f_t: \mathcal{X}_0 \to \mathcal{X}_t$ directly, but we instead parametrize its infinitesmal generator,
+$$
+\begin{align}
+u_t(x_t;\theta) = \frac{dx_t(x_0)}{dt}, \text{ where } x_t = f_t(x_0;\theta)
+\end{align}
+$$</p>
+<p>In this parametrization, we can write $f_t(x_0;\theta) = x_0 + \int_0^t u_s(x_s;\theta) ds$ because
+$$
+\begin{align}
+  f_t(x_0;\theta) &amp;= x_0 + \int_0^t u_s(x_s;\theta) ds \
+  &amp;= x_0 + \int_0^t \frac{dx_s(x_0)}{ds} ds \
+  &amp;= x_0 + \int_{x_0}^{x_t} dx_s \
+  &amp;= x_t
+\end{align}
+$$</p>
+<p>Using the change of variables formula from before, we have that samples the model $x_0\sim p_0(x_0)$, $x_t = f_t(x_0;\theta)$ have the log likelihood $\log p_t(x_t)$ where
+$$
+\begin{align}
+\log p_t(x_t;\theta) = \log p_0(x_0) - \log \left| \frac{\partial f_t(x_0;\theta)}{\partial x_0} \right| \text{ where }x_0=f_t^{-1}(x_t;\theta)
+\end{align}
+$$
+and $p_1(x_1;\theta) = p_\text{model}(x_1;\theta)$.  We can relate $p_t(x_t;\theta)$ with $u_t(x_t;\theta)$ using the instantaneous change of variables formula:
+$$
+\begin{align}
+\frac{d\log p_t(x_t)}{dt} = -\text{Div}(u_t(x_t))
+\end{align}
+$$</p>
+<p>Like $f_t(x_0;\theta)$, we can compute the log likelihood of a sample by integrating the instantaneous change of variables formula:
+$$
+\begin{align}
+  \log p_t(x_t;\theta) &amp;= \log p_0(x_0) - \log \left| \frac{\partial f_t(x_0;\theta)}{\partial x_0} \right| \
+  &amp;= \log p_0(x_0) - \int_0^1 \text{Tr}(u_t(x_t;\theta)) dt
+\end{align}
+$$</p>
+<h1>Optimal continuous normalizing flow</h1>
+<p>Next, we'll show how to construct $u_t$ so that $\log p_1(x_1;\theta) = \log p_\text{data}(x_1)$.  Assume that $p_t(x_t)$ is a marginal probability distribution over $x_t$ and some random variable $y$ so that
+$$
+\begin{align}
+  p_t(x_t) = \int p_y(y)p_{t|y}(x_t|y) dy
+\end{align}
+$$
+We need to choose $p_y(y)$ and $p_{t|y}(x_t|y)$ so that the conditions at $t=0$ and $t=1$ are satisfied: $p_{t=0} = p_0$ and $p_{t=1} = p_\text{data}$.  Notice that $p_{t|y}(x_t|y)$ is time dependent, so it can also be written as the likelihood of $x_t$ under the flow of a conditional vector field, $u_t(x_t|y)$.  It turns out that $u_t(x)$ can be written as the expected value of conditional vector fields over the posterior distribution of $y$ given $x_t$:
+$$
+\begin{align}
+u_t(x_t) = \mathbb{E}<em t_y="t|y">{p</em>(y|x_t)}[u_t(x_t|y)]
+\end{align}
+$$
+Thus, we have constructed a continuous normalizing flow that satisfies our conditions.  To summarize, we can build a continuous normalizing flow that generates samples on $p_\text{data}$ by:
+1. Choose $p_y(y)$ and $p_{t|y}(x_t|y)$ so that $p_{t=0} = p_0$ and $p_{t=1} = p_\text{data}$
+2. Find a flow $u_t(x_t|y)$ for $p_{t|y}(x_t|y)$
+3. Compute $u_t(x_t) = \mathbb{E}<em t_y="t|y">{p</em>(y|x_t)}[u_t(x_t|y)]$</p>
+<p>The point of introducing $u_t(x_t|y)$ is not to estimate $u_t(x_t)$, but to estimate its <strong>expectation</strong> as follows:
+$$
+\begin{align}
+\mathbb{E}<em p__t_y="p_{t|y">{p_t(x_t)}[u_t(x_t)] &amp;= \int p_t(x_t)u_t(x_t) dx_t \
+&amp;= \int p_t(x_t)\mathbb{E}</em>(y|x_t)}[u_t(x_t|y)] dx_t \
+&amp;= \int \int p_t(x_t)p_{t|y}(y|x_t)u_t(x_t|y) dx_t dy \
+&amp;= \int \int p_y(y)p_{t|y}(x_t|y)u_t(x_t|y) dx_t dy \
+&amp;= \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[u_t(x_t|y)\right]
+\end{align}
+$$</p>
+<p>Thus if we can sample from $p_y(y)$ and $p_t(x_t|y)$, then we can compute an unbiased estimate of $\mathbb{E}<em t_y="t|y">{p_t(x_t)}[u_t(x_t)]$.  Before we see how this is useful for learning $u_t(x_t)$, we'll show an example of how to choose $p_y(y)$ and $p</em>(x_t|y)$.</p>
+<h1>Gaussian conditional flows</h1>
+<p>Let $p_y = p_\text{data}$ and $p_{t|y}(x_t|y) = \mathcal{N}(x_t; \mu_t(y), \Sigma_t(y))$ and let $(\mu_0(y), \Sigma_0(y)) = (0, I)$ and $(\mu_1(y), \Sigma_1(y)) = (y, 0)$ so that $p_0(x_0) = N(x_0|0,I)$ and $p_{1|y}(x_1|y) = \delta(x_1 - y)$.  We have that $p_1(x_1) = p_\text{data}(x_1)$ because
+$$
+\begin{align}
+  p_1(x_1) &amp;= \int p_y(y)p_{t=1|y}(x_1|y) dy \
+  &amp;= \int p_\text{data}(y)\mathcal{N}(x_1; \mu_1(y), \Sigma_1(y)) dy \
+  &amp;= \mathcal{N}(x_1; \mu_1, \Sigma_1) \
+  &amp;= p_\text{data}(x_1)
+\end{align}
+$$</p>
+<p>Notice that we can sample $x_t \sim p_{t|y}(x_t|y)$ using the model:
+$$
+\begin{align}
+x_0 &amp;\sim N(0,I) \
+x_t &amp;= \mu_t(y) + \Sigma_t(y)^{1/2}x_0
+\end{align}
+$$
+So we can differentiate $x_t$ to get the conditional vector field:
+$$
+\begin{align}
+u_t(x_t|y) &amp;= \frac{dx_t}{dt} \
+&amp;= \frac{d}{dt}\left[\mu_t(y) + \Sigma_t(y)^{1/2}x_0\right] \
+&amp;= \frac{d \mu_t(y)}{dt} + \frac{d \Sigma_t(y)^{1/2}}{dt}\underbrace{x_0}_{\Sigma_t^{\frac{-1}{2}}(x_t - \mu_t(y))} \
+&amp;= \frac{d \mu_t(y)}{dt} + \frac{d \Sigma_t(y)^{1/2}}{dt}\Sigma_t^{\frac{-1}{2}}(x_t - \mu_t(y))
+\end{align}
+$$</p>
+<h1>Flow matching</h1>
+<p>Now that we have a way to construct a target continuous normalizing flow whose generating vector field is $u_t(x_t)$, we can train a model to match $u_t(x_t)$.  Let $v_t(x_t;\theta)$ be a parametric neural network whose flow corresponds to the probability density function $q_t(x_t)$.  We can train $v_t(x_t;\theta)$ to match $u_t(x_t)$ by minimizing the following loss function:
+$$
+\begin{align}
+\mathcal{L}<em p_t_x_t_="p_t(x_t)">{\text{FM}}(\theta) &amp;= \int_0^1 \mathbb{E}</em>\left[\left|u_t(x_t) - v_t(x_t;\theta)\right|^2\right] dt \
+&amp;= \small{\underbrace{\int_0^1 \mathbb{E}<em C_1>{p_t(x_t)}[|u_t(x_t)|^2]dt}</em> - 2\int_0^1 \mathbb{E}<em p_t_x_t_="p_t(x_t)">{p_t(x_t)}[u_t(x_t)^Tv_t(x_t;\theta)]dt + \int_0^1 \mathbb{E}</em>[|v_t(x_t;\theta)|^2]dt} \
+&amp;= C_1 - 2\int_0^1 \mathbb{E}<em p_t_x_t_="p_t(x_t)">{p_t(x_t)}\left[u_t(x_t)\right]^Tv_t(x_t;\theta)dt + \int_0^1 \mathbb{E}</em>\left[|v_t(x_t;\theta)|^2\right]dt \
+&amp;= C_1 - 2\int_0^1 \mathbb{E}<em p_t_x_t_="p_t(x_t)">{p_y(y)p_t(x_t|y)}\left[u_t(x_t|y)\right]^Tv_t(x_t;\theta)dt + \int_0^1 \mathbb{E}</em>\left[|v_t(x_t;\theta)|^2\right]dt \
+&amp;= C_1 - C_2 + \underbrace{\int_0^1 \mathbb{E}<em _mathcal_L="\mathcal{L">{p_y(y)p_t(x_t|y)}\left[|u_t(x_t|y) - v_t(x_t;\theta)|^2\right]dt}</em><em p_y_y_p_t_x_t_y_="p_y(y)p_t(x_t|y)">{\text{CFM}}(\theta)}
+\end{align}
+$$
+where $C_2 = \int_0^1 \mathbb{E}</em>\left[|u_t(x_t|y)|^2\right]dt$.  So we can minimize $\mathcal{L}<em _text_CFM="\text{CFM">{\text{FM}}(\theta)$ by minimizing $\mathcal{L}</em>}(\theta)$ because $C_1$ and $C_2$ are constants.  $\mathcal{L}_{\text{CFM}}(\theta)$ is called the <strong>conditional flow matching</strong> loss.</p>
+<p>We can also reparametrize $x_t$ with $f_t(x_t|y)$ to get the following loss function:
+$$
+\begin{align}
+\mathcal{L}<em p_y_y_p_t_x_t_y_="p_y(y)p_t(x_t|y)">{\text{CFM}}(\theta) &amp;= \int_0^1 \mathbb{E}</em>\left[|u_t(x_t|y) - v_t(x_t;\theta)|^2\right]dt \
+&amp;= \int_0^1 \mathbb{E}_{p_y(y)p_0(x_0)}\left[\left|u_t(f_t(x_0)|y) - v_t(x_t;\theta)\right|^2\right]dt
+\end{align}
+$$</p>
+<p>In this form, we see a new recipe for what we need to do to train $v_t(x_t;\theta)$:
+1. Sample $y\sim p_y(y)$ and $x_0\sim p_0(x_0)$
+2. Construct some path that starts at $x_0$ and ends at $y$
+3. Sample any point on this path (to get $f_t(x_0)$) and get the tangent vector at that point (to get $u_t(f_t(x_0)|y)$)
+4. Compute the loss between $u_t(f_t(x_0)|y)$ and $v_t(x_t;\theta)$</p>
+<p>As we saw in the Gaussian flow matching section, we will often choose $p_y(y) = p_\text{data}(y)$ and $p_0(x_0) = \mathcal{N}(x_0; 0, I)$, so we are free to choose any path that starts at $x_0$ and ends at $y$.  The simplest choice is a straight line between $x_0$ and $y$, but we can also choose a more complicated path.</p>
+<h1>Riemannian flow matching</h1>
+<p>Riemannian flow matching chooses the path between $x_0$ and $y$ using a gradient flow.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/kernel-stein-discrepancy.html" rel="bookmark"
+                           title="Permalink to Kernel Stein Discrepancy">Kernel Stein Discrepancy</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-07-15T00:00:00-05:00">
+                Published: Sat 15 July 2023
+        </abbr>
+		<br />
+        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
+                Updated: Sat 15 July 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
+        </address>
+<p>In <a href="/category/sten-vi.html">Sten VI</a>.</p>
+<p>tags: <a href="/tag/stein-discrepancy.html">stein discrepancy</a> <a href="/tag/kernels.html">kernels</a> <a href="/tag/stein-variational-gradient-descent.html">stein variational gradient descent</a> <a href="/tag/rkhs.html">rkhs</a> </p>
+</footer><!-- /.post-info -->                <p>A tutorial on kernel Stein discrepancy</p>
+                <a class="readmore" href="/kernel-stein-discrepancy.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
