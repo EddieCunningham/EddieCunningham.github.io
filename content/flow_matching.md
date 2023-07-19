@@ -3,73 +3,13 @@ Date: 2023-07-15
 Modified: 2023-07-15
 Category: Blog
 Tags: flows, matching, generative models
-Slug: flow-maching
+Slug: flow-matching
 Summary: A tutorial on flow matching
 
-# What problem are we trying to solve?
-We are interested in learning a parametric approximation of an unknown probability distribution that we can sample from and compute likelihood on.  Given a target probability distribution called $p_\text{data}(x)$, where $x\in \mathcal{X}$, we want to learn a parametric approximation called $p_\text{model}(x;\theta)$.  In our problem setup, we assume that we can sample from $p_\text{data}(x)$ and that $p_\text{data}(x)>0, \forall x\in \mathcal{X}$.  The second assumption ensures that a solution exists, as we will see later.
+Flow matching is probably the most important contribution to the field of normalizing flows in the last few years.  It allows us to train continuous normalizing flows in a simulation free way while also avoiding the pitfalls that comes with working with likelihoods.  In this tutorial, we'll go over what flow matching is and some of its practical properties.
 
-Our goals are two fold:
-1. Sample from $p_\text{model}(x;\theta)$.
-2. Compute the probability of a given sample $x$ under $p_\text{model}(x)$.
-
-# How do we solve this problem?
-We will learn an invertible function, $f: \mathcal{X}_0 \to \mathcal{X}_1$ that is parametrized by $\theta$, and specify a prior probability distribution over $\mathcal{X}_0$ called $p_0$ such that the following model produces a sample $x\sim p_\text{model}(x;\theta)$:
-$$
-\begin{align}
-  z &\sim p_0(z) \\
-  x &= f(z;\theta)
-\end{align}
-$$
-
-We can compute the log likelihood of a sample $x$ under $p_\text{model}(x;\theta)$ by applying the change of variables formula:
-$$
-\begin{align}
-  \log p_\text{model}(x;\theta) &= \log p_0(f^{-1}(x;\theta)) + \log\left| \frac{\partial f^{-1}(x;\theta)}{\partial x} \right| \\
-  &= \log p_0(z) - \log \left| \frac{\partial f(x;\theta)}{\partial z} \right|^{-1} \text{ where }z=f^{-1}(x;\theta)
-\end{align}
-$$
-
-The class of models that we just described is called **normalizing flows**.  Under the assumption that $p_\text{data}(x) > 0, \forall x\in \mathcal{X}$, there always exists an $f$ so that $p_\text{model} = p_\text{data}$.  Typically normalizing flows are trained to minimize $\text{KL}\left[p_\text{model}||p_\text{data}\right]$, leading us to one of an infinite number of solutions for $f$.  The specific kinds of flows that we will look at are called **continuous normalizing flows**.
-
-# Continuous normalizing flows
-Continuous normalizing flows are a type of normalizing flow where $f$ is a continuous function of $t\in [0,1]$ and $f_1$ is used in the computation of $p_\text{model}(x;\theta)$.  In this setting, we do not parametrize $f_t: \mathcal{X}_0 \to \mathcal{X}_t$ directly, but we instead parametrize its infinitesmal generator,
-$$
-\begin{align}
-u_t(x_t;\theta) = \frac{dx_t(x_0)}{dt}, \text{ where } x_t = f_t(x_0;\theta)
-\end{align}
-$$
-
-In this parametrization, we can write $f_t(x_0;\theta) = x_0 + \int_0^t u_s(x_s;\theta) ds$ because
-$$
-\begin{align}
-  f_t(x_0;\theta) &= x_0 + \int_0^t u_s(x_s;\theta) ds \\
-  &= x_0 + \int_0^t \frac{dx_s(x_0)}{ds} ds \\
-  &= x_0 + \int_{x_0}^{x_t} dx_s \\
-  &= x_t
-\end{align}
-$$
-
-Using the change of variables formula from before, we have that samples the model $x_0\sim p_0(x_0)$, $x_t = f_t(x_0;\theta)$ have the log likelihood $\log p_t(x_t)$ where
-$$
-\begin{align}
-\log p_t(x_t;\theta) = \log p_0(x_0) - \log \left| \frac{\partial f_t(x_0;\theta)}{\partial x_0} \right| \text{ where }x_0=f_t^{-1}(x_t;\theta)
-\end{align}
-$$
-and $p_1(x_1;\theta) = p_\text{model}(x_1;\theta)$.  We can relate $p_t(x_t;\theta)$ with $u_t(x_t;\theta)$ using the instantaneous change of variables formula:
-$$
-\begin{align}
-\frac{d\log p_t(x_t)}{dt} = -\text{Div}(u_t(x_t))
-\end{align}
-$$
-
-Like $f_t(x_0;\theta)$, we can compute the log likelihood of a sample by integrating the instantaneous change of variables formula:
-$$
-\begin{align}
-  \log p_t(x_t;\theta) &= \log p_0(x_0) - \log \left| \frac{\partial f_t(x_0;\theta)}{\partial x_0} \right| \\
-  &= \log p_0(x_0) - \int_0^1 \text{Tr}(u_t(x_t;\theta)) dt
-\end{align}
-$$
+# Overview
+Say that we are trying to learn a parametric approximation of an unknown probability distribution that we can sample from.  The first [flow matching paper](https://arxiv.org/pdf/2210.02747.pdf) showed how we can **construct** a continuous normalizing flow that generates this target from any user specified prior.  Moreover, this flow that we can write down is something that we can use as a target to train a parametric model against.  This training algorithm does not suffer from the common pitfalls that maximum likelihood or score matching suffer from because it does not require us to compute likelihoods or score functions.  If you're not familiar with continuous normalizing flows, check out [my post]({static}/continuous_normalizing_flows.md) on them.
 
 # Optimal continuous normalizing flow
 Next, we'll show how to construct $u_t$ so that $\log p_1(x_1;\theta) = \log p_\text{data}(x_1)$.  Assume that $p_t(x_t)$ is a marginal probability distribution over $x_t$ and some random variable $y$ so that

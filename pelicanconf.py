@@ -1,5 +1,5 @@
 AUTHOR = 'Eddie Cunningham'
-SITENAME = 'Demystifying ML Math'
+SITENAME = 'The Weeds'
 SITEURL = ''
 
 PATH = 'content'

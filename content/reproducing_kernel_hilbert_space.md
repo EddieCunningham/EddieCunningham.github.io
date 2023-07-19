@@ -51,7 +51,7 @@ $$
   K(x,y) = \sum_{i=1}^{\infty} \lambda_i e_i(x)e_i(y)
 \end{align}
 $$
-We can verify this easily because
+This is similar to how We can verify this easily because
 $$
 \begin{align}
   T_K e_i(x) &= \int_X K(x,y)e_i(y)dy \\
@@ -107,14 +107,14 @@ $$
 \end{align}
 $$
 
-Finally, we can also push linear operators on $x$ through the inner product.  For example, let $\nabla_x$ be the gradient function on $x$.  Then
+Finally, we can also push linear operators on $x$ through the inner product.  For example, let $\text{grad }$ be the gradient function on $x$.  Then
 $$
 \begin{align}
-  \langle f, \nabla_x K_x \rangle_{\mathcal{H}_K} &= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2}\langle \nabla_x K_x, e_i \rangle_{L_2} \\
-  &= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \int_X \nabla_x K(x,y)e_i(y)dy \\
-  &= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \sum_{j=1}^{\infty} \lambda_j \nabla_x e_j(x) \delta_{ij} \\
-  &= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \lambda_i \nabla_x e_i(x) \\
-  &= \nabla_x \sum_{i=1}^{\infty} \langle f, e_i \rangle_{L_2} e_i(x) \\
-  &= \nabla_x f(x)
+  \langle f, \text{grad } K_x \rangle_{\mathcal{H}_K} &= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2}\langle \text{grad } K_x, e_i \rangle_{L_2} \\
+  &= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \int_X \text{grad } K(x,y)e_i(y)dy \\
+  &= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \sum_{j=1}^{\infty} \lambda_j \text{grad } e_j(x) \delta_{ij} \\
+  &= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \lambda_i \text{grad } e_i(x) \\
+  &= \text{grad } \sum_{i=1}^{\infty} \langle f, e_i \rangle_{L_2} e_i(x) \\
+  &= \text{grad } f(x)
 \end{align}
 $$
