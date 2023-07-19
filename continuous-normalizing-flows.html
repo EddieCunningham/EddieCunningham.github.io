@@ -4,21 +4,27 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>The Weeds - flows</title>
+        <title>Continuous normalizing flows</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="description" content="A tutorial on continuous normalizing flows" />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
                 <h1><a href="/">The Weeds</a></h1>
                 <nav><ul>
-                    <li><a href="/category/blog.html">Blog</a></li>
+                    <li class="active"><a href="/category/blog.html">Blog</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/continuous-normalizing-flows.html" rel="bookmark"
+           title="Permalink to Continuous normalizing flows">Continuous normalizing flows</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/continuous-normalizing-flows.html">Continuous normalizing flows</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-07-15T00:00:00-05:00">
                 Published: Sat 15 July 2023
@@ -33,7 +39,7 @@
         </address>
 <p>In <a href="/category/blog.html">Blog</a>.</p>
 <p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
-</footer><!-- /.post-info --><h1>What problem are we trying to solve?</h1>
+</footer><!-- /.post-info -->      <h1>What problem are we trying to solve?</h1>
 <p>We are interested in learning a parametric approximation of an unknown probability distribution that we can sample from and compute likelihood on.  Given a target probability distribution called <span class="math">\(p_\text{data}(x)\)</span>, where <span class="math">\(x\in \mathcal{M}\)</span>, we want to learn a parametric approximation called <span class="math">\(p_\text{model}(x;\theta)\)</span>.  In our problem setup, we assume that we can sample from <span class="math">\(p_\text{data}(x)\)</span> and that <span class="math">\(p_\text{data}(x)&gt;0, \forall x\in \mathcal{M}\)</span>.  The second assumption ensures that a solution exists, as we will see later.</p>
 <p>We have 2 goals:
 1. Sample from <span class="math">\(p_\text{model}(x;\theta)\)</span>.
@@ -263,40 +269,11 @@ We can compute <span class="math">\(\nabla_x V_t\epsilon\)</span> almost as effi
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-</script>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</script>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/flow-matching.html" rel="bookmark"
-                           title="Permalink to Flow matching">Flow matching</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-15T00:00:00-05:00">
-                Published: Sat 15 July 2023
-        </abbr>
-		<br />
-        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
-                Updated: Sat 15 July 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
-        </address>
-<p>In <a href="/category/blog.html">Blog</a>.</p>
-<p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
-</footer><!-- /.post-info -->                <p>A tutorial on flow matching</p>
-                <a class="readmore" href="/flow-matching.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>

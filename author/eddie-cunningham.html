@@ -4,13 +4,13 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>Demystifying ML Math - Eddie Cunningham</title>
+        <title>The Weeds - Eddie Cunningham</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="/">Demystifying ML Math</a></h1>
+                <h1><a href="/">The Weeds</a></h1>
                 <nav><ul>
                     <li><a href="/category/blog.html">Blog</a></li>
                 </ul></nav>
@@ -88,7 +88,7 @@ This implies that we can write <span class="math">\(K\)</span> in terms of its e
 \end{align}
 $$</div>
 <p>
-We can verify this easily because
+This is similar to how We can verify this easily because
 </p>
 <div class="math">$$
 \begin{align}
@@ -147,16 +147,16 @@ This is called the reproducing property because it means that the evaluation of 
   &amp;= K(x, y)
 \end{align}
 $$</div>
-<p>Finally, we can also push linear operators on <span class="math">\(x\)</span> through the inner product.  For example, let <span class="math">\(\nabla_x\)</span> be the gradient function on <span class="math">\(x\)</span>.  Then
+<p>Finally, we can also push linear operators on <span class="math">\(x\)</span> through the inner product.  For example, let <span class="math">\(\text{grad }\)</span> be the gradient function on <span class="math">\(x\)</span>.  Then
 </p>
 <div class="math">$$
 \begin{align}
-  \langle f, \nabla_x K_x \rangle_{\mathcal{H}_K} &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2}\langle \nabla_x K_x, e_i \rangle_{L_2} \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \int_X \nabla_x K(x,y)e_i(y)dy \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \sum_{j=1}^{\infty} \lambda_j \nabla_x e_j(x) \delta_{ij} \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \lambda_i \nabla_x e_i(x) \\
-  &amp;= \nabla_x \sum_{i=1}^{\infty} \langle f, e_i \rangle_{L_2} e_i(x) \\
-  &amp;= \nabla_x f(x)
+  \langle f, \text{grad } K_x \rangle_{\mathcal{H}_K} &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2}\langle \text{grad } K_x, e_i \rangle_{L_2} \\
+  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \int_X \text{grad } K(x,y)e_i(y)dy \\
+  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \sum_{j=1}^{\infty} \lambda_j \text{grad } e_j(x) \delta_{ij} \\
+  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \lambda_i \text{grad } e_i(x) \\
+  &amp;= \text{grad } \sum_{i=1}^{\infty} \langle f, e_i \rangle_{L_2} e_i(x) \\
+  &amp;= \text{grad } f(x)
 \end{align}
 $$</div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
@@ -229,7 +229,33 @@ $$</div>
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="/flow-maching.html" rel="bookmark"
+                    <h1><a href="/continuous-normalizing-flows.html" rel="bookmark"
+                           title="Permalink to Continuous normalizing flows">Continuous normalizing flows</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-07-15T00:00:00-05:00">
+                Published: Sat 15 July 2023
+        </abbr>
+		<br />
+        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
+                Updated: Sat 15 July 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
+        </address>
+<p>In <a href="/category/blog.html">Blog</a>.</p>
+<p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
+</footer><!-- /.post-info -->                <p>A tutorial on continuous normalizing flows</p>
+                <a class="readmore" href="/continuous-normalizing-flows.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/flow-matching.html" rel="bookmark"
                            title="Permalink to Flow matching">Flow matching</a></h1>
                 </header>
 
@@ -249,7 +275,7 @@ $$</div>
 <p>In <a href="/category/blog.html">Blog</a>.</p>
 <p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
 </footer><!-- /.post-info -->                <p>A tutorial on flow matching</p>
-                <a class="readmore" href="/flow-maching.html">read more</a>
+                <a class="readmore" href="/flow-matching.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 
@@ -281,8 +307,8 @@ $$</div>
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="/kernel-stein-discrepancy.html" rel="bookmark"
-                           title="Permalink to Kernel Stein Discrepancy">Kernel Stein Discrepancy</a></h1>
+                    <h1><a href="/stein-vi.html" rel="bookmark"
+                           title="Permalink to Stein variational gradient descent">Stein variational gradient descent</a></h1>
                 </header>
 
                 <div class="entry-content">
@@ -300,8 +326,8 @@ $$</div>
         </address>
 <p>In <a href="/category/blog.html">Blog</a>.</p>
 <p>tags: <a href="/tag/stein-discrepancy.html">stein discrepancy</a> <a href="/tag/kernels.html">kernels</a> <a href="/tag/stein-variational-gradient-descent.html">stein variational gradient descent</a> <a href="/tag/rkhs.html">rkhs</a> </p>
-</footer><!-- /.post-info -->                <p>A tutorial on kernel Stein discrepancy</p>
-                <a class="readmore" href="/kernel-stein-discrepancy.html">read more</a>
+</footer><!-- /.post-info -->                <p>A tutorial on Stein variational gradient descent</p>
+                <a class="readmore" href="/stein-vi.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->

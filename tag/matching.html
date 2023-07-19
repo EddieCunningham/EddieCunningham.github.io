@@ -4,13 +4,13 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>Demystifying ML Math - matching</title>
+        <title>The Weeds - matching</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="/">Demystifying ML Math</a></h1>
+                <h1><a href="/">The Weeds</a></h1>
                 <nav><ul>
                     <li><a href="/category/blog.html">Blog</a></li>
                 </ul></nav>
@@ -18,7 +18,7 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/flow-maching.html">Flow matching</a></h1>
+                    <h1 class="entry-title"><a href="/continuous-normalizing-flows.html">Continuous normalizing flows</a></h1>
 <footer class="post-info">
         <abbr class="published" title="2023-07-15T00:00:00-05:00">
                 Published: Sat 15 July 2023
@@ -34,12 +34,12 @@
 <p>In <a href="/category/blog.html">Blog</a>.</p>
 <p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
 </footer><!-- /.post-info --><h1>What problem are we trying to solve?</h1>
-<p>We are interested in learning a parametric approximation of an unknown probability distribution that we can sample from and compute likelihood on.  Given a target probability distribution called <span class="math">\(p_\text{data}(x)\)</span>, where <span class="math">\(x\in \mathcal{X}\)</span>, we want to learn a parametric approximation called <span class="math">\(p_\text{model}(x;\theta)\)</span>.  In our problem setup, we assume that we can sample from <span class="math">\(p_\text{data}(x)\)</span> and that <span class="math">\(p_\text{data}(x)&gt;0, \forall x\in \mathcal{X}\)</span>.  The second assumption ensures that a solution exists, as we will see later.</p>
-<p>Our goals are two fold:
+<p>We are interested in learning a parametric approximation of an unknown probability distribution that we can sample from and compute likelihood on.  Given a target probability distribution called <span class="math">\(p_\text{data}(x)\)</span>, where <span class="math">\(x\in \mathcal{M}\)</span>, we want to learn a parametric approximation called <span class="math">\(p_\text{model}(x;\theta)\)</span>.  In our problem setup, we assume that we can sample from <span class="math">\(p_\text{data}(x)\)</span> and that <span class="math">\(p_\text{data}(x)&gt;0, \forall x\in \mathcal{M}\)</span>.  The second assumption ensures that a solution exists, as we will see later.</p>
+<p>We have 2 goals:
 1. Sample from <span class="math">\(p_\text{model}(x;\theta)\)</span>.
 2. Compute the probability of a given sample <span class="math">\(x\)</span> under <span class="math">\(p_\text{model}(x)\)</span>.</p>
-<h1>How do we solve this problem?</h1>
-<p>We will learn an invertible function, <span class="math">\(f: \mathcal{X}_0 \to \mathcal{X}_1\)</span> that is parametrized by <span class="math">\(\theta\)</span>, and specify a prior probability distribution over <span class="math">\(\mathcal{X}_0\)</span> called <span class="math">\(p_0\)</span> such that the following model produces a sample <span class="math">\(x\sim p_\text{model}(x;\theta)\)</span>:
+<h2>How do we solve this problem?</h2>
+<p>We will learn an invertible function, <span class="math">\(f: \mathcal{M} \to \mathcal{M}\)</span> that is parametrized by <span class="math">\(\theta\)</span>, and specify a prior probability distribution over <span class="math">\(\mathcal{M}\)</span> called <span class="math">\(p_0\)</span> such that the following model produces a sample <span class="math">\(x\sim p_\text{model}(x;\theta)\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
@@ -51,145 +51,157 @@ $$</div>
 </p>
 <div class="math">$$
 \begin{align}
-  \log p_\text{model}(x;\theta) &amp;= \log p_0(f^{-1}(x;\theta)) + \log\left| \frac{\partial f^{-1}(x;\theta)}{\partial x} \right| \\
-  &amp;= \log p_0(z) - \log \left| \frac{\partial f(x;\theta)}{\partial z} \right|^{-1} \text{ where }z=f^{-1}(x;\theta)
+  \log p_\text{model}(x;\theta) &amp;= \log p_0(z) - \log \left| \frac{\partial f(x;\theta)}{\partial z} \right| \\
+  &amp;\text{ where }z=f^{-1}(x;\theta)
 \end{align}
 $$</div>
-<p>The class of models that we just described is called <strong>normalizing flows</strong>.  Under the assumption that <span class="math">\(p_\text{data}(x) &gt; 0, \forall x\in \mathcal{X}\)</span>, there always exists an <span class="math">\(f\)</span> so that <span class="math">\(p_\text{model} = p_\text{data}\)</span>.  Typically normalizing flows are trained to minimize <span class="math">\(\text{KL}\left[p_\text{model}||p_\text{data}\right]\)</span>, leading us to one of an infinite number of solutions for <span class="math">\(f\)</span>.  The specific kinds of flows that we will look at are called <strong>continuous normalizing flows</strong>.</p>
+<p>The class of models that we just described is called <strong>normalizing flows</strong>.  Continuous normalizing flows are a special kind of normalizing flow where <span class="math">\(f\)</span> is constructed as the solution to an ODE.</p>
 <h1>Continuous normalizing flows</h1>
-<p>Continuous normalizing flows are a type of normalizing flow where <span class="math">\(f\)</span> is a continuous function of <span class="math">\(t\in [0,1]\)</span> and <span class="math">\(f_1\)</span> is used in the computation of <span class="math">\(p_\text{model}(x;\theta)\)</span>.  In this setting, we do not parametrize <span class="math">\(f_t: \mathcal{X}_0 \to \mathcal{X}_t\)</span> directly, but we instead parametrize its infinitesmal generator,
+<p>Continuous normalizing flows are a type of normalizing flow where <span class="math">\(f\)</span> is a continuous function of <span class="math">\(t\in [0,1]\)</span> and <span class="math">\(f_1\)</span> is used in the computation of <span class="math">\(p_\text{model}(x;\theta)\)</span>.  In this setting, we do not parametrize <span class="math">\(f_t: \mathcal{M} \to \mathcal{M}\)</span> directly, but we instead parametrize its time derivative:
 </p>
 <div class="math">$$
 \begin{align}
-u_t(x_t;\theta) = \frac{dx_t(x_0)}{dt}, \text{ where } x_t = f_t(x_0;\theta)
+V_t(x_t;\theta) = \frac{dx_t(x_0)}{dt}, \text{ where } x_t = f_t(x_0;\theta)
 \end{align}
 $$</div>
-<p>In this parametrization, we can write <span class="math">\(f_t(x_0;\theta) = x_0 + \int_0^t u_s(x_s;\theta) ds\)</span> because
+<p>So we can generate samples from <span class="math">\(p_\text{model}(x;\theta)\)</span> by first sampling <span class="math">\(x_0\sim p_0(x_0)\)</span> and then integrating <span class="math">\(V_t(x_t;\theta)\)</span> from <span class="math">\(t=0\)</span> to <span class="math">\(t=1\)</span>.  In order to get the log likelihood of a sample <span class="math">\(x\)</span>, we can compute the determinant of the Jacobian of <span class="math">\(f_1\)</span> which is feasible with modern auto-diff packages like <a href="https://github.com/patrick-kidger/diffrax">Diffrax</a> or <a href="https://github.com/rtqichen/torchdiffeq">Torchdiffeq</a>.  However another alternative is to find how probability density function evolves over time and then integrating those dynamics.</p>
+<h2>Log likelihood dynamics</h2>
+<p>We are interested in finding how the probability density function, <span class="math">\(p_t\)</span> will change when we move its samples along the vector field <span class="math">\(V_t\)</span>.  In order to figure this out, we will need to figure out how <span class="math">\(p_t\)</span> and <span class="math">\(V_t\)</span> are related.  The fundamental relationship that we will begin with is that probability mass is conserved as we flow on <span class="math">\(V_t\)</span>.  This observation will lead us to the continuity equation which defines the dynamics of <span class="math">\(p_t\)</span>.</p>
+<h3>Continuity equation</h3>
+<p>Let <span class="math">\((\mathcal{M},g)\)</span> be a Riemannian manifold with volume form <span class="math">\(\omega_g\)</span>, let <span class="math">\(V_t \in \mathfrak{X}(\mathcal{M})\)</span> be a time dependent vector field on <span class="math">\(\mathcal{M}\)</span> with flow <span class="math">\(f_t: \mathcal{M} \to \mathcal{M}\)</span>.</p>
+<p>Say that at time <span class="math">\(t=0\)</span> we want to compute the probability mass inside a region <span class="math">\(D \subseteq \mathcal{M}\)</span>.  We can do this using our prior <span class="math">\(p_0\)</span> by integrating over the region:
 </p>
 <div class="math">$$
 \begin{align}
-  f_t(x_0;\theta) &amp;= x_0 + \int_0^t u_s(x_s;\theta) ds \\
-  &amp;= x_0 + \int_0^t \frac{dx_s(x_0)}{ds} ds \\
-  &amp;= x_0 + \int_{x_0}^{x_t} dx_s \\
-  &amp;= x_t
-\end{align}
-$$</div>
-<p>Using the change of variables formula from before, we have that samples the model <span class="math">\(x_0\sim p_0(x_0)\)</span>, <span class="math">\(x_t = f_t(x_0;\theta)\)</span> have the log likelihood <span class="math">\(\log p_t(x_t)\)</span> where
-</p>
-<div class="math">$$
-\begin{align}
-\log p_t(x_t;\theta) = \log p_0(x_0) - \log \left| \frac{\partial f_t(x_0;\theta)}{\partial x_0} \right| \text{ where }x_0=f_t^{-1}(x_t;\theta)
+  P(x\in D) = \int_D p_0 \omega_g
 \end{align}
 $$</div>
 <p>
-and <span class="math">\(p_1(x_1;\theta) = p_\text{model}(x_1;\theta)\)</span>.  We can relate <span class="math">\(p_t(x_t;\theta)\)</span> with <span class="math">\(u_t(x_t;\theta)\)</span> using the instantaneous change of variables formula:
+Similarly, at time <span class="math">\(t\)</span> we can compute what the mass is of the same region after it has been flowed by <span class="math">\(V_t\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-\frac{d\log p_t(x_t)}{dt} = -\text{Div}(u_t(x_t))
-\end{align}
-$$</div>
-<p>Like <span class="math">\(f_t(x_0;\theta)\)</span>, we can compute the log likelihood of a sample by integrating the instantaneous change of variables formula:
-</p>
-<div class="math">$$
-\begin{align}
-  \log p_t(x_t;\theta) &amp;= \log p_0(x_0) - \log \left| \frac{\partial f_t(x_0;\theta)}{\partial x_0} \right| \\
-  &amp;= \log p_0(x_0) - \int_0^1 \text{Tr}(u_t(x_t;\theta)) dt
-\end{align}
-$$</div>
-<h1>Optimal continuous normalizing flow</h1>
-<p>Next, we'll show how to construct <span class="math">\(u_t\)</span> so that <span class="math">\(\log p_1(x_1;\theta) = \log p_\text{data}(x_1)\)</span>.  Assume that <span class="math">\(p_t(x_t)\)</span> is a marginal probability distribution over <span class="math">\(x_t\)</span> and some random variable <span class="math">\(y\)</span> so that
-</p>
-<div class="math">$$
-\begin{align}
-  p_t(x_t) = \int p_y(y)p_{t|y}(x_t|y) dy
+  P(x\in f_t(D)) = \int_{f_t(D)} p_t \omega_g
 \end{align}
 $$</div>
 <p>
-We need to choose <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_{t|y}(x_t|y)\)</span> so that the conditions at <span class="math">\(t=0\)</span> and <span class="math">\(t=1\)</span> are satisfied: <span class="math">\(p_{t=0} = p_0\)</span> and <span class="math">\(p_{t=1} = p_\text{data}\)</span>.  Notice that <span class="math">\(p_{t|y}(x_t|y)\)</span> is time dependent, so it can also be written as the likelihood of <span class="math">\(x_t\)</span> under the flow of a conditional vector field, <span class="math">\(u_t(x_t|y)\)</span>.  It turns out that <span class="math">\(u_t(x)\)</span> can be written as the expected value of conditional vector fields over the posterior distribution of <span class="math">\(y\)</span> given <span class="math">\(x_t\)</span>:
+where <span class="math">\(p_t\)</span> is the pushforward measure of <span class="math">\(p_0\)</span> under <span class="math">\(f_t\)</span>.  The fundamental assumption that we can make is that <span class="math">\(P(x\in D) = P(x\in f_t(D))\)</span>.  Intuitively this assumption makes sense because if we think about samples from probability distribution as "particles" distributed in space, then the flow cannot change the number of particles.  With this in mind, we assert that the probability mass in <span class="math">\(f_t(D)\)</span> does not change with respect to time:
 </p>
 <div class="math">$$
 \begin{align}
-u_t(x_t) = \mathbb{E}_{p_{t|y}(y|x_t)}[u_t(x_t|y)]
+  0 &amp;= \frac{d}{dt}\int_{f_t(D)} p_t \omega_g \\
+  &amp;=\frac{d}{dt}\int_D f_t^*\left(p_t \omega_g\right) \\
+  &amp;= \int_D \frac{d}{dt}f_t^*\left(p_t \omega_g\right) \\
+  &amp;= \int_D f_t^* \mathcal{L}_{V_t}\left(p_t \omega_g\right) + f_t^*\frac{d p_t}{dt}\omega_g \\
+  &amp;= \int_D f_t^* \left(d(V_t \lrcorner p_t \omega_g) + V_t \lrcorner \underbrace{d(p_t \omega_g)}_{0} + \frac{d p_t}{dt}\omega_g \right) \\
+  &amp;= \int_D f_t^* \left(d(p_t V_t \lrcorner \omega_g) + \frac{d p_t}{dt}\omega_g \right) \\
+  &amp;= \int_D f_t^* \left(\text{Div}(p_tV_t) + \frac{d p_t}{dt} \right) \omega_g \\
+  &amp;= \int_{f_t(D)} \left(\text{Div}(p_tV_t) + \frac{d p_t}{dt} \right) \omega_g
 \end{align}
 $$</div>
 <p>
-Thus, we have constructed a continuous normalizing flow that satisfies our conditions.  To summarize, we can build a continuous normalizing flow that generates samples on <span class="math">\(p_\text{data}\)</span> by:
-1. Choose <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_{t|y}(x_t|y)\)</span> so that <span class="math">\(p_{t=0} = p_0\)</span> and <span class="math">\(p_{t=1} = p_\text{data}\)</span>
-2. Find a flow <span class="math">\(u_t(x_t|y)\)</span> for <span class="math">\(p_{t|y}(x_t|y)\)</span>
-3. Compute <span class="math">\(u_t(x_t) = \mathbb{E}_{p_{t|y}(y|x_t)}[u_t(x_t|y)]\)</span></p>
-<p>The point of introducing <span class="math">\(u_t(x_t|y)\)</span> is not to estimate <span class="math">\(u_t(x_t)\)</span>, but to estimate its <strong>expectation</strong> as follows:
+The integrand of the last equation relates <span class="math">\(p_t\)</span> and <span class="math">\(V_t\)</span> and is called the continuity equation:
 </p>
 <div class="math">$$
 \begin{align}
-\mathbb{E}_{p_t(x_t)}[u_t(x_t)] &amp;= \int p_t(x_t)u_t(x_t) dx_t \\
-&amp;= \int p_t(x_t)\mathbb{E}_{p_{t|y}(y|x_t)}[u_t(x_t|y)] dx_t \\
-&amp;= \int \int p_t(x_t)p_{t|y}(y|x_t)u_t(x_t|y) dx_t dy \\
-&amp;= \int \int p_y(y)p_{t|y}(x_t|y)u_t(x_t|y) dx_t dy \\
-&amp;= \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[u_t(x_t|y)\right]
+  \frac{d p_t}{dt} + \text{Div}(p_tV_t) = 0
 \end{align}
 $$</div>
-<p>Thus if we can sample from <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_t(x_t|y)\)</span>, then we can compute an unbiased estimate of <span class="math">\(\mathbb{E}_{p_t(x_t)}[u_t(x_t)]\)</span>.  Before we see how this is useful for learning <span class="math">\(u_t(x_t)\)</span>, we'll show an example of how to choose <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_{t|y}(x_t|y)\)</span>.</p>
-<h1>Gaussian conditional flows</h1>
-<p>Let <span class="math">\(p_y = p_\text{data}\)</span> and <span class="math">\(p_{t|y}(x_t|y) = \mathcal{N}(x_t; \mu_t(y), \Sigma_t(y))\)</span> and let <span class="math">\((\mu_0(y), \Sigma_0(y)) = (0, I)\)</span> and <span class="math">\((\mu_1(y), \Sigma_1(y)) = (y, 0)\)</span> so that <span class="math">\(p_0(x_0) = N(x_0|0,I)\)</span> and <span class="math">\(p_{1|y}(x_1|y) = \delta(x_1 - y)\)</span>.  We have that <span class="math">\(p_1(x_1) = p_\text{data}(x_1)\)</span> because
+<h3>Instantaneous change of variables formula</h3>
+<p>We can go a bit further with the derivation using the properties in <a href="https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf">Lee problem 16-12</a> to derive the instantaneous change of variables formula (see appendix C of <a href="https://arxiv.org/pdf/2006.10605.pdf">Mathieu and Nickel</a>).  The first thing to notice is that the continuity equation has no dependence on <span class="math">\(x\in \mathcal{M}\)</span>.  We can introduce this dependence by writing <span class="math">\(p_t\)</span> as <span class="math">\(p_t(t,x(t))\)</span> and <span class="math">\(V_t\)</span> as <span class="math">\(V_t(t,x(t))\)</span> and taking a total derivative.  Using the chain rule, we can write
 </p>
 <div class="math">$$
 \begin{align}
-  p_1(x_1) &amp;= \int p_y(y)p_{t=1|y}(x_1|y) dy \\
-  &amp;= \int p_\text{data}(y)\mathcal{N}(x_1; \mu_1(y), \Sigma_1(y)) dy \\
-  &amp;= \mathcal{N}(x_1; \mu_1, \Sigma_1) \\
-  &amp;= p_\text{data}(x_1)
-\end{align}
-$$</div>
-<p>Notice that we can sample <span class="math">\(x_t \sim p_{t|y}(x_t|y)\)</span> using the model:
-</p>
-<div class="math">$$
-\begin{align}
-x_0 &amp;\sim N(0,I) \\
-x_t &amp;= \mu_t(y) + \Sigma_t(y)^{1/2}x_0
+  \frac{d p_t(t,x(t))}{dt} &amp;= \frac{\partial p_t(t,x(t))}{\partial t} + \langle \text{grad }p_t, \frac{d}{dt}x(t) \rangle_g \\
+  &amp;= -\text{Div}(p_tV_t) + \langle \text{grad }p_t, V_t \rangle_g \\
+  &amp;= -p_t\text{Div}(V_t) - \langle \text{grad } \log p_t, V_t(t,x) \rangle_g + \langle \text{grad } \log p_t, V_t(t,x) \rangle_g \\
+  &amp;= -p_t\text{Div}(V_t)
 \end{align}
 $$</div>
 <p>
-So we can differentiate <span class="math">\(x_t\)</span> to get the conditional vector field:
+So we're left with our final result:
 </p>
 <div class="math">$$
 \begin{align}
-u_t(x_t|y) &amp;= \frac{dx_t}{dt} \\
-&amp;= \frac{d}{dt}\left[\mu_t(y) + \Sigma_t(y)^{1/2}x_0\right] \\
-&amp;= \frac{d \mu_t(y)}{dt} + \frac{d \Sigma_t(y)^{1/2}}{dt}\underbrace{x_0}_{\Sigma_t^{\frac{-1}{2}}(x_t - \mu_t(y))} \\
-&amp;= \frac{d \mu_t(y)}{dt} + \frac{d \Sigma_t(y)^{1/2}}{dt}\Sigma_t^{\frac{-1}{2}}(x_t - \mu_t(y))
-\end{align}
-$$</div>
-<h1>Flow matching</h1>
-<p>Now that we have a way to construct a target continuous normalizing flow whose generating vector field is <span class="math">\(u_t(x_t)\)</span>, we can train a model to match <span class="math">\(u_t(x_t)\)</span>.  Let <span class="math">\(v_t(x_t;\theta)\)</span> be a parametric neural network whose flow corresponds to the probability density function <span class="math">\(q_t(x_t)\)</span>.  We can train <span class="math">\(v_t(x_t;\theta)\)</span> to match <span class="math">\(u_t(x_t)\)</span> by minimizing the following loss function:
-</p>
-<div class="math">$$
-\begin{align}
-\mathcal{L}_{\text{FM}}(\theta) &amp;= \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\left\|u_t(x_t) - v_t(x_t;\theta)\right\|^2\right] dt \\
-&amp;= \small{\underbrace{\int_0^1 \mathbb{E}_{p_t(x_t)}[\|u_t(x_t)\|^2]dt}_{C_1} - 2\int_0^1 \mathbb{E}_{p_t(x_t)}[u_t(x_t)^Tv_t(x_t;\theta)]dt + \int_0^1 \mathbb{E}_{p_t(x_t)}[\|v_t(x_t;\theta)\|^2]dt} \\
-&amp;= C_1 - 2\int_0^1 \mathbb{E}_{p_t(x_t)}\left[u_t(x_t)\right]^Tv_t(x_t;\theta)dt + \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\|v_t(x_t;\theta)\|^2\right]dt \\
-&amp;= C_1 - 2\int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[u_t(x_t|y)\right]^Tv_t(x_t;\theta)dt + \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\|v_t(x_t;\theta)\|^2\right]dt \\
-&amp;= C_1 - C_2 + \underbrace{\int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|u_t(x_t|y) - v_t(x_t;\theta)\|^2\right]dt}_{\mathcal{L}_{\text{CFM}}(\theta)}
+  \frac{d\log p_t(t,x(t))}{dt} = -\text{Div}(V_t)
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(C_2 = \int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|u_t(x_t|y)\|^2\right]dt\)</span>.  So we can minimize <span class="math">\(\mathcal{L}_{\text{FM}}(\theta)\)</span> by minimizing <span class="math">\(\mathcal{L}_{\text{CFM}}(\theta)\)</span> because <span class="math">\(C_1\)</span> and <span class="math">\(C_2\)</span> are constants.  <span class="math">\(\mathcal{L}_{\text{CFM}}(\theta)\)</span> is called the <strong>conditional flow matching</strong> loss.</p>
-<p>We can also reparametrize <span class="math">\(x_t\)</span> with <span class="math">\(f_t(x_t|y)\)</span> to get the following loss function:
+This is an alternate derivation to the one given in the appendix of the original <a href="https://arxiv.org/pdf/1806.07366.pdf">Neural ODE</a> paper.</p>
+<h1>Existence of CNFs</h1>
+<p>A natural question to ask is when a continuous normalizing flow even exists.  Is it always possible to find a vector field whose flow pushes forward a user specified prior to any target probability distribution?  The answer turns out to be yes as long as the prior and target are non degenerate everywhere on the manifold.  The proof for this is called <a href="https://arxiv.org/pdf/2108.08052.pdf">Moser's Theorem</a> and it actually constructs the vector field that we need.</p>
+<p>Let <span class="math">\((\mathcal{M},g)\)</span> be a boundryless n-dimensional Riemannian manifold with volume form <span class="math">\(\omega_g\)</span> and let <span class="math">\(p_t\)</span> be a time dependent probability density so that <span class="math">\(\int_{\mathcal{M}}p_t\omega_g = 1\)</span>.  We start the same way as we did in the continuity equation by asserting that the probability mass in <span class="math">\(f_t(D)\)</span> does not change with respect to time so that <span class="math">\(\frac{d}{dt}\int_{f_t(D)}p_t\omega_g = 0\)</span> for our flow <span class="math">\(f_t\)</span>.  However, we don't know what vector field generates <span class="math">\(f_t\)</span>.  We will proceed by assuming that there is a solution called <span class="math">\(V_t\)</span> and then we'll show what <span class="math">\(V_t\)</span> must be equal to.  Using the steps from deriving the continuity equation, we have
 </p>
 <div class="math">$$
 \begin{align}
-\mathcal{L}_{\text{CFM}}(\theta) &amp;= \int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|u_t(x_t|y) - v_t(x_t;\theta)\|^2\right]dt \\
-&amp;= \int_0^1 \mathbb{E}_{p_y(y)p_0(x_0)}\left[\left\|u_t(f_t(x_0)|y) - v_t(x_t;\theta)\right\|^2\right]dt
+0 &amp;= \frac{d}{dt}\int_{f_t(D)}p_t\omega_g \\
+&amp;= \int_{f_t(D)} d(V_t p_t \lrcorner \omega_g) + \frac{d p_t}{dt}\omega_g \\
 \end{align}
 $$</div>
-<p>In this form, we see a new recipe for what we need to do to train <span class="math">\(v_t(x_t;\theta)\)</span>:
-1. Sample <span class="math">\(y\sim p_y(y)\)</span> and <span class="math">\(x_0\sim p_0(x_0)\)</span>
-2. Construct some path that starts at <span class="math">\(x_0\)</span> and ends at <span class="math">\(y\)</span>
-3. Sample any point on this path (to get <span class="math">\(f_t(x_0)\)</span>) and get the tangent vector at that point (to get <span class="math">\(u_t(f_t(x_0)|y)\)</span>)
-4. Compute the loss between <span class="math">\(u_t(f_t(x_0)|y)\)</span> and <span class="math">\(v_t(x_t;\theta)\)</span></p>
-<p>As we saw in the Gaussian flow matching section, we will often choose <span class="math">\(p_y(y) = p_\text{data}(y)\)</span> and <span class="math">\(p_0(x_0) = \mathcal{N}(x_0; 0, I)\)</span>, so we are free to choose any path that starts at <span class="math">\(x_0\)</span> and ends at <span class="math">\(y\)</span>.  The simplest choice is a straight line between <span class="math">\(x_0\)</span> and <span class="math">\(y\)</span>, but we can also choose a more complicated path.</p>
-<h1>Riemannian flow matching</h1>
-<p>Riemannian flow matching chooses the path between <span class="math">\(x_0\)</span> and <span class="math">\(y\)</span> using a gradient flow.</p>
+<p>
+The trick to Moser's theorem is that we can actually show that <span class="math">\(\frac{d p_t}{dt}\omega_g\)</span> is a closed form, meaning that there exists some <span class="math">\(n-1\)</span> form, <span class="math">\(\beta_t \in \Omega^{n-1}(\mathcal{M})\)</span>, so that <span class="math">\(d\beta_t = \frac{d p_t}{dt}\omega_g\)</span> where <span class="math">\(d\)</span> is the exterior derivative.  As we will show, this is true because <span class="math">\(p_t\)</span> integrates to 1.</p>
+<p>The Hodge decomposition tells us that any top form can be decomposed into a sum of a closed form <span class="math">\(d\beta_t\)</span> and a harmonic form <span class="math">\(\gamma_t\)</span>, so <span class="math">\(\frac{d p_t}{dt}\omega_g = d\beta_t + \gamma_t\)</span>.  Because we are dealing with top forms, we know that <span class="math">\(\gamma_t\)</span> is a scalar multiple of the volume form, <span class="math">\(\gamma_t = c\omega_g\)</span>.  We can solve for what <span class="math">\(c\)</span> is by exploiting the fact that <span class="math">\(p_t\)</span> integrates to 1:
+</p>
+<div class="math">$$
+\begin{align}
+  0 &amp;= \frac{d}{dt}1 \\
+  &amp;= \frac{d}{dt}\int_{\mathcal{M}}p_t\omega_g \\
+  &amp;= \int_{\mathcal{M}}(d\beta_t + \gamma_t) \\
+  &amp;= \underbrace{\int_{\mathcal{M}}d\beta_t}_{\text{Use stoke's theorem}} + \int_{\mathcal{M}}c\omega_g \\
+  &amp;= \underbrace{\int_{\partial \mathcal{M}}\beta_t}_{0 \text{ because $\mathcal{M}$ has no boundary}} + c\int_{\mathcal{M}}\omega_g \\
+  &amp;= c\int_{\mathcal{M}}\omega_g \\
+  &amp;= c \text{Vol}(\mathcal{M})
+\end{align}
+$$</div>
+<p>
+Therefore <span class="math">\(c=0\)</span> and we have that <span class="math">\(\frac{d p_t}{dt}\omega_g = d\beta_t\)</span>.  Plugging this into our equation from before, we have
+</p>
+<div class="math">$$
+\begin{align}
+0 &amp;= \int_{f_t(D)} d(V_t p_t \lrcorner \omega_g) + \frac{d p_t}{dt}\omega_g \\
+&amp;= \int_{f_t(D)} d(V_t p_t \lrcorner \omega_g) + d\beta_t \\
+&amp;= \int_{f_t(D)} d(V_t p_t \lrcorner \omega_g + \beta_t)
+\end{align}
+$$</div>
+<p>
+So now the question that we need to answer is: Does there exist a vector field <span class="math">\(V_t\)</span> so that <span class="math">\(V_t \lrcorner p_t \omega_g + \beta_t = 0\)</span> where <span class="math">\(\beta_t \in \Omega^{n-1}(\mathcal{M})\)</span>?  The answer is yes!  The reason is that we can always write an <span class="math">\(n-1\)</span> for as the interior product with the volume form, so there exists a vector field <span class="math">\(U_t\)</span> so that <span class="math">\(\beta_t = U_t \lrcorner \omega_g\)</span>.  Therefore, we can simplify more:
+</p>
+<div class="math">$$
+\begin{align}
+0 &amp;= \int_{f_t(D)} d(V_t p_t \lrcorner \omega_g + \beta_t) \\
+&amp;= \int_{f_t(D)} d(V_t p_t \lrcorner \omega_g + U_t \lrcorner \omega_g) \\
+&amp;= \int_{f_t(D)} d(V_t p_t + U_t) \lrcorner \omega_g \\
+\end{align}
+$$</div>
+<p>
+We know that the integrand has to be 0, so we can solve for <span class="math">\(V_t\)</span> in terms of <span class="math">\(p_t\)</span> and <span class="math">\(U_t\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  V_t = -\frac{1}{p_t}U_t
+\end{align}
+$$</div>
+<p>
+And we're done!  We have constructed our time dependent vector field whose flow generates the probability path <span class="math">\(p_t\)</span> for all <span class="math">\(t\)</span>.</p>
+<h1>How to train CNFs</h1>
+<p>There are 2 main ways to train CNFs:
+1. Maximum likelihood estimation
+2. Score/flow matching</p>
+<h2>Maximum likelihood estimation</h2>
+<p>MLE is the simplest way to train CNFs.  Since we can compute the log likelihood of a sample <span class="math">\(x\)</span> under <span class="math">\(p_\text{model}(x;\theta)\)</span>, we can just use gradient descent to maximize the log likelihood of the training data.  The only tricky part is that if our data is high dimensional, then the <span class="math">\(\text{Tr}(\nabla_x V_t)\)</span> term in the instantaneous change of variables formula will be expensive difficult to compute because we will need to explicitly compute the Jacobian matrix of <span class="math">\(V_t\)</span>.  However, we can use Hutchinson's trace estimator to get an unbiased estimate which is good enough in practice:
+</p>
+<div class="math">$$
+\begin{align}
+  \text{Tr}(\nabla_x V_t) &amp;= \text{Tr}(\nabla_x V_t\underbrace{\mathbb{E}_{\epsilon \sim \mathcal{N}(0,I)}\left[\epsilon \epsilon^T\right]}_{I}) \\
+  &amp;= \mathbb{E}_{\epsilon \sim \mathcal{N}(0,I)}\left[\text{Tr}(\nabla_x V_t\epsilon \epsilon^T)\right] \\
+  &amp;= \mathbb{E}_{\epsilon \sim \mathcal{N}(0,I)}\left[\text{Tr}(\epsilon^T\nabla_x V_t\epsilon)\right] \\
+  &amp;\approx \epsilon^T\nabla_x V_t\epsilon, \quad \epsilon \sim \mathcal{N}(0,I)
+\end{align}
+$$</div>
+<p>
+We can compute <span class="math">\(\nabla_x V_t\epsilon\)</span> almost as efficiently as computing <span class="math">\(V_t\)</span> using autodiff using a JVP or VJP.  The advantage to using this method is that we can optimize different kinds of objectives like the reverse KL divergence or the forward KL divergence.  The disadvantage is that we need to simulate the dynamics of the model at each time step to get a good approximation of the log likelihood.  Furthermore, if the target distribution is 0 in some places, which is happens if the dataset lies on a manifold, then <span class="math">\(\log p_\text{model}(x;\theta)\)</span> will be trained to approach infinity.  An alternative that avoids this problem is to use matching.</p>
+<h2>Flow matching</h2>
+<p>In the setting where we have samples from our target density, you should always use flow matching to train your model.  See my <a href="{static}/flow_matching.md">post on flow matching</a> for more details.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -253,6 +265,38 @@ $$</div>
 }
 </script>                </article>
             </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/flow-matching.html" rel="bookmark"
+                           title="Permalink to Flow matching">Flow matching</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-07-15T00:00:00-05:00">
+                Published: Sat 15 July 2023
+        </abbr>
+		<br />
+        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
+                Updated: Sat 15 July 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
+        </address>
+<p>In <a href="/category/blog.html">Blog</a>.</p>
+<p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
+</footer><!-- /.post-info -->                <p>A tutorial on flow matching</p>
+                <a class="readmore" href="/flow-matching.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>

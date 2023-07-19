@@ -4,21 +4,27 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>The Weeds - stein variational gradient descent</title>
+        <title>Stein variational gradient descent</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="description" content="A tutorial on Stein variational gradient descent" />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
                 <h1><a href="/">The Weeds</a></h1>
                 <nav><ul>
-                    <li><a href="/category/blog.html">Blog</a></li>
+                    <li class="active"><a href="/category/blog.html">Blog</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/stein-vi.html" rel="bookmark"
+           title="Permalink to Stein variational gradient descent">Stein variational gradient descent</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/stein-vi.html">Stein variational gradient descent</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-07-15T00:00:00-05:00">
                 Published: Sat 15 July 2023
@@ -33,7 +39,7 @@
         </address>
 <p>In <a href="/category/blog.html">Blog</a>.</p>
 <p>tags: <a href="/tag/stein-discrepancy.html">stein discrepancy</a> <a href="/tag/kernels.html">kernels</a> <a href="/tag/stein-variational-gradient-descent.html">stein variational gradient descent</a> <a href="/tag/rkhs.html">rkhs</a> </p>
-</footer><!-- /.post-info --><p>The Stein discrepancy measure is a way of measuring the distance between two probability distributions.  It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the reverse KL divergence to a target distribution.  In this post, we'll go over the kernel Stein discrepancy as introduced by <a href="https://arxiv.org/pdf/1602.03253.pdf">Liu et al.</a> and the extensions in <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu and Zhu</a>.</p>
+</footer><!-- /.post-info -->      <p>The Stein discrepancy measure is a way of measuring the distance between two probability distributions.  It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the reverse KL divergence to a target distribution.  In this post, we'll go over the kernel Stein discrepancy as introduced by <a href="https://arxiv.org/pdf/1602.03253.pdf">Liu et al.</a> and the extensions in <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu and Zhu</a>.</p>
 <h1>Motivation</h1>
 <p>Consider the task of minimizing the reverse KL divergence between a target distribution <span class="math">\(p\)</span> and a model distribution <span class="math">\(q\)</span> over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  If we have a probability path as the solution where <span class="math">\(q_t\)</span> where <span class="math">\(q_0\)</span> is arbitrary and <span class="math">\(q_1 = p\)</span>, then we could be interested in seeing how the reverse KL divergence between <span class="math">\(q_t\)</span> and <span class="math">\(p\)</span> changes as <span class="math">\(t\)</span> changes.</p>
 <p>Let <span class="math">\((q_t, V_t)\)</span> be a probability path between <span class="math">\(q_0\)</span> and <span class="math">\(q_1\)</span> where <span class="math">\(V_t\in \mathfrak{X}(\mathcal{M})\)</span> is the vector field that generates the flow of <span class="math">\(q_t\)</span> and let <span class="math">\(dV_g\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the time derivative of the reverse KL divergence is:
@@ -164,8 +170,11 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-</script>                </article>
-            </aside><!-- /#featured -->
+</script>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
