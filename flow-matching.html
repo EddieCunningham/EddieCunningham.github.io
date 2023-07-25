@@ -1,49 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="generator" content="Pelican" />
-        <title>Flow matching</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
-        <meta name="description" content="A tutorial on flow matching" />
-</head>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <title>    Flow matching
+</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href='https://fonts.googleapis.com/css?family=Gentium+Book+Basic|Merriweather:400,300' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="/theme/css/cid.css">
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">The Weeds</a></h1>
-                <nav><ul>
-                    <li class="active"><a href="/category/blog.html">Blog</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="/flow-matching.html" rel="bookmark"
-           title="Permalink to Flow matching">Flow matching</a></h1>
-    </header>
+            <div class="container">
 
-    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-15T00:00:00-05:00">
-                Published: Sat 15 July 2023
-        </abbr>
-		<br />
-        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
-                Updated: Sat 15 July 2023
-        </abbr>
+<header class="blog-header">
+    <h1><a href="">The Weeds</a></h1>
+    <p></p>
+    <nav>
+        <a href="/">INDEX</a>
+        <a href="/archives">ARCHIVES</a>
+        <a href="/categories">CATEGORIES</a>
+    </nav>
+</header>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
-        </address>
-<p>In <a href="/category/blog.html">Blog</a>.</p>
-<p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
-</footer><!-- /.post-info -->      <p>Flow matching is probably the most important contribution to the field of normalizing flows in the last few years.  It allows us to train continuous normalizing flows in a simulation free way while also avoiding the pitfalls that comes with working with likelihoods.  In this tutorial, we'll go over what flow matching is and some of its practical properties.</p>
+    <div class="post">
+
+        <header>
+            <h1>Flow matching</h1>
+            <p class="date">Written on <time datetime="2023-07-15T00:00:00-05:00">Jul 15, 2023</time></p>
+        </header>
+
+        <article>
+            <p>Flow matching is probably the most important contribution to the field of normalizing flows in the last few years.  It allows us to train continuous normalizing flows in a simulation free way while also avoiding the pitfalls that comes with working with likelihoods.  In this tutorial, we'll go over what flow matching is and some of its practical properties.</p>
 <h1>Overview</h1>
-<p>Say that we are trying to learn a parametric approximation of an unknown probability distribution that we can sample from.  The first <a href="https://arxiv.org/pdf/2210.02747.pdf">flow matching paper</a> showed how we can <strong>construct</strong> a continuous normalizing flow that generates this target from any user specified prior.  Moreover, this flow that we can write down is something that we can use as a target to train a parametric model against.  This training algorithm does not suffer from the common pitfalls that maximum likelihood or score matching suffer from because it does not require us to compute likelihoods or score functions.  If you're not familiar with continuous normalizing flows, check out <a href="{static}/continuous_normalizing_flows.md">my post</a> on them.</p>
-<h1>Optimal continuous normalizing flow</h1>
-<p>Next, we'll show how to construct <span class="math">\(u_t\)</span> so that <span class="math">\(\log p_1(x_1;\theta) = \log p_\text{data}(x_1)\)</span>.  Assume that <span class="math">\(p_t(x_t)\)</span> is a marginal probability distribution over <span class="math">\(x_t\)</span> and some random variable <span class="math">\(y\)</span> so that
+<p>Say that we are trying to learn a parametric approximation of an unknown probability distribution that we can sample from.  The first <a href="https://arxiv.org/pdf/2210.02747.pdf">flow matching paper</a> showed how we can <strong>construct</strong> a continuous normalizing flow that generates this target from any user specified prior.  Moreover, this flow that we can write down is something that we can use as a target to train a parametric model against.  This training algorithm does not suffer from the common pitfalls that maximum likelihood or score matching suffer from because it does not require us to compute likelihoods or score functions.  If you're not familiar with continuous normalizing flows, check out <a href="continuous_normalizing_flows.md">my post</a> on them.</p>
+<h1>CNF construction</h1>
+<p>Here, we'll show how we can <strong>construct</strong> the continuous normalizing flow that generates a target distribution from any user specified prior.  Let <span class="math">\(p_1:=p_\text{data}\)</span> be the target distribution that we want to learn and let <span class="math">\(p_0\)</span> be a user specified prior.  We'll start by assuming that there is a probability path between <span class="math">\(p_0\)</span> and <span class="math">\(p_1\)</span>, denoted by <span class="math">\(p_t\)</span>, that is generated by the flow of a time dependent vector field <span class="math">\(V_t\)</span>.  Our goal will be to show what the equation of <span class="math">\(V_t\)</span> is.</p>
+<p>To do this, we will assume that <span class="math">\(p_t\)</span> is actually a marginal probability distribution over <span class="math">\(x_t\)</span> and some random variable <span class="math">\(y\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
@@ -51,90 +50,100 @@
 \end{align}
 $$</div>
 <p>
-We need to choose <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_{t|y}(x_t|y)\)</span> so that the conditions at <span class="math">\(t=0\)</span> and <span class="math">\(t=1\)</span> are satisfied: <span class="math">\(p_{t=0} = p_0\)</span> and <span class="math">\(p_{t=1} = p_\text{data}\)</span>.  Notice that <span class="math">\(p_{t|y}(x_t|y)\)</span> is time dependent, so it can also be written as the likelihood of <span class="math">\(x_t\)</span> under the flow of a conditional vector field, <span class="math">\(u_t(x_t|y)\)</span>.  It turns out that <span class="math">\(u_t(x)\)</span> can be written as the expected value of conditional vector fields over the posterior distribution of <span class="math">\(y\)</span> given <span class="math">\(x_t\)</span>:
+where <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_{t|y}(x_t|y)\)</span> are chosen so that <span class="math">\(p_{t=0} = p_0\)</span> and <span class="math">\(p_{t=1} = p_\text{data}\)</span>.  Next, we assume that there is a CNF that generates <span class="math">\(p_{t|y}(x_t|y)\)</span> using a vector field <span class="math">\(\tilde{V}_t(x_t|y)\)</span> that takes <span class="math">\(y\)</span> as a parameter.  The key insight that the flow matching paper makes is that we can write <span class="math">\(V_t(x_t)\)</span> as the expected value of <span class="math">\(\tilde{V}_t(x_t|y)\)</span> over the posterior distribution of <span class="math">\(y\)</span> given <span class="math">\(x_t\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-u_t(x_t) = \mathbb{E}_{p_{t|y}(y|x_t)}[u_t(x_t|y)]
+V_t(x_t) &amp;= \int \frac{p_y(y)p_{t|y}(x_t|y)}{p_t(x_t)}\tilde{V}_t(x_t|y) dy \\
+&amp;= \mathbb{E}_{p_{t|y}(y|x_t)}[\tilde{V}_t(x_t|y)]
 \end{align}
 $$</div>
 <p>
-Thus, we have constructed a continuous normalizing flow that satisfies our conditions.  To summarize, we can build a continuous normalizing flow that generates samples on <span class="math">\(p_\text{data}\)</span> by:
-1. Choose <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_{t|y}(x_t|y)\)</span> so that <span class="math">\(p_{t=0} = p_0\)</span> and <span class="math">\(p_{t=1} = p_\text{data}\)</span>
-2. Find a flow <span class="math">\(u_t(x_t|y)\)</span> for <span class="math">\(p_{t|y}(x_t|y)\)</span>
-3. Compute <span class="math">\(u_t(x_t) = \mathbb{E}_{p_{t|y}(y|x_t)}[u_t(x_t|y)]\)</span></p>
-<p>The point of introducing <span class="math">\(u_t(x_t|y)\)</span> is not to estimate <span class="math">\(u_t(x_t)\)</span>, but to estimate its <strong>expectation</strong> as follows:
+We can check that this is true by checking that the continuity equation is satisfied:
 </p>
 <div class="math">$$
 \begin{align}
-\mathbb{E}_{p_t(x_t)}[u_t(x_t)] &amp;= \int p_t(x_t)u_t(x_t) dx_t \\
-&amp;= \int p_t(x_t)\mathbb{E}_{p_{t|y}(y|x_t)}[u_t(x_t|y)] dx_t \\
-&amp;= \int \int p_t(x_t)p_{t|y}(y|x_t)u_t(x_t|y) dx_t dy \\
-&amp;= \int \int p_y(y)p_{t|y}(x_t|y)u_t(x_t|y) dx_t dy \\
-&amp;= \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[u_t(x_t|y)\right]
+  \frac{\partial p_t}{\partial t} &amp;= \frac{d}{dt}\int p_y(y)p_{t|y}(x_t|y) dy \\
+  &amp;= \int p_y(y)\frac{d}{dt}p_{t|y}(x_t|y) dy \\
 \end{align}
 $$</div>
-<p>Thus if we can sample from <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_t(x_t|y)\)</span>, then we can compute an unbiased estimate of <span class="math">\(\mathbb{E}_{p_t(x_t)}[u_t(x_t)]\)</span>.  Before we see how this is useful for learning <span class="math">\(u_t(x_t)\)</span>, we'll show an example of how to choose <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_{t|y}(x_t|y)\)</span>.</p>
-<h1>Gaussian conditional flows</h1>
-<p>Let <span class="math">\(p_y = p_\text{data}\)</span> and <span class="math">\(p_{t|y}(x_t|y) = \mathcal{N}(x_t; \mu_t(y), \Sigma_t(y))\)</span> and let <span class="math">\((\mu_0(y), \Sigma_0(y)) = (0, I)\)</span> and <span class="math">\((\mu_1(y), \Sigma_1(y)) = (y, 0)\)</span> so that <span class="math">\(p_0(x_0) = N(x_0|0,I)\)</span> and <span class="math">\(p_{1|y}(x_1|y) = \delta(x_1 - y)\)</span>.  We have that <span class="math">\(p_1(x_1) = p_\text{data}(x_1)\)</span> because
+<p>Thus, we have constructed a continuous normalizing flow that takes <span class="math">\(p_0\)</span> to <span class="math">\(p_1=p_\text{data}\)</span>.  So far this doesn't seem too useful, but there are two reasons main reasons that will lead us to a simulation free training algorithm:</p>
+<ol>
+<li>
+<p>We can get easy unbiased estimates of the expected vector field as follows:
+  <div class="math">$$
+  \begin{align}
+  \mathbb{E}_{p_t(x_t)}[V_t(x_t)] &amp;= \int p_t(x_t)V_t(x_t) dx_t \\
+  &amp;= \int p_t(x_t)\mathbb{E}_{p_{t|y}(y|x_t)}[\tilde{V}_t(x_t|y)] dx_t \\
+  &amp;= \int \int p_t(x_t)p_{t|y}(y|x_t)\tilde{V}_t(x_t|y) dx_t dy \\
+  &amp;= \int \int p_y(y)p_{t|y}(x_t|y)\tilde{V}_t(x_t|y) dx_t dy \\
+  &amp;= \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\tilde{V}_t(x_t|y)\right]
+  \end{align}
+  $$</div>
 </p>
-<div class="math">$$
-\begin{align}
-  p_1(x_1) &amp;= \int p_y(y)p_{t=1|y}(x_1|y) dy \\
-  &amp;= \int p_\text{data}(y)\mathcal{N}(x_1; \mu_1(y), \Sigma_1(y)) dy \\
-  &amp;= \mathcal{N}(x_1; \mu_1, \Sigma_1) \\
-  &amp;= p_\text{data}(x_1)
-\end{align}
-$$</div>
-<p>Notice that we can sample <span class="math">\(x_t \sim p_{t|y}(x_t|y)\)</span> using the model:
-</p>
-<div class="math">$$
-\begin{align}
-x_0 &amp;\sim N(0,I) \\
-x_t &amp;= \mu_t(y) + \Sigma_t(y)^{1/2}x_0
-\end{align}
-$$</div>
-<p>
-So we can differentiate <span class="math">\(x_t\)</span> to get the conditional vector field:
-</p>
-<div class="math">$$
-\begin{align}
-u_t(x_t|y) &amp;= \frac{dx_t}{dt} \\
-&amp;= \frac{d}{dt}\left[\mu_t(y) + \Sigma_t(y)^{1/2}x_0\right] \\
-&amp;= \frac{d \mu_t(y)}{dt} + \frac{d \Sigma_t(y)^{1/2}}{dt}\underbrace{x_0}_{\Sigma_t^{\frac{-1}{2}}(x_t - \mu_t(y))} \\
-&amp;= \frac{d \mu_t(y)}{dt} + \frac{d \Sigma_t(y)^{1/2}}{dt}\Sigma_t^{\frac{-1}{2}}(x_t - \mu_t(y))
-\end{align}
-$$</div>
+</li>
+<li>
+<p>There are easy choices of <span class="math">\(p_y(y)\)</span> and <span class="math">\(p_t(x_t|y)\)</span> that we can sample from and know in closed form.  Specifically, we will usually choose <span class="math">\(p_y = p_\text{data}\)</span> and <span class="math">\(p_t(x_t|y)\)</span> to be a Gaussian distribution with mean <span class="math">\(\mu_t(y)\)</span> and covariance <span class="math">\(\Sigma_t(y)\)</span> with conditions on <span class="math">\(\mu_t\)</span> and <span class="math">\(\Sigma_t\)</span> that ensure that <span class="math">\(p_{t=0} = p_0\)</span> and <span class="math">\(p_{t=1} = p_\text{data}\)</span>.</p>
+</li>
+</ol>
 <h1>Flow matching</h1>
-<p>Now that we have a way to construct a target continuous normalizing flow whose generating vector field is <span class="math">\(u_t(x_t)\)</span>, we can train a model to match <span class="math">\(u_t(x_t)\)</span>.  Let <span class="math">\(v_t(x_t;\theta)\)</span> be a parametric neural network whose flow corresponds to the probability density function <span class="math">\(q_t(x_t)\)</span>.  We can train <span class="math">\(v_t(x_t;\theta)\)</span> to match <span class="math">\(u_t(x_t)\)</span> by minimizing the following loss function:
+<p>Now that we have a way to construct a target continuous normalizing flow whose generating vector field is <span class="math">\(V_t\)</span>, we can train a model to match <span class="math">\(V_t\)</span>.  Let <span class="math">\(W_t\)</span> be a vector field that is parametrized using a neural network whose flow corresponds to the probability density function <span class="math">\(q_t(x_t)\)</span>.  We can train <span class="math">\(W_t\)</span> to match <span class="math">\(V_t\)</span> by minimizing the following loss function:
 </p>
 <div class="math">$$
 \begin{align}
-\mathcal{L}_{\text{FM}}(\theta) &amp;= \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\left\|u_t(x_t) - v_t(x_t;\theta)\right\|^2\right] dt \\
-&amp;= \small{\underbrace{\int_0^1 \mathbb{E}_{p_t(x_t)}[\|u_t(x_t)\|^2]dt}_{C_1} - 2\int_0^1 \mathbb{E}_{p_t(x_t)}[u_t(x_t)^Tv_t(x_t;\theta)]dt + \int_0^1 \mathbb{E}_{p_t(x_t)}[\|v_t(x_t;\theta)\|^2]dt} \\
-&amp;= C_1 - 2\int_0^1 \mathbb{E}_{p_t(x_t)}\left[u_t(x_t)\right]^Tv_t(x_t;\theta)dt + \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\|v_t(x_t;\theta)\|^2\right]dt \\
-&amp;= C_1 - 2\int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[u_t(x_t|y)\right]^Tv_t(x_t;\theta)dt + \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\|v_t(x_t;\theta)\|^2\right]dt \\
-&amp;= C_1 - C_2 + \underbrace{\int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|u_t(x_t|y) - v_t(x_t;\theta)\|^2\right]dt}_{\mathcal{L}_{\text{CFM}}(\theta)}
+\mathcal{L}_{\text{FM}}(\theta) &amp;= \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\left\|V_t(x_t) - W_t(x_t;\theta)\right\|^2\right] dt \\
+&amp;= \small{\underbrace{\int_0^1 \mathbb{E}_{p_t(x_t)}[\|V_t(x_t)\|^2]dt}_{C_1} - 2\int_0^1 \mathbb{E}_{p_t(x_t)}[V_t(x_t)^TW_t(x_t;\theta)]dt + \int_0^1 \mathbb{E}_{p_t(x_t)}[\|W_t(x_t;\theta)\|^2]dt} \\
+&amp;= C_1 - 2\int_0^1 \mathbb{E}_{p_t(x_t)}\left[V_t(x_t)\right]^TW_t(x_t;\theta)dt + \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\|W_t(x_t;\theta)\|^2\right]dt \\
+&amp;= C_1 - 2\int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\tilde{V}_t(x_t|y)\right]^TW_t(x_t;\theta)dt + \int_0^1 \mathbb{E}_{p_t(x_t)}\left[\|W_t(x_t;\theta)\|^2\right]dt \\
+&amp;= C_1 - C_2 + \underbrace{\int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|\tilde{V}_t(x_t|y) - W_t(x_t;\theta)\|^2\right]dt}_{\mathcal{L}_{\text{CFM}}(\theta)}
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(C_2 = \int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|u_t(x_t|y)\|^2\right]dt\)</span>.  So we can minimize <span class="math">\(\mathcal{L}_{\text{FM}}(\theta)\)</span> by minimizing <span class="math">\(\mathcal{L}_{\text{CFM}}(\theta)\)</span> because <span class="math">\(C_1\)</span> and <span class="math">\(C_2\)</span> are constants.  <span class="math">\(\mathcal{L}_{\text{CFM}}(\theta)\)</span> is called the <strong>conditional flow matching</strong> loss.</p>
+where <span class="math">\(C_2 = \int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|\tilde{V}_t(x_t|y)\|^2\right]dt\)</span>.  So we can minimize <span class="math">\(\mathcal{L}_{\text{FM}}(\theta)\)</span> by minimizing <span class="math">\(\mathcal{L}_{\text{CFM}}(\theta)\)</span> because <span class="math">\(C_1\)</span> and <span class="math">\(C_2\)</span> are constants.  <span class="math">\(\mathcal{L}_{\text{CFM}}(\theta)\)</span> is called the <strong>conditional flow matching</strong> loss.</p>
 <p>We can also reparametrize <span class="math">\(x_t\)</span> with <span class="math">\(f_t(x_t|y)\)</span> to get the following loss function:
 </p>
 <div class="math">$$
 \begin{align}
-\mathcal{L}_{\text{CFM}}(\theta) &amp;= \int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|u_t(x_t|y) - v_t(x_t;\theta)\|^2\right]dt \\
-&amp;= \int_0^1 \mathbb{E}_{p_y(y)p_0(x_0)}\left[\left\|u_t(f_t(x_0)|y) - v_t(x_t;\theta)\right\|^2\right]dt
+\mathcal{L}_{\text{CFM}}(\theta) &amp;= \int_0^1 \mathbb{E}_{p_y(y)p_t(x_t|y)}\left[\|\tilde{V}_t(x_t|y) - W_t(x_t;\theta)\|^2\right]dt \\
+&amp;= \int_0^1 \mathbb{E}_{p_y(y)p_0(x_0)}\left[\left\|\tilde{V}_t(f_t(x_0)|y) - W_t(f_t(x_0);\theta)\right\|^2\right]dt
 \end{align}
 $$</div>
-<p>In this form, we see a new recipe for what we need to do to train <span class="math">\(v_t(x_t;\theta)\)</span>:
+<p>In this form, we can see the algorithm needed to train <span class="math">\(W_t(x_t;\theta)\)</span>:
 1. Sample <span class="math">\(y\sim p_y(y)\)</span> and <span class="math">\(x_0\sim p_0(x_0)\)</span>
 2. Construct some path that starts at <span class="math">\(x_0\)</span> and ends at <span class="math">\(y\)</span>
-3. Sample any point on this path (to get <span class="math">\(f_t(x_0)\)</span>) and get the tangent vector at that point (to get <span class="math">\(u_t(f_t(x_0)|y)\)</span>)
-4. Compute the loss between <span class="math">\(u_t(f_t(x_0)|y)\)</span> and <span class="math">\(v_t(x_t;\theta)\)</span></p>
-<p>As we saw in the Gaussian flow matching section, we will often choose <span class="math">\(p_y(y) = p_\text{data}(y)\)</span> and <span class="math">\(p_0(x_0) = \mathcal{N}(x_0; 0, I)\)</span>, so we are free to choose any path that starts at <span class="math">\(x_0\)</span> and ends at <span class="math">\(y\)</span>.  The simplest choice is a straight line between <span class="math">\(x_0\)</span> and <span class="math">\(y\)</span>, but we can also choose a more complicated path.</p>
-<h1>Riemannian flow matching</h1>
-<p>Riemannian flow matching chooses the path between <span class="math">\(x_0\)</span> and <span class="math">\(y\)</span> using a gradient flow.</p>
+3. Sample any point on this path (to get <span class="math">\(f_t(x_0)\)</span>) and get the tangent vector at that point (to get <span class="math">\(\tilde{V}_t(f_t(x_0)|y)\)</span>)
+4. Compute the loss between <span class="math">\(\tilde{V}_t(f_t(x_0)|y)\)</span> and <span class="math">\(W_t(x_t;\theta)\)</span></p>
+<p>This training algorithm will be efficient so long as the path between <span class="math">\(x_0\)</span> and <span class="math">\(x_1\)</span> (which is given by <span class="math">\(f_t(x_0)\)</span>) is easy to compute.  In the next section, we'll go over one possible example of how to do this.</p>
+<h1>Conditional optimal transport</h1>
+<p>The easiest choice for that we could choose for a path between <span class="math">\(x_0\)</span> and <span class="math">\(y\)</span> is simply a straight line between the two.  This is called the <strong>conditional optimal transport</strong> path and is defined as follows:
+</p>
+<div class="math">$$
+\begin{align}
+  f_t(x_0;y) &amp;= (1-t)x_0 + ty \\
+  &amp;= x_0 + t(y - x_0)
+\end{align}
+$$</div>
+<p>
+The tangent vector to this curve is also trivial to compute:
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{df_t(x_0;y)}{dt} &amp;= y - x_0
+\end{align}
+$$</div>
+<p>
+So the pseudo code to train a CNF using flow matching with the conditional optimal transport path looks like this</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">flow_matching_objective</span><span class="p">(</span><span class="n">data_batch</span><span class="p">):</span>
+  <span class="n">batch_size</span> <span class="o">=</span> <span class="n">data_batch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">t</span> <span class="o">=</span> <span class="n">uniform_sample</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+  <span class="n">x0</span> <span class="o">=</span> <span class="n">normal_sample</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+  <span class="n">xt</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">t</span><span class="o">*</span><span class="p">(</span><span class="n">data_batch</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span>
+  <span class="n">Vt</span> <span class="o">=</span> <span class="n">data_batch</span> <span class="o">-</span> <span class="n">x0</span>
+  <span class="n">Wt</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">xt</span><span class="p">)</span>
+  <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">Vt</span> <span class="o">-</span> <span class="n">Wt</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+  <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</code></pre></div>
+
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -197,37 +206,26 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-    </div><!-- /.entry-content -->
+        </article>
 
-  </article>
-</section>
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>links</h2>
-                        <ul>
-                            <li><a href="https://getpelican.com/">Pelican</a></li>
-                            <li><a href="https://www.python.org/">Python.org</a></li>
-                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
-                            <li><a href="#">You can modify those links in your config file</a></li>
-                        </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
+        <footer>
+            <p>This entry is posted in <a href="/category/blog.html">Blog</a>.</p>
+        </footer>
 
-                            <li><a href="#">You can add links in your config file</a></li>
-                            <li><a href="#">Another social link</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
 
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
-                </address><!-- /#about -->
+    </div>
 
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
 
-</body>
+<footer class="blog-footer">
+
+    <ul class="nav">
+            <li><a href="https://twitter.com/_ecunningham_">Twitter</a></li>
+    </ul>
+
+    <p class="disclaimer">
+    Built with <a href="http://getpelican.com">Pelican</a>, and <a href="https://github.com/hdra/Pelican-Cid">Cid</a> theme.
+    </p>
+</footer>
+            </div>
+    </body>
 </html>

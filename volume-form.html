@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <title>    Volume form
+</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href='https://fonts.googleapis.com/css?family=Gentium+Book+Basic|Merriweather:400,300' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="/theme/css/cid.css">
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+            <div class="container">
+
+<header class="blog-header">
+    <h1><a href="">The Weeds</a></h1>
+    <p></p>
+    <nav>
+        <a href="/">INDEX</a>
+        <a href="/archives">ARCHIVES</a>
+        <a href="/categories">CATEGORIES</a>
+    </nav>
+</header>
+
+    <div class="post">
+
+        <header>
+            <h1>Volume form</h1>
+            <p class="date">Written on <time datetime="2023-07-16T00:00:00-05:00">Jul 16, 2023</time></p>
+        </header>
+
+        <article>
+            <p>The Riemannian volume form is a way to define and measure "volume" on a Riemannian manifold.  In this doc we'll go over where the volume form comes from and how it is able to measure volume.</p>
+<h1>Riemannian metrics</h1>
+<p>Let <span class="math">\(\mathcal{M}\)</span> be a smooth n-dimensional manifold.  A Riemannian metric is a choice of inner product that allows us to define geometric values on manifold, such as length, angles and distance.  Let <span class="math">\((U,(x^i))\)</span> be a coordinate chart of <span class="math">\(\mathcal{M}\)</span>.  Then a Riemannian metric is a contravariant 2-tensor written as
+</p>
+<div class="math">$$
+\begin{align}
+  g = g_{ij}dx^i\otimes dx^j
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(g_{ij}\)</span> is a symmetric positive definite matrix.  The Riemannian metric defines what an inner product means.  Let <span class="math">\(X,Y \in \mathfrak{X}(\mathcal{M})\)</span> be vector fields in the domain of a chart <span class="math">\((U,(x^i))\)</span>.  Then the inner product of <span class="math">\(X\)</span> and <span class="math">\(Y\)</span> is defined as
+</p>
+<div class="math">$$
+\begin{align}
+  \langle X, Y \rangle_g &amp;= g(X, Y) \\
+  &amp;= \left(g_{ij}dx^i \otimes dx^j\right)(X, Y) \\
+  &amp;= g_{ij}dx^i(X)dx^j(Y) \\
+  &amp;= g_{ij}dx^i(X^a \frac{d}{dx^a})dx^j(Y^b \frac{d}{dx^b}) \\
+  &amp;= g_{ij}X^a dx^i(\frac{d}{dx^a})Y^b dx^j(\frac{d}{dx^b}) \\
+  &amp;= g_{ij}X^a \delta^i_a Y^b \delta^j_b \\
+  &amp;= g_{ij}X^i Y^j
+\end{align}
+$$</div>
+<p>
+Note that <span class="math">\(\langle X, Y \rangle_g: U \to \mathbb{R}\)</span> is a function over <span class="math">\(U\)</span>.  When we evaluate it at a point <span class="math">\(p \in U\)</span>, we get a scalar value which represents the inner product between the tangent vectors <span class="math">\(X_p\)</span> and <span class="math">\(Y_p\)</span>.</p>
+<h2>Pullback metrics</h2>
+<p>Because the Riemannian metric is a covariant tensor, we can pull it back through any immersion.  Let <span class="math">\(F: \mathcal{N} \to \mathcal{M}\)</span> be a smooth, injective function with constant rank and say that we have defined a Riemannian metric <span class="math">\(g\)</span> on <span class="math">\(\mathcal{M}\)</span>.  Then the pullback metric of <span class="math">\(g\)</span> through <span class="math">\(F\)</span> is a Riemannian metric on <span class="math">\(\mathcal{N}\)</span> defined as <span class="math">\(F^*g\)</span>.  In the domain of a chart <span class="math">\((V, (z^i))\)</span> of <span class="math">\(\mathcal{N}\)</span> (and assuming that <span class="math">\((U,(x^i))\)</span> is a chart on <span class="math">\(\mathcal{M}\)</span> so that <span class="math">\(F(V)\)</span> and <span class="math">\(U\)</span> overlap), we can write the pullback metric as
+</p>
+<div class="math">$$
+\begin{align}
+  F^* g &amp;= (g_{ij}\circ F)d(x^i \circ F) \otimes d(x^j \circ F) \\
+  &amp;= (g_{ij}\circ F)\left(\frac{dF^i}{dz^u}dz^u \right)\otimes \left(\frac{dF^j}{dz^v}dz^v \right) \\
+  &amp;= \underbrace{(g_{ij}\circ F)\frac{dF^i}{dz^u}\frac{dF^j}{dz^v}}_{\hat{g}_{uv}}dz^u \otimes dz^v \\
+  &amp;= \hat{g}_{uv}dz^u \otimes dz^v
+\end{align}
+$$</div>
+<p>
+So <span class="math">\(F\)</span> and <span class="math">\(g\)</span> define a new Riemannian metric <span class="math">\(\hat{g}\)</span> on <span class="math">\(\mathcal{N}\)</span> whose coordinates are given by <span class="math">\(\hat{g}_{uv}\)</span>.</p>
+<h2>Orthonormal frames</h2>
+<p>Riemannian metrics allow us to define the concept of orthogonality.  Two vectors <span class="math">\(X\)</span> and <span class="math">\(Y\)</span> are orthogonal if <span class="math">\(\langle X, Y \rangle_g=0\)</span>.  An orthonormal frame can be thought of as a collection of vector fields that at each point form an orthonormal basis for the tangent space.</p>
+<h1>Riemannian volume form</h1>
+<p>A Riemannian volume form is a top form <span class="math">\(\omega_g \in \Omega^n(\mathcal{M})\)</span> with the property that for every orthonormal frame <span class="math">\((E_1, \dots, E_n)\)</span> over <span class="math">\(\mathcal{M}\)</span>, we have that
+</p>
+<div class="math">$$
+\begin{align}
+  \omega_g(E_1, \dots, E_n) = 1
+\end{align}
+$$</div>
+<p>
+It turns out that this property alone <strong>defines</strong> a unique <span class="math">\(n\)</span>-form, which we denote by <span class="math">\(\omega_g\)</span>, on <span class="math">\(\mathcal{M}\)</span>.  First we'll show how to construct <span class="math">\(\omega_g\)</span> and show its uniqueness and then we'll show how to define volume.</p>
+<h2>Construction and uniqueness</h2>
+<p>Let <span class="math">\((E_1, \dots, E_n)\)</span> be an orthonormal frame over <span class="math">\(\mathcal{M}\)</span> and let <span class="math">\((\epsilon^1, \dots, \epsilon^n)\)</span> be the dual coframe.  If we let <span class="math">\(\omega_g = \epsilon^1 \wedge \dots \wedge \epsilon^n\)</span>, then <span class="math">\(\omega_g\)</span> clearly satisfies our definition.  Futhermore, let <span class="math">\((\tilde{E_1}, \dots, \tilde{E_n})\)</span> and <span class="math">\(\tilde{\epsilon}^1, \dots, \tilde{\epsilon}^n\)</span> be another orthogonal frame/coframe pair that we use to construct another form <span class="math">\(\tilde{w}_g\)</span> that satisfies our definition of a volume form.  Then we have that
+</p>
+<div class="math">$$
+\begin{align}
+  \omega_g(\tilde{E_1}, \dots, \tilde{E_n}) &amp;= \omega_g(\tilde{E_1}, \dots, \tilde{E_n}) \\
+  &amp;= \epsilon^1 \wedge \dots \wedge \epsilon^n(\tilde{E_1}, \dots, \tilde{E_n}) \\
+  &amp;= \det(\epsilon^i(\tilde{E}_j)) \\
+  &amp;= \det(\epsilon^i(Q^k_j E_k)) \\
+  &amp;= \det(Q^i_j) \\
+  &amp;= 1 \\
+  &amp;= \tilde{w}_g(\tilde{E_1}, \dots, \tilde{E_n})
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(Q^i_j = \epsilon^i(\tilde{E}_j)\)</span> is the change of basis matrix from <span class="math">\((E_1, \dots, E_n)\)</span> to <span class="math">\((\tilde{E_1}, \dots, \tilde{E_n})\)</span>.  It has a determinant of 1 because both bases are orthonormal.  Thus we have that <span class="math">\(\omega_g = \tilde{w}_g\)</span>, so <span class="math">\(\omega_g\)</span> can be defined using any orthonormal frame.  In this setup, <span class="math">\(g\)</span> played a role in the construction of the orthonormal frames.  But to make its relation clearer, we can write <span class="math">\(\omega_g\)</span> in a coordinate chart <span class="math">\((U, (x^i))\)</span> as follows.  Assume that we can write the basis vectors for <span class="math">\(x\)</span> in terms of the orthogonal basis as <span class="math">\(\frac{d}{dx^i} = A^j_iE_j\)</span>.  Then we have that
+</p>
+<div class="math">$$
+\begin{align}
+  \omega_g(\frac{d}{d x^1}, \dots, \frac{d}{d x^n}) &amp;= \epsilon^1 \wedge \dots \wedge \epsilon^n(\frac{d}{d x^1}, \dots, \frac{d}{d x^n}) \\
+  &amp;= \det(\epsilon^i(\frac{d}{d x^j})) \\
+  &amp;= \det(A^i_j) \\
+  &amp;= \det(A^k_i A^k_j)^\frac{1}{2} \\
+  &amp;= \det(A^k_i A^l_j \langle E_k, E_l \rangle_g)^\frac{1}{2} \\
+  &amp;= \det(\langle\frac{d}{d x^i}, \frac{d}{d x^j} \rangle_g)^\frac{1}{2} \\
+  &amp;= \det(g_{ij})^\frac{1}{2} \\
+\end{align}
+$$</div>
+<p>
+So we have that
+</p>
+<div class="math">$$
+\begin{align}
+  \omega_g = \det(g_{ij})^\frac{1}{2} dx^1 \wedge \dots \wedge dx^n
+\end{align}
+$$</div>
+<p>
+So to recap, a volume form is defined as <span class="math">\(\omega_g = \epsilon^1 \wedge \dots \wedge \epsilon^n\)</span> where <span class="math">\((\epsilon^1, \dots, \epsilon^n)\)</span> is a dual coframe for an orthonormal frame with respect to <span class="math">\(g\)</span> and in a coordinate chart, we can write the volume form as <span class="math">\(\omega_g = \det(g_{ij})^\frac{1}{2} dx^1 \wedge \dots \wedge dx^n\)</span>.</p>
+<h2>Volume</h2>
+<p>Let <span class="math">\(D\subseteq \mathcal{M}\)</span>.  Then we can define the volume of <span class="math">\(D\)</span> as
+</p>
+<div class="math">$$
+\begin{align}
+  \text{Vol}(D) &amp;= \int_D \omega_g
+\end{align}
+$$</div>
+<h2>Induced volume form on submanifolds</h2>
+<p>The volume form on <span class="math">\(\mathcal{M}\)</span> induces a volume form on any k-dimensional submanifold <span class="math">\(\mathcal{S} \subset \mathcal{M}\)</span>.  Let <span class="math">\(\iota_{\mathcal{S}}: \mathcal{S} \to \mathcal{M}\)</span> be the inclusion map and let <span class="math">\((E_1,\dots,E_{n-k})\)</span> be an orthonormal frame on the normal bundle of <span class="math">\(\mathcal{S}\)</span>.  Then the induced volume form on <span class="math">\(\mathcal{S}\)</span> is defined as
+</p>
+<div class="math">$$
+\begin{align}
+  \omega_{\tilde{g}} = \iota_{\mathcal{S}}^*(i_{E_{n-k}}\circ \dots \circ i_{E_1}\omega_g)
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(i_{E_i}\)</span> is the interior product with respect to <span class="math">\(E_i\)</span>.  We can check that this is a volume form by applying it to an orthonormal frame <span class="math">\((E_{n-k}, \dots, E_n)\)</span> on <span class="math">\(\mathcal{S}\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  \omega_{\tilde{g}}(E_{n-k}, \dots, E_n) &amp;= \iota_{\mathcal{S}}^*(i_{E_{n-k}}\circ \dots \circ i_{E_1}\omega_g)(E_{n-k}, \dots, E_n) \\
+  &amp;= (i_{E_{n-k}}\circ \dots \circ i_{E_1}\omega_g)(\iota_{\mathcal{S}}(E_{n-k}), \dots, \iota_{\mathcal{S}}(E_n)) \\
+  &amp;= (i_{E_{n-k}}\circ \dots \circ i_{E_1}\omega_g)(E_{n-k}, \dots, E_n) \\
+  &amp;= \omega_g(E_1, \dots, E_n) \\
+  &amp;= 1
+\end{align}
+$$</div>
+<p>
+where the last equality follows from the fact that <span class="math">\(\omega_g\)</span> is a volume form on <span class="math">\(\mathcal{M}\)</span>.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+        </article>
+
+        <footer>
+            <p>This entry is posted in <a href="/category/blog.html">Blog</a>.</p>
+        </footer>
+
+
+    </div>
+
+
+<footer class="blog-footer">
+
+    <ul class="nav">
+            <li><a href="https://twitter.com/_ecunningham_">Twitter</a></li>
+    </ul>
+
+    <p class="disclaimer">
+    Built with <a href="http://getpelican.com">Pelican</a>, and <a href="https://github.com/hdra/Pelican-Cid">Cid</a> theme.
+    </p>
+</footer>
+            </div>
+    </body>
+</html>
