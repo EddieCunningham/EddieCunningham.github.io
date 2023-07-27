@@ -1,42 +1,81 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>    Stein variational gradient descent
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Eddie Cunningham" />
+
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="stein discrepancy, kernels, stein variational gradient descent, rkhs, Blog, " />
+
+<meta property="og:title" content="Riemannian stein variational gradient descent "/>
+<meta property="og:url" content="/stein-vi.html" />
+<meta property="og:description" content="A tutorial on Stein variational gradient descent" />
+<meta property="og:site_name" content="The Weeds" />
+<meta property="og:article:author" content="Eddie Cunningham" />
+<meta property="og:article:published_time" content="2023-07-15T00:00:00-05:00" />
+<meta property="og:article:modified_time" content="2023-07-15T00:00:00-05:00" />
+<meta name="twitter:title" content="Riemannian stein variational gradient descent ">
+<meta name="twitter:description" content="A tutorial on Stein variational gradient descent">
+
+        <title>Riemannian stein variational gradient descent  · The Weeds
 </title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href='https://fonts.googleapis.com/css?family=Gentium+Book+Basic|Merriweather:400,300' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="/theme/css/cid.css">
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="/theme/css/custom.css" media="screen">
+
+
+
     </head>
     <body>
-        <!--[if lt IE 7]>
-            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-        <![endif]-->
+        <div id="content">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a class="brand" href="/"><span class=site-name>The Weeds</span></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right top-menu">
+                                <li >
+                                    <a href=
+                                       "/"
+                                    >Home</a>
+                                </li>
+                                <li ><a href="/pages/about.html">About</a></li>
+                                <li ><a href="/categories.html">Categories</a></li>
+                                <li ><a href="/tags.html">Tags</a></li>
+                                <li ><a href="/archives.html">Archives</a></li>
+                                <li><form class="navbar-search" action="/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span1"></div>
+                    <div class="span10">
+<article itemscope>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+        <h1>
+            <a href="/stein-vi.html">
+                Riemannian stein variational gradient descent
+            </a>
+        </h1>
+    </header>
+</div>
 
-            <div class="container">
-
-<header class="blog-header">
-    <h1><a href="">The Weeds</a></h1>
-    <p></p>
-    <nav>
-        <a href="/">INDEX</a>
-        <a href="/archives">ARCHIVES</a>
-        <a href="/categories">CATEGORIES</a>
-    </nav>
-</header>
-
-    <div class="post">
-
-        <header>
-            <h1>Stein variational gradient descent</h1>
-            <p class="date">Written on <time datetime="2023-07-15T00:00:00-05:00">Jul 15, 2023</time></p>
-        </header>
-
-        <article>
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+            
             <p>The Stein discrepancy measure is a way of measuring the distance between two probability distributions.  It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the reverse KL divergence to a target distribution.  In this post, we'll go over the kernel Stein discrepancy as introduced by <a href="https://arxiv.org/pdf/1602.03253.pdf">Liu et al.</a> and the extensions in <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu and Zhu</a>.</p>
 <h1>Motivation</h1>
 <p>Consider the task of minimizing the reverse KL divergence between a target distribution <span class="math">\(p\)</span> and a model distribution <span class="math">\(q\)</span> over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  If we have a probability path as the solution where <span class="math">\(q_t\)</span> where <span class="math">\(q_0\)</span> is arbitrary and <span class="math">\(q_1 = p\)</span>, then we could be interested in seeing how the reverse KL divergence between <span class="math">\(q_t\)</span> and <span class="math">\(p\)</span> changes as <span class="math">\(t\)</span> changes.</p>
@@ -169,26 +208,105 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-        </article>
-
-        <footer>
-            <p>This entry is posted in <a href="/category/blog.html">Blog</a>.</p>
-        </footer>
 
 
-    </div>
+             
+ 
+            
+            
+            
 
 
-<footer class="blog-footer">
 
-    <ul class="nav">
-            <li><a href="https://twitter.com/_ecunningham_">Twitter</a></li>
-    </ul>
 
-    <p class="disclaimer">
-    Built with <a href="http://getpelican.com">Pelican</a>, and <a href="https://github.com/hdra/Pelican-Cid">Cid</a> theme.
-    </p>
-</footer>
+
+
+            <hr/>
+        </div>
+        <section id="article-sidebar" class="span2">
+            <h4>Published</h4>
+            <time itemprop="dateCreated" datetime="2023-07-15T00:00:00-05:00">Jul 15, 2023</time>
+
+            <h4>Category</h4>
+            <a class="category-link" href="/categories.html#blog-ref">Blog</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="/tags.html#kernels-ref">kernels
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#rkhs-ref">rkhs
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#stein-discrepancy-ref">stein discrepancy
+                    <span>1</span>
+</a></li>
+                <li><a href="/tags.html#stein-variational-gradient-descent-ref">stein variational gradient descent
+                    <span>1</span>
+</a></li>
+            </ul>
+            
+
+
+
+
+
+            
+
+
+
+
+
+        </section>
+</div>
+</article>
+                    </div>
+                    <div class="span1"></div>
+                </div>
             </div>
+        </div>
+<footer>
+
+
+
+
+    <div id="fpowered">
+        Powered by: <a href="http://getpelican.com/" title="Pelican Home Page" target="_blank" rel="nofollow noopener noreferrer">Pelican</a>
+        Theme: <a href="https://elegant.oncrashreboot.com/" title="Theme Elegant Home Page" target="_blank" rel="nofollow noopener noreferrer">Elegant</a>
+    </div>
+</footer>            <script src="//code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    <script>
+    (function () {
+        if (window.location.hash.match(/^#comment-\d+$/)) {
+            $('#comment_thread').collapse('show');
+        }
+    })();
+    window.onhashchange=function(){
+        if (window.location.hash.match(/^#comment-\d+$/))
+            window.location.reload(true);
+    }
+    $('#comment_thread').on('shown', function () {
+        var link = document.getElementById('comment-accordion-toggle');
+        var old_innerHTML = link.innerHTML;
+        $(link).fadeOut(200, function() {
+            $(this).text('Click here to hide comments').fadeIn(200);
+        });
+        $('#comment_thread').on('hidden', function () {
+            $(link).fadeOut(200, function() {
+                $(this).text(old_innerHTML).fadeIn(200);
+            });
+        })
+    })
+</script>
+
     </body>
+    <!-- Theme: Elegant built for Pelican
+        License : MIT -->
 </html>
