@@ -164,14 +164,6 @@ So we have that
 $$</div>
 <p>
 So to recap, a volume form is defined as <span class="math">\(\omega_g = \epsilon^1 \wedge \dots \wedge \epsilon^n\)</span> where <span class="math">\((\epsilon^1, \dots, \epsilon^n)\)</span> is a dual coframe for an orthonormal frame with respect to <span class="math">\(g\)</span> and in a coordinate chart, we can write the volume form as <span class="math">\(\omega_g = \det(g_{ij})^\frac{1}{2} dx^1 \wedge \dots \wedge dx^n\)</span>.</p>
-<h2>Volume</h2>
-<p>Let <span class="math">\(D\subseteq \mathcal{M}\)</span>.  Then we can define the volume of <span class="math">\(D\)</span> as
-</p>
-<div class="math">$$
-\begin{align}
-  \text{Vol}(D) &amp;= \int_D \omega_g
-\end{align}
-$$</div>
 <h2>Induced volume form on submanifolds</h2>
 <p>The volume form on <span class="math">\(\mathcal{M}\)</span> induces a volume form on any k-dimensional submanifold <span class="math">\(\mathcal{S} \subset \mathcal{M}\)</span>.  Let <span class="math">\(\iota_{\mathcal{S}}: \mathcal{S} \to \mathcal{M}\)</span> be the inclusion map and let <span class="math">\((E_1,\dots,E_{n-k})\)</span> be an orthonormal frame on the normal bundle of <span class="math">\(\mathcal{S}\)</span>.  Then the induced volume form on <span class="math">\(\mathcal{S}\)</span> is defined as
 </p>
@@ -194,8 +186,61 @@ where <span class="math">\(i_{E_i}\)</span> is the interior product with respect
 $$</div>
 <p>
 where the last equality follows from the fact that <span class="math">\(\omega_g\)</span> is a volume form on <span class="math">\(\mathcal{M}\)</span>.</p>
+<h2>Pullback volume forms</h2>
+<p>Let <span class="math">\(F: \mathcal{N} \to \mathcal{M}\)</span> be a diffeomorphism and <span class="math">\(\omega_g\)</span> be a volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the volume form on <span class="math">\(\mathcal{N}\)</span> induced by <span class="math">\(F\)</span> and <span class="math">\(\omega_g\)</span> is:
+</p>
+<div class="math">$$
+\begin{align}
+  F^*\omega_g = \omega_{F^*g}
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(F^*g\)</span> is the pullback metric of <span class="math">\(g\)</span> through <span class="math">\(F\)</span>.  We can see this by checking that <span class="math">\(F^*\omega_g\)</span> is a volume form on <span class="math">\(\mathcal{N}\)</span> with respect to the pullback metric <span class="math">\(F^*g\)</span>.  Let <span class="math">\((E_1, \dots, E_n)\)</span> be an orthonormal frame on <span class="math">\(\mathcal{M}\)</span>.  Then we can see that <span class="math">\((F^{-1}_*E_1, \dots, F^{-1}_*E_n)\)</span> is an orthonormal frame on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span> because
+</p>
+<div class="math">$$
+\begin{align}
+  \langle F^{-1}_*E_i, F^{-1}_*E_j \rangle_{F^*g} &amp;= F^*g(F^{-1}_*E_i, F^{-1}_*E_j) \\
+  &amp;= g(F_*F^{-1}_*E_i, F_*F^{-1}_*E_j) \\
+  &amp;= g(E_i, E_j) \\
+  &amp;= \delta_{ij}
+\end{align}
+$$</div>
+<p>
+Furthermore, the dual basis for <span class="math">\((F^{-1}_*E_1, \dots, F^{-1}_*E_n)\)</span> is <span class="math">\((F^*\epsilon^1, \dots, F^*\epsilon^n)\)</span> where <span class="math">\((\epsilon^1, \dots, \epsilon^n)\)</span> is the dual basis for <span class="math">\((E_1, \dots, E_n)\)</span> because
+</p>
+<div class="math">$$
+\begin{align}
+  F^*\epsilon^i(F^{-1}_*E_j) &amp;= \epsilon^i(F_*F^{-1}_*E_j) \\
+  &amp;= \epsilon^i(E_j) \\
+  &amp;= \delta^i_j
+\end{align}
+$$</div>
+<p>
+So now that we know that <span class="math">\((F^*\epsilon^1, \dots, F^*\epsilon^n)\)</span> forms an orthonormal dual frame on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span>, and we know that volume forms can be written as the wedge product of any orthonormal dual frame, we can immediately see that <span class="math">\(F^*\omega_g\)</span> is a volume form on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  F^*\omega_g &amp;= F^*(\epsilon^1 \wedge \dots \wedge \epsilon^n) \\
+  &amp;= (F^*\epsilon^1) \wedge \dots \wedge (F^*\epsilon^n)
+\end{align}
+$$</div>
+<h2>Volume</h2>
+<p>The volume form can be used to define the <strong>signed</strong> volume of a region on a manifold using integration.  Let <span class="math">\((U, \phi)\)</span> be a chart on <span class="math">\(\mathcal{M}\)</span> and let <span class="math">\((x^i)\)</span> be a set of coordinates for <span class="math">\(\phi(U)\)</span>.  Then the volume of a region <span class="math">\(D \subseteq U\)</span> can be defined as
+</p>
+<div class="math">$$
+\begin{align}
+  \text{Vol}(D) &amp;= \int_D \omega_g \\
+  &amp;= \pm \int_{\phi(D)}(\phi^{-1})^*\omega_g \\
+  &amp;= \pm \int_{\phi(D)}\underbrace{\omega_{(\phi^{-1})^*g}}_{\omega_{\bar{g}}} \\
+  &amp;= \pm \int_{\phi(D)}\det(\bar{g}_{ij})^\frac{1}{2} dx^1 \wedge \dots \wedge dx^n \\
+  &amp;= \pm \int_{\phi(D)}\det(\bar{g}_{ij})^\frac{1}{2} dx^1 \dots dx^n
+\end{align}
+$$</div>
+<p>
+So the volume of <span class="math">\(D\)</span> is defined as the integral of volume form and we can evaluate it by pulling back the volume form to a coordinate chart and integrating over the chart.</p>
+<p>The plus or minus sign appears due to the orientation of the chart.  If the chart is orientation preserving, then the sign is positive and if the chart is orientation reversing, then the sign is negative.  This can be an issue for non-orientable manifolds.  For example if we wanted to find the volume of a Mobius strip, we would need to use two charts to cover the strip.  One chart would be orientation preserving and the other would be orientation reversing, so the volumes we compute on each chart would cancel.  A way to get around this is to use a Riemannian density instead of a volume form.</p>
 <h1>Riemannian densities</h1>
-<p>The Riemannian volume form is a way to construct a <strong>signed</strong> volume on a manifold.  For manifolds that are not orientable this can be an issue because if we sum the volumes of regions with different orientations, the total volume can be 0.  To get around this, we can define a Riemannian density, which is an object that acts like the absolute value of a volume form.  See Chapter 16 of <a href="https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf">this book</a> for a reference.</p>
+<p>A Riemannian density is an object that is like the absolute value of a volume form and can be used to define an unsigned volume on a manifold.  See Chapter 16 of <a href="https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf">Lee 2013</a> for a reference.</p>
 <p>Let <span class="math">\(\omega_g\)</span> be a volume form over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  Then a Riemmanian density, <span class="math">\(\mu_g\)</span> can be constructed as the absolute value of <span class="math">\(\omega_g\)</span>:
 </p>
 <div class="math">$$
@@ -203,6 +248,28 @@ where the last equality follows from the fact that <span class="math">\(\omega_g
   \mu_g = |\omega_g|
 \end{align}
 $$</div>
+<p>
+where the absolute value sign means that we take the absolute value of the evaluation of the volume form
+</p>
+<div class="math">$$
+\begin{align}
+  \mu_g(E_1,\dots,D_n) &amp;= |\omega_g|(E_1,\dots,D_n) \\
+  &amp;= |\omega_g(E_1,\dots,D_n)|
+\end{align}
+$$</div>
+<p>
+The Riemannian density, although they aren't tensors, have many of the same properties as the volume form like the ability to pullback through immersions and define volume.  If <span class="math">\((U, \phi)\)</span> is a chart on <span class="math">\(\mathcal{M}\)</span>, then the volume of a region <span class="math">\(D \subseteq U\)</span> can be defined as
+</p>
+<div class="math">$$
+\begin{align}
+  \text{Vol}(D) &amp;= \int_D \mu_g \\
+  &amp;= \int_D |\omega_g| \\
+  &amp;= \int_{\phi(D)} (\phi^{-1})^*|\omega_g| \\
+  &amp;= \int_{\phi(D)} |(\phi^{-1})^*\omega_g| \\
+\end{align}
+$$</div>
+<p>
+The absolute value sign will cancel out the sign ambiguity that we had with the volume form, so we don't need to worry about orientation.  So we can use the Riemannian density to measure volume on non-orientable manifolds.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
