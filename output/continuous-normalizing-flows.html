@@ -1,45 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="generator" content="Pelican" />
-        <title>Continuous normalizing flows</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
-        <meta name="description" content="A tutorial on continuous normalizing flows" />
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Eddie Cunningham" />
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">The Weeds</a></h1>
-                <nav><ul>
-                    <li class="active"><a href="/category/blog.html">Blog</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="/continuous-normalizing-flows.html" rel="bookmark"
-           title="Permalink to Continuous normalizing flows">Continuous normalizing flows</a></h1>
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="flows, matching, generative models, Blog, " />
+
+<meta property="og:title" content="Continuous normalizing flows "/>
+<meta property="og:url" content="/continuous-normalizing-flows.html" />
+<meta property="og:description" content="A tutorial on continuous normalizing flows" />
+<meta property="og:site_name" content="The Weeds" />
+<meta property="og:article:author" content="Eddie Cunningham" />
+<meta property="og:article:published_time" content="2023-07-15T00:00:00-05:00" />
+<meta property="og:article:modified_time" content="2023-07-15T00:00:00-05:00" />
+<meta name="twitter:title" content="Continuous normalizing flows ">
+<meta name="twitter:description" content="A tutorial on continuous normalizing flows">
+
+        <title>Continuous normalizing flows  · The Weeds
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="/theme/css/custom.css" media="screen">
+
+
+
+    </head>
+    <body>
+        <div id="content">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a class="brand" href="/"><span class=site-name>The Weeds</span></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right top-menu">
+                                <li >
+                                    <a href=
+                                       "/"
+                                    >Home</a>
+                                </li>
+                                <li ><a href="/pages/about.html">About</a></li>
+                                <li ><a href="/categories.html">Categories</a></li>
+                                <li ><a href="/tags.html">Tags</a></li>
+                                <li ><a href="/archives.html">Archives</a></li>
+                                <li><form class="navbar-search" action="/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span1"></div>
+                    <div class="span10">
+<article itemscope>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+        <h1>
+            <a href="/continuous-normalizing-flows.html">
+                Continuous normalizing flows
+            </a>
+        </h1>
     </header>
+</div>
 
-    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-15T00:00:00-05:00">
-                Published: Sat 15 July 2023
-        </abbr>
-		<br />
-        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
-                Updated: Sat 15 July 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
-        </address>
-<p>In <a href="/category/blog.html">Blog</a>.</p>
-<p>tags: <a href="/tag/flows.html">flows</a> <a href="/tag/matching.html">matching</a> <a href="/tag/generative-models.html">generative models</a> </p>
-</footer><!-- /.post-info -->      <h1>What problem are we trying to solve?</h1>
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+            
+            <h1>What problem are we trying to solve?</h1>
 <p>We are interested in learning a parametric approximation of an unknown probability distribution that we can sample from and compute likelihood on.  Given a target probability distribution called <span class="math">\(p_\text{data}(x)\)</span>, where <span class="math">\(x\in \mathcal{M}\)</span>, we want to learn a parametric approximation called <span class="math">\(p_\text{model}(x;\theta)\)</span>.  In our problem setup, we assume that we can sample from <span class="math">\(p_\text{data}(x)\)</span> and that <span class="math">\(p_\text{data}(x)&gt;0, \forall x\in \mathcal{M}\)</span>.  The second assumption ensures that a solution exists, as we will see later.</p>
 <p>We have 2 goals:
 1. Sample from <span class="math">\(p_\text{model}(x;\theta)\)</span>.
@@ -79,7 +116,7 @@ $$</div>
 </p>
 <div class="math">$$
 \begin{align}
-  P(x\in D) = \int_D p_0 \omega_g
+  P(x_0\in D) = \int_D p_0 \omega_g
 \end{align}
 $$</div>
 <p>
@@ -87,11 +124,11 @@ Similarly, at time <span class="math">\(t\)</span> we can compute what the mass 
 </p>
 <div class="math">$$
 \begin{align}
-  P(x\in f_t(D)) = \int_{f_t(D)} p_t \omega_g
+  P(x_t\in f_t(D)) = \int_{f_t(D)} p_t \omega_g
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(p_t\)</span> is the pushforward measure of <span class="math">\(p_0\)</span> under <span class="math">\(f_t\)</span>.  The fundamental assumption that we can make is that <span class="math">\(P(x\in D) = P(x\in f_t(D))\)</span>.  Intuitively this assumption makes sense because if we think about samples from probability distribution as "particles" distributed in space, then the flow cannot change the number of particles.  With this in mind, we assert that the probability mass in <span class="math">\(f_t(D)\)</span> does not change with respect to time:
+where <span class="math">\(p_t\)</span> is the pushforward measure of <span class="math">\(p_0\)</span> under <span class="math">\(f_t\)</span>.  The fundamental assumption that we can make is that <span class="math">\(P(x_0\in D) = P(x_t\in f_t(D))\)</span>.  Intuitively this assumption makes sense because if we think about samples from probability distribution as "particles" distributed in space, then the flow cannot change the number of particles.  With this in mind, we assert that the probability mass in <span class="math">\(f_t(D)\)</span> does not change with respect to time:
 </p>
 <div class="math">$$
 \begin{align}
@@ -114,27 +151,25 @@ The integrand of the last equation relates <span class="math">\(p_t\)</span> and
 \end{align}
 $$</div>
 <h3>Instantaneous change of variables formula</h3>
-<p>The continuity equation is coordinate free and valid on any manifold, however when we are doing machine learning, our data is typically presented to us in Euclidean space.  In this setting, we can derive the instantaneous change of variables formula as follows.  First, notice that the <span class="math">\(\frac{dp_t}{dt}\)</span> term in the continuity equation is actually a partial derivative.  We can explicitly write out the dependence of <span class="math">\(p_t\)</span> on <span class="math">\(t\)</span> and <span class="math">\(x\)</span> as <span class="math">\(p_t(t,x)\)</span> and then the continuity equation becomes:
+<p>In practice we are interested in computing the log likelihood of a sample <span class="math">\(x\)</span> under <span class="math">\(p_\text{model}(x;\theta)\)</span>, which requires knowing how the log likelihood of a sample changes over time.  This is the same as knowing how the log likelihood changes under the flow of <span class="math">\(V_t\)</span> and time.  In particular, we want to know <span class="math">\(\frac{d\log p_t(t,x(t))}{dt}\)</span>.  In geometry terms, this is the same as knowing how <span class="math">\(\log p_t\)</span> changes on the flow of <span class="math">\(\frac{d}{dt} + V_t\)</span>.  Here, we assume that <span class="math">\((\frac{d}{dt}, \frac{d}{dx^1}, \dots, \frac{d}{dx^n})\)</span> forms a basis for the space <span class="math">\(\mathbb{R} \times \mathcal{M}\)</span>, so the vector field <span class="math">\(\frac{d}{dt} + V_t = \frac{d}{dt} + V_t^i \frac{d}{dx^i}\)</span> describes the flow of both time and points on the manifold.</p>
+<p>Lets compute the Lie derivative of <span class="math">\(p_t\)</span> with respect to <span class="math">\(\frac{d}{dt} + V_t\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{\partial p_t(t,x)}{\partial t} + \text{Div}(p_t(t,x)V_t(t,x)) &amp;= \frac{\partial p_t(t,x)}{\partial t} + \sum_{i=1}^n \frac{\partial}{\partial x_i} \left(p_t(t,x)V_t^i(t,x)\right) \\
-  &amp;= \frac{\partial p_t(t,x)}{\partial t} + \sum_{i=1}^n \left(\frac{\partial p_t(t,x)}{\partial x_i}\underbrace{V_t^i(t,x)}_{\frac{dx^i(t)}{dt}} + p_t(t,x)\frac{\partial V_t^i(t,x)}{\partial x_i}\right) \\
-  &amp;= \frac{\partial p_t(t,x)}{\partial t} + \sum_{i=1}^n \frac{\partial p_t(t,x)}{\partial x_i}\frac{dx^i(t)}{dt} + p_t(t,x)\sum_{i=1}^n \frac{\partial V_t^i(t,x)}{\partial x_i} \\
-  &amp;= \frac{dp_t(t,x(t))}{dt} + p_t(t,x)\text{Tr}(\nabla_x V_t(t,x)) \\
-  &amp;= p_t(t,x)\left(\frac{d\log p_t(t,x(t))}{dt} + \text{Tr}(\nabla_x V_t(t,x))   \right)
+  \frac{d p_t(t,x(t))}{dt} &amp;= \mathcal{L}_{\frac{d}{dt} + V_t} p_t \\
+  &amp;= \frac{d}{dt}p_t + V_t^i \frac{\partial}{\partial x^i}p_t \\
+  &amp;= -\text{Div}(p_tV_t) + \langle \text{grad }p_t, V_t \rangle_g \\
+  &amp;= -p_t\text{Div}(V_t) - \langle \text{grad } p_t, V_t \rangle_g + \langle \text{grad } p_t, V_t \rangle_g \\
+  &amp;= -p_t\text{Div}(V_t)
 \end{align}
 $$</div>
-<p>
-Because this quantity is 0, we're left with the instantaneous change of variables formula:
+<p>Dividing both sides by <span class="math">\(p_t\)</span> gives us the final result:
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{d\log p_t(t,x(t))}{dt} = -\text{Tr}(\nabla_x V_t(t,x))
+  \frac{d\log p_t(t,x(t))}{dt} = -\text{Div}(V_t)
 \end{align}
 $$</div>
-<p>
-This is an alternate derivation to the one given in the appendix of the original <a href="https://arxiv.org/pdf/1806.07366.pdf">Neural ODE</a> paper.</p>
 <h1>Existence of CNFs</h1>
 <p>A natural question to ask is when a continuous normalizing flow even exists.  Is it always possible to find a vector field whose flow pushes forward a user specified prior to any target probability distribution?  The answer turns out to be yes as long as the prior and target are non degenerate everywhere on the manifold.  The proof for this is called <a href="https://arxiv.org/pdf/2108.08052.pdf">Moser's Theorem</a> and it actually constructs the vector field that we need.</p>
 <p>Let <span class="math">\((\mathcal{M},g)\)</span> be a boundryless n-dimensional Riemannian manifold with volume form <span class="math">\(\omega_g\)</span> and let <span class="math">\(p_t\)</span> be a time dependent probability density so that <span class="math">\(\int_{\mathcal{M}}p_t\omega_g = 1\)</span>.  We start the same way as we did in the continuity equation by asserting that the probability mass in <span class="math">\(f_t(D)\)</span> does not change with respect to time so that <span class="math">\(\frac{d}{dt}\int_{f_t(D)}p_t\omega_g = 0\)</span> for our flow <span class="math">\(f_t\)</span>.  However, we don't know what vector field generates <span class="math">\(f_t\)</span>.  We will proceed by assuming that there is a solution called <span class="math">\(V_t\)</span> and then we'll show what <span class="math">\(V_t\)</span> must be equal to.  Using the steps from deriving the continuity equation, we have
@@ -153,7 +188,7 @@ The trick to Moser's theorem is that we can actually show that <span class="math
 \begin{align}
   0 &amp;= \frac{d}{dt}1 \\
   &amp;= \frac{d}{dt}\int_{\mathcal{M}}p_t\omega_g \\
-  &amp;= \int_{\mathcal{M}}d\beta_t + \gamma_t \\
+  &amp;= \int_{\mathcal{M}}(d\beta_t + \gamma_t) \\
   &amp;= \underbrace{\int_{\mathcal{M}}d\beta_t}_{\text{Use stoke's theorem}} + \int_{\mathcal{M}}c\omega_g \\
   &amp;= \underbrace{\int_{\partial \mathcal{M}}\beta_t}_{0 \text{ because $\mathcal{M}$ has no boundary}} + c\int_{\mathcal{M}}\omega_g \\
   &amp;= c\int_{\mathcal{M}}\omega_g \\
@@ -171,7 +206,7 @@ Therefore <span class="math">\(c=0\)</span> and we have that <span class="math">
 \end{align}
 $$</div>
 <p>
-So now the question that we need to answer is: Does there exist a vector field <span class="math">\(V_t\)</span> so that <span class="math">\(V_t \lrcorner p_t \omega_g + \beta_t\)</span> where <span class="math">\(\beta_t \in \Omega^{n-1}(\mathcal{M})\)</span>?  The answer is yes!  The reason is that we can always write an <span class="math">\(n-1\)</span> for as the interior product with the volume form, so there exists a vector field <span class="math">\(U_t\)</span> so that <span class="math">\(\beta_t = U_t \lrcorner \omega_g\)</span>.  Therefore, we can simplify more:
+So now the question that we need to answer is: Does there exist a vector field <span class="math">\(V_t\)</span> so that <span class="math">\(V_t \lrcorner p_t \omega_g + \beta_t = 0\)</span> where <span class="math">\(\beta_t \in \Omega^{n-1}(\mathcal{M})\)</span>?  The answer is yes!  The reason is that we can always write an <span class="math">\(n-1\)</span> for as the interior product with the volume form, so there exists a vector field <span class="math">\(U_t\)</span> so that <span class="math">\(\beta_t = U_t \lrcorner \omega_g\)</span>.  Therefore, we can simplify more:
 </p>
 <div class="math">$$
 \begin{align}
@@ -181,7 +216,7 @@ So now the question that we need to answer is: Does there exist a vector field <
 \end{align}
 $$</div>
 <p>
-We know that the integrand has to be 0, so we can solve for <span class="math">\(V_t\)</span> in terms of <span class="math">\(p_t\)</span> and <span class="math">\(U_t\)</span>:
+We know that the integrand has to be <span class="math">\(0\)</span>, so we can solve for <span class="math">\(V_t\)</span> in terms of <span class="math">\(p_t\)</span> and <span class="math">\(U_t\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
@@ -208,7 +243,7 @@ $$</div>
 <p>
 We can compute <span class="math">\(\nabla_x V_t\epsilon\)</span> almost as efficiently as computing <span class="math">\(V_t\)</span> using autodiff using a JVP or VJP.  The advantage to using this method is that we can optimize different kinds of objectives like the reverse KL divergence or the forward KL divergence.  The disadvantage is that we need to simulate the dynamics of the model at each time step to get a good approximation of the log likelihood.  Furthermore, if the target distribution is 0 in some places, which is happens if the dataset lies on a manifold, then <span class="math">\(\log p_\text{model}(x;\theta)\)</span> will be trained to approach infinity.  An alternative that avoids this problem is to use matching.</p>
 <h2>Flow matching</h2>
-<p>In the setting where we have samples from our target density, you should always use flow matching to train your model.  See my <a href="/content/flow_matching.md">post on flow matching</a> for more details.</p>
+<p>In the setting where we have samples from our target density, you should always use flow matching to train your model.  See my <a href="flow_matching.md">post on flow matching</a> for more details.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -271,37 +306,102 @@ We can compute <span class="math">\(\nabla_x V_t\epsilon\)</span> almost as effi
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-    </div><!-- /.entry-content -->
 
-  </article>
-</section>
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>links</h2>
-                        <ul>
-                            <li><a href="https://getpelican.com/">Pelican</a></li>
-                            <li><a href="https://www.python.org/">Python.org</a></li>
-                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
-                            <li><a href="#">You can modify those links in your config file</a></li>
-                        </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
 
-                            <li><a href="#">You can add links in your config file</a></li>
-                            <li><a href="#">Another social link</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
+             
+ 
+            
+            
+            
 
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
-                </address><!-- /#about -->
 
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
 
-</body>
+
+
+
+            <hr/>
+        </div>
+        <section id="article-sidebar" class="span2">
+            <h4>Published</h4>
+            <time itemprop="dateCreated" datetime="2023-07-15T00:00:00-05:00">Jul 15, 2023</time>
+
+            <h4>Category</h4>
+            <a class="category-link" href="/categories.html#blog-ref">Blog</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="/tags.html#flows-ref">flows
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#generative-models-ref">generative models
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#matching-ref">matching
+                    <span>2</span>
+</a></li>
+            </ul>
+            
+
+
+
+
+
+            
+
+
+
+
+
+        </section>
+</div>
+</article>
+                    </div>
+                    <div class="span1"></div>
+                </div>
+            </div>
+        </div>
+<footer>
+
+
+
+
+    <div id="fpowered">
+        Powered by: <a href="http://getpelican.com/" title="Pelican Home Page" target="_blank" rel="nofollow noopener noreferrer">Pelican</a>
+        Theme: <a href="https://elegant.oncrashreboot.com/" title="Theme Elegant Home Page" target="_blank" rel="nofollow noopener noreferrer">Elegant</a>
+    </div>
+</footer>            <script src="//code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    <script>
+    (function () {
+        if (window.location.hash.match(/^#comment-\d+$/)) {
+            $('#comment_thread').collapse('show');
+        }
+    })();
+    window.onhashchange=function(){
+        if (window.location.hash.match(/^#comment-\d+$/))
+            window.location.reload(true);
+    }
+    $('#comment_thread').on('shown', function () {
+        var link = document.getElementById('comment-accordion-toggle');
+        var old_innerHTML = link.innerHTML;
+        $(link).fadeOut(200, function() {
+            $(this).text('Click here to hide comments').fadeIn(200);
+        });
+        $('#comment_thread').on('hidden', function () {
+            $(link).fadeOut(200, function() {
+                $(this).text(old_innerHTML).fadeIn(200);
+            });
+        })
+    })
+</script>
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+        License : MIT -->
 </html>

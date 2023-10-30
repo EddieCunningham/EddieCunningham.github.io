@@ -1,4 +1,4 @@
-Title: Stein variational gradient descent
+Title: Riemannian stein variational gradient descent
 Date: 2023-07-15
 Modified: 2023-07-15
 Category: Blog
@@ -11,16 +11,16 @@ The Stein discrepancy measure is a way of measuring the distance between two pro
 # Motivation
 Consider the task of minimizing the reverse KL divergence between a target distribution $p$ and a model distribution $q$ over a Riemannian manifold $(\mathcal{M},g)$.  If we have a probability path as the solution where $q_t$ where $q_0$ is arbitrary and $q_1 = p$, then we could be interested in seeing how the reverse KL divergence between $q_t$ and $p$ changes as $t$ changes.
 
-Let $(q_t, V_t)$ be a probability path between $q_0$ and $q_1$ where $V_t\in \mathfrak{X}(\mathcal{M})$ is the vector field that generates the flow of $q_t$ and let $dV_g$ be the volume form on $\mathcal{M}$.  Then the time derivative of the reverse KL divergence is:
+Let $(q_t, V_t)$ be a probability path between $q_0$ and $q_1$ where $V_t\in \mathfrak{X}(\mathcal{M})$ is the vector field that generates the flow of $q_t$ and let $\omega_g$ be the volume form on $\mathcal{M}$.  Then the time derivative of the reverse KL divergence is:
 $$
 \begin{align}
-  \frac{d}{dt}\text{KL}\left[q_t||p\right] &= \int \frac{d}{dt}q_t\log \frac{q_t}{p}dV_{g} \\
-  &= \int \left((\frac{d q_t}{dt})\log \frac{q_t}{p} + q_t\frac{d \log q}{dt}\right)dV_{g} \\
-  &= \int \left(-\text{Div}(q_t V_t) \log \frac{q_t}{p} + \underbrace{\frac{d q}{dt}}_{\text{$0$ in expectation}}\right)dV_{g} \\
-  &= \int \langle \text{grad } \log \frac{q_t}{p} , q_t V_t\rangle_gdV_{g} \\
-  &= \int q_t\left( \langle \text{grad } \log q_t , V_t\rangle_g - \langle \text{grad } \log p, V_t\rangle_g \right)dV_{g} \\
-  &= \int \langle \text{grad } q_t , V_t\rangle_g dV_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g dV_{g} \\
-  &= -\int q_t \text{Div}(V_t) dV_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g dV_{g} \\
+  \frac{d}{dt}\text{KL}\left[q_t||p\right] &= \int \frac{d}{dt}q_t\log \frac{q_t}{p}\omega_g \\
+  &= \int \left((\frac{d q_t}{dt})\log \frac{q_t}{p} + q_t\frac{d \log q}{dt}\right)\omega_g \\
+  &= \int \left(-\text{Div}(q_t V_t) \log \frac{q_t}{p} + \underbrace{\frac{d q}{dt}}_{\text{$0$ in expectation}}\right)\omega_g \\
+  &= \int \langle \text{grad } \log \frac{q_t}{p} , q_t V_t\rangle_g\omega_g \\
+  &= \int q_t\left( \langle \text{grad } \log q_t , V_t\rangle_g - \langle \text{grad } \log p, V_t\rangle_g \right)\omega_g \\
+  &= \int \langle \text{grad } q_t , V_t\rangle_g \omega_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g \omega_g \\
+  &= -\int q_t \text{Div}(V_t) \omega_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g \omega_g \\
   &= -\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right]
 \end{align}
 $$
@@ -54,7 +54,7 @@ $$
   \mathfrak{X} = \left\{V_t = \text{grad } f \mid f \in \mathcal{H}_K \right\}
 \end{align}
 $$
-where $\mathcal{H}_k$ is a reproducing kernel Hilbert space (RKHS) with kernel $K$.  Check out my [post on RKHS]({static}/reproducing_kernel_hilbert_space.md) for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that $V_t = \text{grad } f_t$.  Also recall that $\text{grad } f_t = \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K}$ and $\text{Div}(\text{grad } f_t) = \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}$.
+where $\mathcal{H}_k$ is a reproducing kernel Hilbert space (RKHS) with kernel $K$.  Check out my [post on RKHS](reproducing_kernel_hilbert_space.md) for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that $V_t = \text{grad } f_t$.  Also recall that $\text{grad } f_t = \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K}$ and $\text{Div}(\text{grad } f_t) = \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}$.
 
 Then we can simplify the objective further by rewriting $V_t$ in terms of $f_t$:
 $$

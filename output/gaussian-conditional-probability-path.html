@@ -1,46 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="generator" content="Pelican" />
-        <title>Diffusion as Gaussian conditional probability paths</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
-        <meta name="description" content="How Gaussian conditional probability paths are related to diffusion" />
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Eddie Cunningham" />
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">The Weeds</a></h1>
-                <nav><ul>
-                    <li class="active"><a href="/category/blog.html">Blog</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="/gaussian-conditional-probability-path.html" rel="bookmark"
-           title="Permalink to Diffusion as Gaussian conditional probability paths">Diffusion as Gaussian conditional probability paths</a></h1>
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content="diffusion, sde, cnf, conditional probability paths, Blog, " />
+
+<meta property="og:title" content="Diffusion as Gaussian conditional probability paths "/>
+<meta property="og:url" content="/gaussian-conditional-probability-path.html" />
+<meta property="og:description" content="How Gaussian conditional probability paths are related to diffusion" />
+<meta property="og:site_name" content="The Weeds" />
+<meta property="og:article:author" content="Eddie Cunningham" />
+<meta property="og:article:published_time" content="2023-07-15T00:00:00-05:00" />
+<meta property="og:article:modified_time" content="2023-07-15T00:00:00-05:00" />
+<meta name="twitter:title" content="Diffusion as Gaussian conditional probability paths ">
+<meta name="twitter:description" content="How Gaussian conditional probability paths are related to diffusion">
+
+        <title>Diffusion as Gaussian conditional probability paths  · The Weeds
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="/theme/css/custom.css" media="screen">
+
+
+
+    </head>
+    <body>
+        <div id="content">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a class="brand" href="/"><span class=site-name>The Weeds</span></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right top-menu">
+                                <li >
+                                    <a href=
+                                       "/"
+                                    >Home</a>
+                                </li>
+                                <li ><a href="/pages/about.html">About</a></li>
+                                <li ><a href="/categories.html">Categories</a></li>
+                                <li ><a href="/tags.html">Tags</a></li>
+                                <li ><a href="/archives.html">Archives</a></li>
+                                <li><form class="navbar-search" action="/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span1"></div>
+                    <div class="span10">
+<article itemscope>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+        <h1>
+            <a href="/gaussian-conditional-probability-path.html">
+                Diffusion as Gaussian conditional probability paths
+            </a>
+        </h1>
     </header>
+</div>
 
-    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-15T00:00:00-05:00">
-                Published: Sat 15 July 2023
-        </abbr>
-		<br />
-        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
-                Updated: Sat 15 July 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
-        </address>
-<p>In <a href="/category/blog.html">Blog</a>.</p>
-<p>tags: <a href="/tag/diffusion.html">diffusion</a> <a href="/tag/sde.html">sde</a> <a href="/tag/cnf.html">cnf</a> <a href="/tag/conditional-probability-paths.html">conditional probability paths</a> </p>
-</footer><!-- /.post-info -->      <h1>Relationship between diffusion and flow matching</h1>
-<p>Here we'll go over the relationship between diffusion and flow matching.</p>
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+            
+            <p>In my <a href="flow_matching.md">previous post</a> on flow matching, we went over how to construct a <a href="continuous_normalizing_flows.md">continuous normalizing flow</a> that transforms samples from a user specified prior, <span class="math">\(p_{t=0}\)</span>, to a target probability distribution, <span class="math">\(p_{t=1}\)</span>, that we can sample from.  In order to do this, we assumed that we could construct some probability path <span class="math">\(p_t\)</span> that can be written as a marginal distribution over a latent variable:
+</p>
+<div class="math">$$
+\begin{align}
+p_t(x_t) = \int p_y(y)p_{t|y}(x_t|y) dy
+\end{align}
+$$</div>
+<p>
+In this post we'll go over one easy way to choose <span class="math">\(p_y\)</span> and <span class="math">\(p_{t|y}\)</span> and go over how this relates to diffusion models.</p>
+<h1>Gaussian conditional flows</h1>
+<p>If we choose <span class="math">\(p_0 = N(0,I)\)</span>, then we can make the following choices for <span class="math">\(p_y\)</span> and <span class="math">\(p_{t|y}\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+p_y(y) &amp;= p_\text{data}(y) \\
+p_{t|y}(x_t|y) &amp;= \mathcal{N}(x_t; \mu_t(y), \Sigma_t(y))
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(\mu_t\)</span> and <span class="math">\(\Sigma_t\)</span> are differentiable functions of <span class="math">\(y\)</span> that satisfy the following conditions:
+</p>
+<div class="math">$$
+\begin{align}
+\mu_{t=0}(y) = 0,\quad \Sigma_{t=0}(y) = I \\
+\mu_{t=1}(y) = y,\quad \Sigma_{t=1}(y) = 0 \\
+\end{align}
+$$</div>
+<p>We can verify that that these choices of <span class="math">\(p_y\)</span> and <span class="math">\(p_{t|y}\)</span> give us the correct marginals at <span class="math">\(t=0\)</span> and <span class="math">\(t=1\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  p_0(x_0) &amp;= \int p_y(y)p_{t=0|y}(x_0|y) dy \\
+  &amp;= \int p_\text{data}(y)\mathcal{N}(x_0; \mu_0(y), \Sigma_0(y)) dy \\
+  &amp;= \int p_\text{data}(y)\mathcal{N}(x_0; 0, I) dy \\
+  &amp;= \mathcal{N}(x_0; 0, I)
+\end{align}
+$$</div>
+<div class="math">$$
+\begin{align}
+  p_1(x_1) &amp;= \int p_y(y)p_{t=1|y}(x_1|y) dy \\
+  &amp;= \int p_\text{data}(y)\mathcal{N}(x_1; \mu_1(y), \Sigma_1(y)) dy \\
+  &amp;= \int p_\text{data}(y)\delta(x_1 - y) dy \\
+  &amp;= p_\text{data}(x_1)
+\end{align}
+$$</div>
+<h2>Vector field that generates the probability path</h2>
+<p>In order to use these choices of <span class="math">\(p_y\)</span> and <span class="math">\(p_{t|y}\)</span>, we need to be able to compute the vector field that generates the probability path.  Because we are working with simple distributions like Gaussians, everything is available to us in closed form.</p>
+<p>To find the vector field, we first need to the equation for the path that a sample can evolve on.  Notice that we can sample <span class="math">\(x_t \sim p_{t|y}(x_t|y)\)</span> using the model:
+</p>
+<div class="math">$$
+\begin{align}
+x_0 &amp;\sim N(0,I) \\
+x_t &amp;= \mu_t(y) + \Sigma_t(y)^{1/2}x_0
+\end{align}
+$$</div>
+<p>
+So we can differentiate <span class="math">\(x_t\)</span> to get the conditional vector field:
+</p>
+<div class="math">$$
+\begin{align}
+\tilde{V}_t(x_t|y) &amp;= \frac{dx_t}{dt} \\
+&amp;= \frac{d}{dt}\left[\mu_t(y) + \Sigma_t(y)^{1/2}x_0\right] \\
+&amp;= \frac{d \mu_t(y)}{dt} + \frac{d \Sigma_t(y)^{1/2}}{dt}\underbrace{x_0}_{\Sigma_t^{\frac{-1}{2}}(x_t - \mu_t(y))} \\
+&amp;= \frac{d \mu_t(y)}{dt} + \frac{d \Sigma_t(y)^{1/2}}{dt}\Sigma_t^{\frac{-1}{2}}(x_t - \mu_t(y))
+\end{align}
+$$</div>
+<p>
+The simplest choice of <span class="math">\(\mu_t\)</span> and <span class="math">\(\Sigma_t\)</span> that satisfies our boundary conditions is:
+</p>
+<div class="math">$$
+\begin{align}
+\mu_t(y) &amp;= ty \\
+\Sigma_t(y) &amp;= (1-t)^2I
+\end{align}
+$$</div>
+<p>
+This leads us to the optimal transport conditional VFs from the <a href="https://arxiv.org/pdf/2210.02747.pdf">flow matching paper</a> and straight path example from my <a href="flow_matching.md">post on flow matching</a> which has
+</p>
+<div class="math">$$
+\begin{align}
+  x_t(x_0;y) &amp;= x_0 + t(y - x_0) \\
+  \tilde{V}_t(x_t|y) &amp;= y - x_0
+\end{align}
+$$</div>
+<p>Even though we are free to parametrize <span class="math">\(\Sigma\)</span> in terms of <span class="math">\(y\)</span> as well as <span class="math">\(t\)</span>, we will only consider the case where <span class="math">\(\Sigma\)</span> only depends on <span class="math">\(t\)</span> going forward so that things simplify.  This is also the case that appears in practice.</p>
+<h1>Relationship between diffusion and flow matching</h1>
+<p>Now that we have the equations that describe the probability path, we can relate this to diffusion models by relating the vector fields that generate the probability path to the score function.</p>
 <h2>CNF from an SDE</h2>
 <p>The appendix of the flow matching paper has a section that shows how to go from a stochastic differential equation to vector field that generates its flow.  This is expressed by the Fokker-Planck equation:
 If we have a stochastic differential equation of the form <span class="math">\(dx = f_tdt + g_t dw\)</span>, the its probability path has the form
@@ -55,79 +177,119 @@ where <span class="math">\(\Delta\)</span> is the Laplace operator.  If we rearr
 </p>
 <div class="math">$$
 \begin{align}
-\frac{\partial p_t}{\partial t} = -\text{Div}(\underbrace{(f_t - \frac{g_t^2}{2}\nabla \log p_t)}_{w_t}p_t )
+\frac{\partial p_t}{\partial t} = -\text{Div}(\underbrace{(f_t - \frac{g_t^2}{2}\nabla \log p_t)}_{V_t}p_t )
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(w_t\)</span> is the vector field that generates the flow of <span class="math">\(p_t\)</span>.  So the vector field that generates the flow of <span class="math">\(p_t\)</span> is given by <span class="math">\(w_t = f_t - \frac{g_t^2}{2}\nabla \log p_t\)</span>.</p>
+where <span class="math">\(w_t\)</span> is the vector field that generates the flow of <span class="math">\(p_t\)</span>.  So the vector field that generates the flow of <span class="math">\(p_t\)</span> is given by <span class="math">\(V_t = f_t - \frac{g_t^2}{2}\nabla \log p_t\)</span>.</p>
 <h2>SDE from a CNF</h2>
-<p>Next, we'll go in the reverse direction and show how CNFs that are constructed using conditional probability paths can be expressed as stochastic differential equations.</p>
-<p>Let <span class="math">\(p_t(x_t)\)</span> be the probability path of our CNF and assume that it has the following form:
+<p>Next, we'll go in the reverse direction and show how CNFs that are constructed using conditional Gaussian probability paths can be expressed as stochastic differential equations.</p>
+<p>Recall that our probability path has the form:
 </p>
 <div class="math">$$
-p_t(x_t) = \int q(x_1)N(x_t|\mu_t(x_1),\Sigma_t)dx_1
+\begin{align}
+p_t(x_t) = \int p_\text{data}(y)\mathcal{N}(x_t; \mu_t(y), \Sigma_t) dy
+\end{align}
 $$</div>
 <p>
-Gaussian distributions have the special property that the vector field that generates their flow can be written in terms of the score function.</p>
+To get the score function of the probability path, we'll first show how the score function of the conditional Gaussian relates to its vector field that generates its flow.</p>
 <h3>Score function and vector field of a Gaussian</h3>
-<p>Recall that we can sample by first sampling <span class="math">\(x_0 \sim N(0,I)\)</span> and then computing <span class="math">\(x_t = \mu_t + \Sigma_t^\frac{1}{2}x_0\)</span> and that the score function of a Gaussian is given by <span class="math">\(\nabla \log N(x_t|\mu_t,\Sigma_t) = \Sigma_t^{-1}(x_t - \mu_t)\)</span>.  We can write the score function in terms of <span class="math">\(x_0\)</span> as follows:
+<p>Recall that the score function of a Gaussian is given by
 </p>
 <div class="math">$$
 \begin{align}
-\nabla \log N(x_t|\mu_t,\Sigma_t) &amp;= \Sigma_t^{-1}(x_t - \mu_t) \\
-&amp;= \Sigma_t^{-1}(\mu_t + \Sigma_t^\frac{1}{2}x_0 - \mu_t) \\
-&amp;= \Sigma_t^{-1}\Sigma_t^\frac{1}{2}x_0 \\
-&amp;= \Sigma_t^{-\frac{1}{2}}x_0
+  \nabla \log N(x_t|\mu_t,\Sigma_t) = -\Sigma_t^{-1}(x_t - \mu_t)
 \end{align}
 $$</div>
 <p>
-Next, we can compute the vector field that generates the flow of <span class="math">\(N(x_t|\mu_t,\Sigma_t)\)</span> by taking the time derivative of a sample from <span class="math">\(N(x_t|\mu_t,\Sigma_t)\)</span>:
+and the vector field that generates the flow is
 </p>
 <div class="math">$$
 \begin{align}
-u_t &amp;= \frac{dx_t}{dt} \\
- &amp;= \frac{d}{dt}(\mu_t + \Sigma_t^\frac{1}{2}x_0) \\
-&amp;= \frac{d \mu_t}{dt} + \frac{d\Sigma_t^\frac{1}{2}}{dt}x_0
+  \tilde{V}_t &amp;= \frac{d \mu_t}{dt} + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{-\frac{1}{2}}(x_t - \mu_t)
 \end{align}
 $$</div>
 <p>
-So by replacing <span class="math">\(x_0\)</span> in terms of the score function, we have our final relationship:
+We can multiply the score function by <span class="math">\(\Sigma_t^\frac{1}{2}\)</span> and then plug it into the vector field equation to relate the two:
 </p>
 <div class="math">$$
 \begin{align}
-u_t &amp;= \frac{d \mu_t}{dt} + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log N(x_t|\mu_t,\Sigma_t)
+  \tilde{V}_t &amp;= \frac{d \mu_t}{dt} - \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log N(x_t|\mu_t,\Sigma_t)
 \end{align}
 $$</div>
+<p>Now that we have a relationship between the score and vector field for the conditional distribution, we can take a look at how this relates to the score function and vector field of the marginal distribution.</p>
 <h2>Relationship of marginals</h2>
-<p>Now that we have a relationship between the conditional probability path and the vector field that generates its flow, we can use this to relate the marginal vector field and score function.  The key property that we will exploit is that the score function, like the vector field, can be written as an expectation of the conditional versions over the posterior distribution:
+<p>The key property that we will exploit is the posterior expectation property that both the score function and marginal vector field satisfy:
 </p>
 <div class="math">$$
 \begin{align}
-\nabla \log p_t(x_t) &amp;= \int p_t(x_1|x_t)\nabla \log p_t(x_t|x_1)dx_1 \\
-u_t(x_t) &amp;= \int p_t(x_1|x_t)u_t(x_t|x_1)dx_1
+\nabla \log p_t(x_t) &amp;= \int p_t(y|x_t)\nabla \log p_t(x_t|y)dy \\
+V_t(x_t) &amp;= \int p_t(y|x_t)\tilde{V}_t(x_t|y)dy
 \end{align}
 $$</div>
 <p>
-So we can plug in our expression for the conditional vector field:
+This is easily seen for the score function because
 </p>
 <div class="math">$$
 \begin{align}
-u_t(x_t) &amp;= \int p_t(x_1|x_t)u_t(x_t|x_1)dx_1 \\
-&amp;= \int p_t(x_1|x_t)(\frac{d \mu_t(x_1)}{dt} + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log N(x_t|\mu_t(x_1),\Sigma_t))dx_1 \\
-&amp;= \underbrace{\int p_t(x_1|x_t)\frac{d \mu_t(x_1)}{dt}dx_1}_{f_t(x_t)} + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\int p_t(x_1|x_t)\nabla \log N(x_t|\mu_t(x_1),\Sigma_t)dx_1 \\
-&amp;= f_t(x_t) + \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log p_t(x_t)
+\nabla \log p_t(x_t) &amp;= \frac{1}{p_t(x_t)}\nabla\int p_y(y)p_{t|y}(x_t|y)dy \\
+&amp;= \frac{1}{p_t(x_t)}\int p_y(y)\nabla p_{t|y}(x_t|y)dy \\
+&amp;= \int \frac{p_y(y)p_{t|y}(x_t|y)}{p_t(x_t)} \nabla \log p_{t|y}(x_t|y)dy \\
+&amp;= \int p_t(y|x_t)\nabla \log p_{t|y}(x_t|y)dy
 \end{align}
 $$</div>
 <p>
-Notice that this almost matches the form of the vector field for a diffusion model.</p>
+and the marginal vector field because of the continuity equation (see my <a href="flow_matching.md">flow matching</a> post).</p>
+<p>So now we can plug and chug our equations for the conditional distribution into these marginal equations:
+</p>
+<div class="math">$$
+\begin{align}
+  V_t(x_t) &amp;= \int p_t(y|x_t)\tilde{V}_t(x_t|y)dy \\
+  &amp;= \int p_t(y|x_t)\left(\frac{d \mu_t(y)}{dt} - \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\underbrace{\nabla \log N(x_t|\mu_t(y),\Sigma_t)}_{\nabla \log p_{t|y}(x_t|y)}\right)dy \\
+  &amp;= \int p_t(y|x_t)\frac{d \mu_t(y)}{dt}dy - \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\int p_t(y|x_t)\nabla \log p_{t|y}(x_t|y)dy \\
+  &amp;= \int p_t(y|x_t)\frac{d \mu_t(y)}{dt}dy - \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log p_t(x_t)
+\end{align}
+$$</div>
+<p>
+Notice the similarity between this equation and the equation that we get from the Fokker-planck equation.  Next, we'll show that in the conditional optimal transport case, the first term can be simplified fully.</p>
 <h2>Optimal transport conditional paths</h2>
-<p>We can look at the special case where we use the optimal transport conditional path where <span class="math">\(\mu_t(x_1) = tx_1\)</span> and <span class="math">\(\Sigma_t = (1-t)^2I\)</span>.  In this case, we can simplify <span class="math">\(f_t(x_t)\)</span> as follows:
+<p>We can look at the special case where we use the optimal transport conditional path where <span class="math">\(\mu_t(y) = ty\)</span> and <span class="math">\(\Sigma_t = (1-t)^2I\)</span>.  In this case, we can fully simplify the expression of the marginal distribution's vector field by exploiting the fact that <span class="math">\(\frac{d\mu_t(y)}{dt} = \frac{1}{t}\mu_t(y)\)</span>.  Again, because we want to relate everything to the score function, lets write <span class="math">\(\mu_t(y)\)</span> in terms of <span class="math">\(\nabla \log p_{t|y}\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-f_t(x_t) &amp;= \int p_t(x_1|x_t)\frac{d \mu_t(x_1)}{dt}dx_1 \\
-&amp;= \int p_t(x_1|x_t)t \mu_t(x_1)dx_1 \\
-&amp;= t \int p_t(x_1|x_t)  \\
+  \nabla \log N(x_t|\mu_t,\Sigma_t) = -\Sigma_t^{-1}(x_t - \mu_t) \\
+  \implies \mu_t = \Sigma_t\nabla \log N(x_t|\mu_t,\Sigma_t) + x_t
+\end{align}
+$$</div>
+<p>Now lets simplify the posterior expectation:
+</p>
+<div class="math">$$
+\begin{align}
+  \int p_t(y|x_t)\frac{d \mu_t(y)}{dt}dy &amp;= \int p_t(y|x_t)\frac{1}{t}\mu_t(y)dy \\
+  &amp;= \frac{1}{t}\int p_t(y|x_t)\left(\Sigma_t\nabla \log N(x_t|\mu_t(y),\Sigma_t) + x_t\right)dy \\
+  &amp;= \frac{1}{t}\left(\Sigma_t\int p_t(y|x_t)\log N(x_t|\mu_t(y),\Sigma_t)dy + x_t\right) \\
+  &amp;= \frac{1}{t}\left(\Sigma_t \nabla \log p_t(x_t) + x_t\right)
+\end{align}
+$$</div>
+<p>
+Now we're almost done!  Next, we'll substitute <span class="math">\(\Sigma_t = (1-t)^2I\)</span> into the full expression:
+</p>
+<div class="math">$$
+\begin{align}
+  V_t(x_t) &amp;= \int p_t(y|x_t)\frac{d \mu_t(y)}{dt}dy - \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log p_t(x_t) \\
+  &amp;= \frac{1}{t}\left(\Sigma_t \nabla \log p_t(x_t) + x_t\right) - \frac{d\Sigma_t^\frac{1}{2}}{dt}\Sigma_t^{\frac{1}{2}}\nabla \log p_t(x_t) \\
+  &amp;= \frac{1}{t}\left((1-t)^2\nabla \log p_t(x_t) + x_t \right) - \frac{d (1-t)}{dt}(1-t)\nabla \log p_t(x_t) \\
+  &amp;= \frac{1}{t}x_t + \left[\frac{(1-t)^2}{t} + (1-t)\right]\nabla \log p_t(x_t) \\
+  &amp;= \frac{1}{t}x_t + \frac{1-t}{t}\nabla \log p_t(x_t) \\
+  &amp;= \frac{1}{t}(x_t + (1-t)\nabla \log p_t(x_t))
+\end{align}
+$$</div>
+<p>
+Our final expression that relates the vector field that generates the probability path and the score function of a CNF that is constructed using conditional probability paths is:
+</p>
+<div class="math">$$
+\begin{align}
+  V_t(x_t) &amp;= \frac{1}{t}(x_t + (1-t)\nabla \log p_t(x_t))
 \end{align}
 $$</div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
@@ -192,37 +354,105 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-    </div><!-- /.entry-content -->
 
-  </article>
-</section>
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>links</h2>
-                        <ul>
-                            <li><a href="https://getpelican.com/">Pelican</a></li>
-                            <li><a href="https://www.python.org/">Python.org</a></li>
-                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
-                            <li><a href="#">You can modify those links in your config file</a></li>
-                        </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
 
-                            <li><a href="#">You can add links in your config file</a></li>
-                            <li><a href="#">Another social link</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
+             
+ 
+            
+            
+            
 
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
-                </address><!-- /#about -->
 
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
 
-</body>
+
+
+
+            <hr/>
+        </div>
+        <section id="article-sidebar" class="span2">
+            <h4>Published</h4>
+            <time itemprop="dateCreated" datetime="2023-07-15T00:00:00-05:00">Jul 15, 2023</time>
+
+            <h4>Category</h4>
+            <a class="category-link" href="/categories.html#blog-ref">Blog</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="/tags.html#cnf-ref">cnf
+                    <span>1</span>
+</a></li>
+                <li><a href="/tags.html#conditional-probability-paths-ref">conditional probability paths
+                    <span>1</span>
+</a></li>
+                <li><a href="/tags.html#diffusion-ref">diffusion
+                    <span>1</span>
+</a></li>
+                <li><a href="/tags.html#sde-ref">sde
+                    <span>2</span>
+</a></li>
+            </ul>
+            
+
+
+
+
+
+            
+
+
+
+
+
+        </section>
+</div>
+</article>
+                    </div>
+                    <div class="span1"></div>
+                </div>
+            </div>
+        </div>
+<footer>
+
+
+
+
+    <div id="fpowered">
+        Powered by: <a href="http://getpelican.com/" title="Pelican Home Page" target="_blank" rel="nofollow noopener noreferrer">Pelican</a>
+        Theme: <a href="https://elegant.oncrashreboot.com/" title="Theme Elegant Home Page" target="_blank" rel="nofollow noopener noreferrer">Elegant</a>
+    </div>
+</footer>            <script src="//code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    <script>
+    (function () {
+        if (window.location.hash.match(/^#comment-\d+$/)) {
+            $('#comment_thread').collapse('show');
+        }
+    })();
+    window.onhashchange=function(){
+        if (window.location.hash.match(/^#comment-\d+$/))
+            window.location.reload(true);
+    }
+    $('#comment_thread').on('shown', function () {
+        var link = document.getElementById('comment-accordion-toggle');
+        var old_innerHTML = link.innerHTML;
+        $(link).fadeOut(200, function() {
+            $(this).text('Click here to hide comments').fadeIn(200);
+        });
+        $('#comment_thread').on('hidden', function () {
+            $(link).fadeOut(200, function() {
+                $(this).text(old_innerHTML).fadeIn(200);
+            });
+        })
+    })
+</script>
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+        License : MIT -->
 </html>

@@ -51,16 +51,16 @@ Let $(\mathcal{M},g)$ be a Riemannian manifold with volume form $\omega_g$, let 
 Say that at time $t=0$ we want to compute the probability mass inside a region $D \subseteq \mathcal{M}$.  We can do this using our prior $p_0$ by integrating over the region:
 $$
 \begin{align}
-  P(x\in D) = \int_D p_0 \omega_g
+  P(x_0\in D) = \int_D p_0 \omega_g
 \end{align}
 $$
 Similarly, at time $t$ we can compute what the mass is of the same region after it has been flowed by $V_t$:
 $$
 \begin{align}
-  P(x\in f_t(D)) = \int_{f_t(D)} p_t \omega_g
+  P(x_t\in f_t(D)) = \int_{f_t(D)} p_t \omega_g
 \end{align}
 $$
-where $p_t$ is the pushforward measure of $p_0$ under $f_t$.  The fundamental assumption that we can make is that $P(x\in D) = P(x\in f_t(D))$.  Intuitively this assumption makes sense because if we think about samples from probability distribution as "particles" distributed in space, then the flow cannot change the number of particles.  With this in mind, we assert that the probability mass in $f_t(D)$ does not change with respect to time:
+where $p_t$ is the pushforward measure of $p_0$ under $f_t$.  The fundamental assumption that we can make is that $P(x_0\in D) = P(x_t\in f_t(D))$.  Intuitively this assumption makes sense because if we think about samples from probability distribution as "particles" distributed in space, then the flow cannot change the number of particles.  With this in mind, we assert that the probability mass in $f_t(D)$ does not change with respect to time:
 $$
 \begin{align}
   0 &= \frac{d}{dt}\int_{f_t(D)} p_t \omega_g \\
@@ -81,23 +81,25 @@ $$
 $$
 
 ### Instantaneous change of variables formula
-We can go a bit further with the derivation using the properties in [Lee problem 16-12](https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf) to derive the instantaneous change of variables formula (see appendix C of [Mathieu and Nickel](https://arxiv.org/pdf/2006.10605.pdf)).  The first thing to notice is that the continuity equation has no dependence on $x\in \mathcal{M}$.  We can introduce this dependence by writing $p_t$ as $p_t(t,x(t))$ and $V_t$ as $V_t(t,x(t))$ and taking a total derivative.  Using the chain rule, we can write
+In practice we are interested in computing the log likelihood of a sample $x$ under $p_\text{model}(x;\theta)$, which requires knowing how the log likelihood of a sample changes over time.  This is the same as knowing how the log likelihood changes under the flow of $V_t$ and time.  In particular, we want to know $\frac{d\log p_t(t,x(t))}{dt}$.  In geometry terms, this is the same as knowing how $\log p_t$ changes on the flow of $\frac{d}{dt} + V_t$.  Here, we assume that $(\frac{d}{dt}, \frac{d}{dx^1}, \dots, \frac{d}{dx^n})$ forms a basis for the space $\mathbb{R} \times \mathcal{M}$, so the vector field $\frac{d}{dt} + V_t = \frac{d}{dt} + V_t^i \frac{d}{dx^i}$ describes the flow of both time and points on the manifold.
+
+Lets compute the Lie derivative of $p_t$ with respect to $\frac{d}{dt} + V_t$:
 $$
 \begin{align}
-  \frac{d p_t(t,x(t))}{dt} &= \frac{\partial p_t(t,x(t))}{\partial t} + \langle \text{grad }p_t, \frac{d}{dt}x(t) \rangle_g \\
+  \frac{d p_t(t,x(t))}{dt} &= \mathcal{L}_{\frac{d}{dt} + V_t} p_t \\
+  &= \frac{d}{dt}p_t + V_t^i \frac{\partial}{\partial x^i}p_t \\
   &= -\text{Div}(p_tV_t) + \langle \text{grad }p_t, V_t \rangle_g \\
-  &= -p_t\text{Div}(V_t) - \langle \text{grad } \log p_t, V_t(t,x) \rangle_g + \langle \text{grad } \log p_t, V_t(t,x) \rangle_g \\
+  &= -p_t\text{Div}(V_t) - \langle \text{grad } p_t, V_t \rangle_g + \langle \text{grad } p_t, V_t \rangle_g \\
   &= -p_t\text{Div}(V_t)
 \end{align}
 $$
-So we're left with our final result:
+
+Dividing both sides by $p_t$ gives us the final result:
 $$
 \begin{align}
   \frac{d\log p_t(t,x(t))}{dt} = -\text{Div}(V_t)
 \end{align}
 $$
-This is an alternate derivation to the one given in the appendix of the original [Neural ODE](https://arxiv.org/pdf/1806.07366.pdf) paper.
-
 # Existence of CNFs
 A natural question to ask is when a continuous normalizing flow even exists.  Is it always possible to find a vector field whose flow pushes forward a user specified prior to any target probability distribution?  The answer turns out to be yes as long as the prior and target are non degenerate everywhere on the manifold.  The proof for this is called [Moser's Theorem](https://arxiv.org/pdf/2108.08052.pdf) and it actually constructs the vector field that we need.
 
@@ -138,7 +140,7 @@ $$
 &= \int_{f_t(D)} d(V_t p_t + U_t) \lrcorner \omega_g \\
 \end{align}
 $$
-We know that the integrand has to be 0, so we can solve for $V_t$ in terms of $p_t$ and $U_t$:
+We know that the integrand has to be $0$, so we can solve for $V_t$ in terms of $p_t$ and $U_t$:
 $$
 \begin{align}
   V_t = -\frac{1}{p_t}U_t
@@ -165,4 +167,4 @@ $$
 We can compute $\nabla_x V_t\epsilon$ almost as efficiently as computing $V_t$ using autodiff using a JVP or VJP.  The advantage to using this method is that we can optimize different kinds of objectives like the reverse KL divergence or the forward KL divergence.  The disadvantage is that we need to simulate the dynamics of the model at each time step to get a good approximation of the log likelihood.  Furthermore, if the target distribution is 0 in some places, which is happens if the dataset lies on a manifold, then $\log p_\text{model}(x;\theta)$ will be trained to approach infinity.  An alternative that avoids this problem is to use matching.
 
 ## Flow matching
-In the setting where we have samples from our target density, you should always use flow matching to train your model.  See my [post on flow matching]({static}/flow_matching.md) for more details.
+In the setting where we have samples from our target density, you should always use flow matching to train your model.  See my [post on flow matching](flow_matching.md) for more details.

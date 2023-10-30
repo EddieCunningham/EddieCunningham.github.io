@@ -1,286 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="generator" content="Pelican" />
-        <title>The Weeds - rkhs</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Eddie Cunningham" />
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">The Weeds</a></h1>
-                <nav><ul>
-                    <li><a href="/category/blog.html">Blog</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/reproducing-kernel-hilbert-space.html">Reproducing Kernel Hilbert Space</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2023-07-16T00:00:00-05:00">
-                Published: Sun 16 July 2023
-        </abbr>
-		<br />
-        <abbr class="modified" title="2023-07-16T00:00:00-05:00">
-                Updated: Sun 16 July 2023
-        </abbr>
+<meta property="og:title" content="The Weeds"/>
+<meta name="twitter:title" content="The Weeds">
+<meta property="og:url" content="" />
+<meta property="og:site_name" content="The Weeds" />
+<meta property="og:article:author" content="Eddie Cunningham" />
+        <title>The Weeds - rkhs tag</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="/theme/css/custom.css" media="screen">
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
-        </address>
-<p>In <a href="/category/blog.html">Blog</a>.</p>
-<p>tags: <a href="/tag/rkhs.html">rkhs</a> <a href="/tag/mercer-representation.html">mercer representation</a> <a href="/tag/kernels.html">kernels</a> </p>
-</footer><!-- /.post-info --><p>We'll go over the basics of RKHS and how to use them in practice using the <a href="https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space#Integral_operators_and_Mercer's_theorem">Mercer representation</a>.</p>
-<h1>Square integrable functions</h1>
-<p>The kinds of functions that we will care about are square integrable functions.  Let <span class="math">\(X\)</span> be a compact space.  A function <span class="math">\(f\)</span> is square integrable (meaning <span class="math">\(f \in L_2(X)\)</span>) if it has a bounded norm with repspect to the inner product
-</p>
-<div class="math">$$
-\begin{align}
-  \langle f, g \rangle_{L_2} = \int_X f(x)g(x)dx
-\end{align}
-$$</div>
-<p>
-In other words, the space of integrable functions is defined as
-</p>
-<div class="math">$$
-\begin{align}
-  L_2(X) = \left\{f \mid \langle f, f \rangle_{L_2} &lt; \infty \right\}
-\end{align}
-$$</div>
-<p>
-If we have a basis of functions <span class="math">\(\{e_i\}_{i=1}^{\infty}\)</span> for <span class="math">\(L_2(X)\)</span>, then we can write any function <span class="math">\(f\in L_2(X)\)</span> in terms of the basis functions as
-</p>
-<div class="math">$$
-\begin{align}
-   f(x) &amp;= \sum_{i=1}^{\infty} \langle f, e_i \rangle_{L_2} e_i(x) \\
-   &amp;= \sum_{i=1}^{\infty} \underbrace{\int_X f(y)e_i(y)dy}_{f_i} e_i(x) \\
-   &amp;= \sum_{i=1}^{\infty} f_i e_i(x)
-\end{align}
-$$</div>
-<p>
-where <span class="math">\(f_i\)</span> is defined as the component of <span class="math">\(f\)</span> in the <span class="math">\(e_i\)</span> basis.  By our assumption that <span class="math">\(f\in L_2(X)\)</span>, we have that <span class="math">\(f_i &lt; \infty\)</span> for all <span class="math">\(i\)</span>.</p>
-<h1>Kernels</h1>
-<p>A kernel function <span class="math">\(K: X\times X \to \mathbb{R}\)</span> is a symmetric, positive definite function.  We can think of a kernel function as a way to "smooth" out functions by integrating them with respect to the kernel function.  We will define this "smoothing operation" as <span class="math">\(T_K: L_2(X) \to L_2(X)\)</span>:
-</p>
-<div class="math">$$
-\begin{align}
-  T_Kf(x) &amp;= \int_X K(x,y)f(y)dy \\
-  &amp;= \langle K_x, f \rangle_{L_2}, \text{ where }K_x(y) = K(x,y)
-\end{align}
-$$</div>
-<p>
-Notice that <span class="math">\(T_K\)</span> is a self-adjoint linear operator, so by the Mercer theorem it has an eigendecomposition.  This means that there exists scalars <span class="math">\(\{\lambda_i\}_{i=1}^{\infty}\)</span> and orthonormal functions <span class="math">\(\{e_i\}_{i=1}^{\infty}\)</span> (where <span class="math">\(\int_{\infty}^{\infty} e_i(x)e_j(x) dx = \delta_{ij}\)</span>) so that
-</p>
-<div class="math">$$
-\begin{align}
-  T_K e_i(x) = \lambda_i e_i(x), \quad \forall i
-\end{align}
-$$</div>
-<p>
-This implies that we can write <span class="math">\(K\)</span> in terms of its eigendecomposition as
-</p>
-<div class="math">$$
-\begin{align}
-  K(x,y) = \sum_{i=1}^{\infty} \lambda_i e_i(x)e_i(y)
-\end{align}
-$$</div>
-<p>
-This is similar to how We can verify this easily because
-</p>
-<div class="math">$$
-\begin{align}
-  T_K e_i(x) &amp;= \int_X K(x,y)e_i(y)dy \\
-  &amp;= \int_X \sum_{j=1}^{\infty} \lambda_j e_j(x)e_j(y)e_i(y)dy \\
-  &amp;= \sum_{j=1}^{\infty} \lambda_j e_j(x) \int_X e_j(y)e_i(y)dy \\
-  &amp;= \sum_{j=1}^{\infty} \lambda_j e_j(x) \delta_{ij} \\
-  &amp;= \lambda_i e_i(x)
-\end{align}
-$$</div>
-<p>Using these definitions, we can relate <span class="math">\(K\)</span> to its eigenfunctions in a more linear algabraic way as
-</p>
-<div class="math">$$
-\begin{align}
-  \langle K_x, e_i \rangle_{L_2} = \lambda_i e_i(x)
-\end{align}
-$$</div>
-<p>
-This expression highlights the interpretation that a Hilbert space is an infinite dimensional vector space because <span class="math">\(x\)</span> is analagous to a row index.  For example, if we have a matrix symmetric PSD <span class="math">\(\Sigma \in \mathbb{R}^{n\times n}\)</span> with eigenvectors <span class="math">\(\{v_i \in \mathbb{R}^n\}_{i=1}^{n}\)</span> and eigenvalues <span class="math">\(\{\lambda_i \in \mathbb{R}\}_{i=1}^{n}\)</span>, we can write the j'th index of the scaled i'th eigenvector is <span class="math">\(\langle \Sigma_j, v_i \rangle_2 = \lambda_i (v_i)_j\)</span>.</p>
-<h1>Reproducing Kernel Hilbert Space</h1>
-<p>Now that we've seen how to relate the kernel function with its eigenfunctions, we can define the RKHS.  An RKHS associated with a kernel <span class="math">\(K\)</span> is a Hilbert space with an inner product that resembles the inner product weighted by a symmetric matrix <span class="math">\(\Sigma\)</span> on <span class="math">\(R^n\)</span>, <span class="math">\(\langle x, y \rangle_\Sigma = x^T\Sigma^{-1} y\)</span>.</p>
-<p>Recall that <span class="math">\(K(x,y) = \sum_{i=1}^{\infty} \lambda_i e_i(x)e_i(y)\)</span>.  We define the inner product of an RKHS as follows:
-</p>
-<div class="math">$$
-\begin{align}
-  \langle f, g \rangle_{\mathcal{H}_K} = \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2}\langle g, e_i \rangle_{L_2}
-\end{align}
-$$</div>
-<p>
-This is similar to the inner product weighted by <span class="math">\(\Sigma^{-1}\)</span> on <span class="math">\(\mathbb{R}^n\)</span> because if the eigendecomposition of <span class="math">\(\Sigma^{-1}\)</span> is <span class="math">\(\Sigma^{-1}=\frac{1}{\lambda_i}v_i v_i^T\)</span>, then <span class="math">\(\langle x, y \rangle_{\Sigma^{-1}} = x^T\Sigma^{-1} y = \sum_{i=1}^n \frac{1}{\lambda_i} (x^Tv_i)(y^Tv_i) = \sum_{i=1}^n \frac{1}{\lambda_i} \langle x, v_i \rangle_2 \langle y, v_i \rangle_2\)</span>.  Finally, an RKHS is defined as the collection of functions with finite norm under this inner product:
-</p>
-<div class="math">$$
-\begin{align}
-  \mathcal{H}_K = \left\{f\in L_2(X) \mid \langle f, f \rangle_{\mathcal{H}_K} &lt; \infty \right\}
-\end{align}
-$$</div>
-<h2>Reproducing property</h2>
-<p>The "reproducing" part of RKHS comes from the following property:
-</p>
-<div class="math">$$
-\begin{align}
-  \langle f, K_x \rangle_{\mathcal{H}_K} &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2}\langle K_x, e_i \rangle_{L_2} \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\underbrace{\langle f, e_i \rangle_{L_2}}_{f_i} \int_X K(x,y)e_i(y)dy \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}f_i \int_X \sum_{j=1}^{\infty} \lambda_j e_j(x)e_j(y)e_i(y)dy \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}f_i \sum_{j=1}^{\infty} \lambda_j e_j(x) \delta_{ij} \\
-  &amp;= \sum_{i=1}^{\infty} f_i e_i(x) \\
-  &amp;= f(x)
-\end{align}
-$$</div>
-<p>
-This is called the reproducing property because it means that the evaluation of a function <span class="math">\(f\)</span> at <span class="math">\(x\)</span> can be "reproduced" by the inner product of <span class="math">\(f\)</span> with <span class="math">\(K_x\)</span>. We get another nice property if we take the inner product with the partially filled kernel functions:
-</p>
-<div class="math">$$
-\begin{align}
-  \langle K_x, K_y \rangle_{\mathcal{H}_K} &amp;= K_x(y) \\
-  &amp;= K(x, y)
-\end{align}
-$$</div>
-<p>Finally, we can also push linear operators on <span class="math">\(x\)</span> through the inner product.  For example, let <span class="math">\(\text{grad }\)</span> be the gradient function on <span class="math">\(x\)</span>.  Then
-</p>
-<div class="math">$$
-\begin{align}
-  \langle f, \text{grad } K_x \rangle_{\mathcal{H}_K} &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2}\langle \text{grad } K_x, e_i \rangle_{L_2} \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \int_X \text{grad } K(x,y)e_i(y)dy \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \sum_{j=1}^{\infty} \lambda_j \text{grad } e_j(x) \delta_{ij} \\
-  &amp;= \sum_{i=1}^{\infty} \frac{1}{\lambda_i}\langle f, e_i \rangle_{L_2} \lambda_i \text{grad } e_i(x) \\
-  &amp;= \text{grad } \sum_{i=1}^{\infty} \langle f, e_i \rangle_{L_2} e_i(x) \\
-  &amp;= \text{grad } f(x)
-\end{align}
-$$</div>
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
 
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
+    </head>
+    <body>
+        <div id="content">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a class="brand" href="/"><span class=site-name>The Weeds</span></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right top-menu">
+                                <li >
+                                    <a href=
+                                       "/"
+                                    >Home</a>
+                                </li>
+                                <li ><a href="/pages/about.html">About</a></li>
+                                <li ><a href="/categories.html">Categories</a></li>
+                                <li ><a href="/tags.html">Tags</a></li>
+                                <li ><a href="/archives.html">Archives</a></li>
+                                <li><form class="navbar-search" action="/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span1"></div>
+                    <div class="span10">
 
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
 
-    var configscript = document.createElement('script');
-    configscript.type = 'text/x-mathjax-config';
-    configscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        availableFonts: ['STIX', 'TeX']," +
-        "        preferredFont: 'STIX'," +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
+<div class="row-fluid">
 
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+    <div class="row-fluid">
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/kernel-stein-discrepancy.html" rel="bookmark"
-                           title="Permalink to Kernel Stein Discrepancy">Kernel Stein Discrepancy</a></h1>
-                </header>
+    </div>
 
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-07-15T00:00:00-05:00">
-                Published: Sat 15 July 2023
-        </abbr>
-		<br />
-        <abbr class="modified" title="2023-07-15T00:00:00-05:00">
-                Updated: Sat 15 July 2023
-        </abbr>
+    <div class="row-fluid">
+        <div class="span8 offset2">
+            <header>
+            <h1 id="recent-posts">Recent Posts <a id="allposts" href="/archives.html">all posts</a></h1>
+            </header>
+        <div class="recent-posts">
+            <div itemscope class="recent-posts-article">
+                <a href="/reproducing-kernel-hilbert-space.html">
+                    Reproducing Kernel Hilbert Space
+                </a>
+                <div class="recent-posts-posted">
+                    posted in
+                    <a href="/categories.html#blog-ref">Blog</a>
+                    <div class="recent-posts-time">
+                        <time itemprop="dateCreated" datetime="2023-07-16T00:00:00-05:00">Sun 16 July 2023</time>
+                    </div>
+                </div>
+            </div>
+            <div itemscope class="recent-posts-article">
+                <a href="/stein-vi.html">
+                    Riemannian stein variational gradient descent
+                </a>
+                <div class="recent-posts-posted">
+                    posted in
+                    <a href="/categories.html#blog-ref">Blog</a>
+                    <div class="recent-posts-time">
+                        <time itemprop="dateCreated" datetime="2023-07-15T00:00:00-05:00">Sat 15 July 2023</time>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+                    </div>
+                    <div class="span1"></div>
+                </div>
+            </div>
+        </div>
+<footer>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/eddie-cunningham.html">Eddie Cunningham</a>
-        </address>
-<p>In <a href="/category/blog.html">Blog</a>.</p>
-<p>tags: <a href="/tag/stein-discrepancy.html">stein discrepancy</a> <a href="/tag/kernels.html">kernels</a> <a href="/tag/stein-variational-gradient-descent.html">stein variational gradient descent</a> <a href="/tag/rkhs.html">rkhs</a> </p>
-</footer><!-- /.post-info -->                <p>A tutorial on kernel Stein discrepancy</p>
-                <a class="readmore" href="/kernel-stein-discrepancy.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>links</h2>
-                        <ul>
-                            <li><a href="https://getpelican.com/">Pelican</a></li>
-                            <li><a href="https://www.python.org/">Python.org</a></li>
-                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
-                            <li><a href="#">You can modify those links in your config file</a></li>
-                        </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
 
-                            <li><a href="#">You can add links in your config file</a></li>
-                            <li><a href="#">Another social link</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
 
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
-                </address><!-- /#about -->
 
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
-
-</body>
+    <div id="fpowered">
+        Powered by: <a href="http://getpelican.com/" title="Pelican Home Page" target="_blank" rel="nofollow noopener noreferrer">Pelican</a>
+        Theme: <a href="https://elegant.oncrashreboot.com/" title="Theme Elegant Home Page" target="_blank" rel="nofollow noopener noreferrer">Elegant</a>
+    </div>
+</footer>        <script src="//code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+    </body>
+    <!-- Theme: Elegant built for Pelican
+        License : MIT -->
 </html>
