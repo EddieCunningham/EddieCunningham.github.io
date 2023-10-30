@@ -79,11 +79,11 @@
             <h1>Overview</h1>
 <p>KL-divergence minimization, score matching and flow matching are all different ways to train generative models.  KL-divergence minimization is typically used to train normalizing flows, score matching for diffusion models and flow matching for continuous normalizing flows.  In this post, we'll go over how these three methods are related and when to use each one.</p>
 <h1>KL-divergence</h1>
-<p>Let <span class="math">\(p\)</span> and <span class="math">\(q\)</span> be two probability density functions defined on a Riemannian manifold <span class="math">\((\mathcal{M}, g)\)</span> and let <span class="math">\(\omega_g\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  The KL-divergence between <span class="math">\(p\)</span> and <span class="math">\(q\)</span> is defined as
+<p>Let <span class="math">\(p\)</span> and <span class="math">\(q\)</span> be two probability density functions defined on a Riemannian manifold <span class="math">\((\mathcal{M}, g)\)</span> and let <span class="math">\(dV_g\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  The KL-divergence between <span class="math">\(p\)</span> and <span class="math">\(q\)</span> is defined as
 </p>
 <div class="math">$$
 \begin{align}
-\text{KL}[p\|q] &amp;= \int_{\mathcal{M}}p \log \frac{p}{q} \omega_g
+\text{KL}[p\|q] &amp;= \int_{\mathcal{M}}p \log \frac{p}{q} dV_g
 \end{align}
 $$</div>
 <p>
@@ -92,9 +92,9 @@ It has the nice property that <span class="math">\(KL[p\|q] \geq 0\)</span> and 
 </p>
 <div class="math">$$
 \begin{align}
-  \nabla_{\theta}\text{KL}[p\|q(\theta)] &amp;= \nabla_{\theta}\int_{\mathcal{M}}p \log \frac{p}{q(\theta)} \omega_g \\
-  &amp;= \underbrace{\nabla_{\theta}\int_{\mathcal{M}}p \log p \omega_g}_{0} - \nabla_{\theta}\int_{\mathcal{M}}p \log q(\theta) \omega_g \\
-  &amp;= -\int_{\mathcal{M}}p \nabla_{\theta}\log q(\theta) \omega_g \\
+  \nabla_{\theta}\text{KL}[p\|q(\theta)] &amp;= \nabla_{\theta}\int_{\mathcal{M}}p \log \frac{p}{q(\theta)} dV_g \\
+  &amp;= \underbrace{\nabla_{\theta}\int_{\mathcal{M}}p \log p dV_g}_{0} - \nabla_{\theta}\int_{\mathcal{M}}p \log q(\theta) dV_g \\
+  &amp;= -\int_{\mathcal{M}}p \nabla_{\theta}\log q(\theta) dV_g \\
   &amp;= -\nabla_{\theta}\mathbb{E}_p\left[\log q(\theta)\right]
 \end{align}
 $$</div>
@@ -132,7 +132,7 @@ $$</div>
 </p>
 <div class="math">$$
 \begin{align}
-  \mathcal{L}_{\text{SM}}(\theta) &amp;= \int_{t_0}^{t_1} \int_{\mathcal{M}}p_t \left\|\nabla_x \log p_t - \nabla_x \log q_t(\theta)\right\|_g^2 \omega_g dt
+  \mathcal{L}_{\text{SM}}(\theta) &amp;= \int_{t_0}^{t_1} \int_{\mathcal{M}}p_t \left\|\nabla_x \log p_t - \nabla_x \log q_t(\theta)\right\|_g^2 dV_g dt
 \end{align}
 $$</div>
 <p>
@@ -142,12 +142,26 @@ where <span class="math">\(q(x;\theta)\)</span> is the model distribution with p
 </p>
 <div class="math">$$
 \begin{align}
-  \mathcal{L}_{\text{FM}}(\theta) &amp;= \int_{t_0}^{t_1} \int_{\mathcal{M}}p_t \left\|V_t - W_t\right\|_g^2 \omega_g dt
+  \mathcal{L}_{\text{FM}}(\theta) &amp;= \int_{t_0}^{t_1} \int_{\mathcal{M}}p_t \left\|V_t - W_t\right\|_g^2 dV_g dt
 \end{align}
 $$</div>
 <p>
 Flow matching is used to train <a href="https://arxiv.org/pdf/2002.02428.pdf">continuous normalizing flows</a> and has been shown to be a more stable alternative to score matching.</p>
-<h1>Relationship between KL-divergence and matching</h1>
+<h1>Entropy</h1>
+<p>We can see how a generating vector field and score function interact through the time derivative of the entropy of a probability distribution.  If <span class="math">\((p_t,V_t)\)</span> is a probability path, then
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{d}{dt}H(p_t) &amp;= -\frac{d}{dt}\int_{\mathcal{M}}p_t \log p_t dV_g \\
+  &amp;= -\int_{\mathcal{M}}\frac{dp_t}{dt} \log p_t dV_g - \underbrace{\int_{\mathcal{M}}\frac{dp_t}{dt}dV_g}_{0} \\
+  &amp;= \int_{\mathcal{M}}\text{Div}(p_tV_t) \log p_t dV_g \\
+  &amp;= -\int_{\mathcal{M}}\langle p_tV_t, \nabla\log p_t \rangle_g dV_g \\
+  &amp;= -\int_{\mathcal{M}}p_t\langle V_t, \nabla\log p_t \rangle_g dV_g \\
+\end{align}
+$$</div>
+<p>
+So the inner product between the score function and the vector field tells us how the entropy changes.  We can see that to maximize this quantity, we need <span class="math">\(V_t\)</span> to be in the same opposite direction as <span class="math">\(\nabla \log p_t\)</span>.  This makes sense as this corresponds to flowing outwards from the peak of the distribution.</p>
+<h1>KL-Divergence</h1>
 <p>Now that we've introduced KL-divergence, score matching, and flow matching, we can see how they are related.  Say that we have a probability path for our target distribution <span class="math">\(p_t\)</span> and a path for our model distribution <span class="math">\(q_t\)</span> and assume that <span class="math">\(p_0 = q_0\)</span> (we construct the probability paths like this in flow matching).  We can express the KL divergence between the final two distributions, <span class="math">\(p_{t=1}\)</span> and <span class="math">\(q_{t=1}\)</span>, as
 </p>
 <div class="math">$$
@@ -159,28 +173,28 @@ $$</div>
 <p>
 Before expanding the time derivative of the KL-divergence, lets go over the identities that we need to know.  Recall that we are assuming that <span class="math">\(\mathcal{M}\)</span> is a Riemannian manifold with metric <span class="math">\(g\)</span> and no boundary.  The identities we're using are:
 1. Continuity equation: <span class="math">\(\frac{\partial p_t}{\partial t} = -\text{Div}(p_tV_t)\)</span>
-2. Integration by parts for boundryless manifolds: <span class="math">\(-\int_{\mathcal{M}}f\text{Div}(V)\omega_g = \int_\mathcal{M}\langle \nabla f, V\rangle_g \omega_g\)</span>
+2. Integration by parts for boundryless manifolds: <span class="math">\(-\int_{\mathcal{M}}f\text{Div}(V)dV_g = \int_\mathcal{M}\langle \nabla f, V\rangle_g dV_g\)</span>
 See my post on <a href="continuous_normalizing_flows.md">continuous normalizing flows</a> for a derivation of the continuity equation and <a href="https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf">problem 16-12 of Lee</a> for integration by parts.</p>
 <p>Next, lets expand the time derivative of KL-divergence:
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{d}{dt}\text{KL}\left[p_t\|q_t\right] &amp;= \frac{d}{dt}\int_{\mathcal{M}}p_t \log \frac{p_t}{q_t} \omega_g \\
-  &amp;= \int_{\mathcal{M}}\frac{d p_t}{dt} \log \frac{p_t}{q_t} \omega_g + \int_{\mathcal{M}}p_t \frac{d}{dt}\log \frac{p_t}{q_t} \omega_g \\
-  &amp;= -\int_{\mathcal{M}}\text{Div}(p_tV_t) \log \frac{p_t}{q_t} \omega_g + \underbrace{\int_{\mathcal{M}}p_t \frac{d}{dt}\log p_t \omega_g}_{0} - \int_{\mathcal{M}}\frac{p_t}{q_t} \frac{dq_t}{dt} \omega_g \\
-  &amp;= \int_{\mathcal{M}}\langle p_t V_t, \nabla \log \frac{p_t}{q_t} \rangle_g \omega_g + \int_{\mathcal{M}}\frac{p_t}{q_t} \text{Div}(q_tW_t) \omega_g \\
-  &amp;= \int_{\mathcal{M}}p_t\langle V_t, \nabla \log \frac{p_t}{q_t} \rangle_g \omega_g - \int_{\mathcal{M}}\langle \nabla \frac{p_t}{q_t}, q_tW_t\rangle_g  \omega_g \\
-  &amp;= \int_{\mathcal{M}}p_t\langle V_t, \nabla \log \frac{p_t}{q_t} \rangle_g \omega_g - \int_{\mathcal{M}}p_t \langle \nabla \log \frac{p_t}{q_t}, W_t\rangle_g  \omega_g \\
-  &amp;= \int_{\mathcal{M}}p_t\langle V_t - W_t, \nabla \log p_t - \nabla \log q_t \rangle_g \omega_g
+  \frac{d}{dt}\text{KL}\left[p_t\|q_t\right] &amp;= \frac{d}{dt}\int_{\mathcal{M}}p_t \log \frac{p_t}{q_t} dV_g \\
+  &amp;= \int_{\mathcal{M}}\frac{d p_t}{dt} \log \frac{p_t}{q_t} dV_g + \int_{\mathcal{M}}p_t \frac{d}{dt}\log \frac{p_t}{q_t} dV_g \\
+  &amp;= -\int_{\mathcal{M}}\text{Div}(p_tV_t) \log \frac{p_t}{q_t} dV_g + \underbrace{\int_{\mathcal{M}}p_t \frac{d}{dt}\log p_t dV_g}_{0} - \int_{\mathcal{M}}\frac{p_t}{q_t} \frac{dq_t}{dt} dV_g \\
+  &amp;= \int_{\mathcal{M}}\langle p_t V_t, \nabla \log \frac{p_t}{q_t} \rangle_g dV_g + \int_{\mathcal{M}}\frac{p_t}{q_t} \text{Div}(q_tW_t) dV_g \\
+  &amp;= \int_{\mathcal{M}}p_t\langle V_t, \nabla \log \frac{p_t}{q_t} \rangle_g dV_g - \int_{\mathcal{M}}\langle \nabla \frac{p_t}{q_t}, q_tW_t\rangle_g  dV_g \\
+  &amp;= \int_{\mathcal{M}}p_t\langle V_t, \nabla \log \frac{p_t}{q_t} \rangle_g dV_g - \int_{\mathcal{M}}p_t \langle \nabla \log \frac{p_t}{q_t}, W_t\rangle_g  dV_g \\
+  &amp;= \int_{\mathcal{M}}p_t\langle V_t - W_t, \nabla \log p_t - \nabla \log q_t \rangle_g dV_g
 \end{align}
 $$</div>
 <p>
 Notice that we have an equation that combines both the scores and vector fields.  We can write the score matching and flow matching objectives more suggestively by writing the <span class="math">\(L2\)</span> norm as an inner product:</p>
 <div class="math">$$
 \begin{align}
-  \text{KL}\left[p_1\|q_1\right] &amp;= \int \int_{\mathcal{M}}p_t\langle V_t - W_t, \nabla \log p_t - \nabla \log q_t \rangle_g \omega_g dt \\
-  \mathcal{L}_{\text{SM}} &amp;= \int_{t_0}^{t_1} \int_{\mathcal{M}}p_t \langle \nabla_x \log p_t - \nabla_x \log q_t, \nabla_x \log p_t - \nabla_x \log q_t \rangle_g \omega_g dt \\
-  \mathcal{L}_{\text{FM}} &amp;= \int_{t_0}^{t_1} \int_{\mathcal{M}}p_t \langle V_t - W_t, V_t - W_t \rangle_g \omega_g dt
+  \text{KL}\left[p_1\|q_1\right] &amp;= \int \int_{\mathcal{M}}p_t\langle V_t - W_t, \nabla \log p_t - \nabla \log q_t \rangle_g dV_g dt \\
+  \mathcal{L}_{\text{SM}} &amp;= \int_{t_0}^{t_1} \int_{\mathcal{M}}p_t \langle \nabla_x \log p_t - \nabla_x \log q_t, \nabla_x \log p_t - \nabla_x \log q_t \rangle_g dV_g dt \\
+  \mathcal{L}_{\text{FM}} &amp;= \int_{t_0}^{t_1} \int_{\mathcal{M}}p_t \langle V_t - W_t, V_t - W_t \rangle_g dV_g dt
 \end{align}
 $$</div>
 <p>

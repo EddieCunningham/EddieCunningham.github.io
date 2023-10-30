@@ -102,7 +102,7 @@ $$</div>
 <p>
 Note that <span class="math">\(\langle X, Y \rangle_g: U \to \mathbb{R}\)</span> is a function over <span class="math">\(U\)</span>.  When we evaluate it at a point <span class="math">\(p \in U\)</span>, we get a scalar value which represents the inner product between the tangent vectors <span class="math">\(X_p\)</span> and <span class="math">\(Y_p\)</span>.</p>
 <h2>Pullback metrics</h2>
-<p>Because the Riemannian metric is a covariant tensor, we can pull it back through any immersion.  Let <span class="math">\(F: \mathcal{N} \to \mathcal{M}\)</span> be a smooth, injective function with constant rank and say that we have defined a Riemannian metric <span class="math">\(g\)</span> on <span class="math">\(\mathcal{M}\)</span>.  Then the pullback metric of <span class="math">\(g\)</span> through <span class="math">\(F\)</span> is a Riemannian metric on <span class="math">\(\mathcal{N}\)</span> defined as <span class="math">\(F^*g\)</span>.  In the domain of a chart <span class="math">\((V, (z^i))\)</span> of <span class="math">\(\mathcal{N}\)</span> (and assuming that <span class="math">\((U,(x^i))\)</span> is a chart on <span class="math">\(\mathcal{M}\)</span> so that <span class="math">\(F(V)\)</span> and <span class="math">\(U\)</span> overlap), we can write the pullback metric as
+<p>Because the Riemannian metric is a covariant tensor, we can pull it back through any smooth map.  Let <span class="math">\(F: \mathcal{N} \to \mathcal{M}\)</span> be a smooth map and say that we have defined a Riemannian metric <span class="math">\(g\)</span> on <span class="math">\(\mathcal{M}\)</span>.  Then the pullback metric of <span class="math">\(g\)</span> through <span class="math">\(F\)</span> is a Riemannian metric on <span class="math">\(\mathcal{N}\)</span> defined as <span class="math">\(F^*g\)</span>.  In the domain of a chart <span class="math">\((V, (z^i))\)</span> of <span class="math">\(\mathcal{N}\)</span> (and assuming that <span class="math">\((U,(x^i))\)</span> is a chart on <span class="math">\(\mathcal{M}\)</span> so that <span class="math">\(F(V)\)</span> and <span class="math">\(U\)</span> overlap), we can write the pullback metric as
 </p>
 <div class="math">$$
 \begin{align}
@@ -115,23 +115,81 @@ $$</div>
 <p>
 So <span class="math">\(F\)</span> and <span class="math">\(g\)</span> define a new Riemannian metric <span class="math">\(\hat{g}\)</span> on <span class="math">\(\mathcal{N}\)</span> whose coordinates are given by <span class="math">\(\hat{g}_{uv}\)</span>.</p>
 <h2>Orthonormal frames</h2>
-<p>Riemannian metrics allow us to define the concept of orthogonality.  Two vectors <span class="math">\(X\)</span> and <span class="math">\(Y\)</span> are orthogonal if <span class="math">\(\langle X, Y \rangle_g=0\)</span>.  An orthonormal frame can be thought of as a collection of vector fields that at each point form an orthonormal basis for the tangent space.</p>
-<h1>Riemannian volume form</h1>
-<p>A Riemannian volume form is a top form <span class="math">\(\omega_g \in \Omega^n(\mathcal{M})\)</span> with the property that for every orthonormal frame <span class="math">\((E_1, \dots, E_n)\)</span> over <span class="math">\(\mathcal{M}\)</span>, we have that
+<p>Riemannian metrics allow us to define the concept of orthogonality.  Two vectors <span class="math">\(X\)</span> and <span class="math">\(Y\)</span> are orthogonal if <span class="math">\(\langle X, Y \rangle_g=0\)</span>.  An orthonormal frame is a frame <span class="math">\((E_1,\dots,E_n)\)</span> where <span class="math">\(\langle E_i, E_j \rangle_g = \delta_{ij}\)</span>.  There is a dual frame associated with every orthonormal frame, <span class="math">\((\epsilon^1,\dots,\epsilon^n)\)</span>, where <span class="math">\(\epsilon^i(E_j) = \delta^i_j\)</span>.  Due to the definition that <span class="math">\(g(E_i, E_j) = \delta_{ij}\)</span>, we can write the Riemannian metric in terms of the dual frame as:
 </p>
 <div class="math">$$
 \begin{align}
-  \omega_g(E_1, \dots, E_n) = 1
+  g = \epsilon^i \otimes \epsilon^i
+\end{align}
+$$</div>
+<p>We can also see what the coordinates of the orthonormal frames are.  Let <span class="math">\(E_j = E_j^k\frac{\partial}{\partial x^k}\)</span> and <span class="math">\(\epsilon^i = \epsilon^i_kdx^k\)</span>.  By definition of the dual frame, we get that
+</p>
+<div class="math">$$
+\begin{align}
+  \delta^i_j &amp;= \epsilon^i(E_j) \\
+  &amp;= \epsilon^i_k E^k_j
+\end{align}
+$$</div>
+<p>But we also have that
+</p>
+<div class="math">$$
+\begin{align}
+  \delta_{ij} &amp;= g(E_i, E_j) \\
+  &amp;= g_{lk}dx^l \otimes dx^k(E_i^a\frac{\partial}{\partial x^a}, E_j^b\frac{\partial}{\partial x^b}) \\
+  &amp;= E_i^lg_{lk}E_j^k
 \end{align}
 $$</div>
 <p>
-It turns out that this property alone <strong>defines</strong> a unique <span class="math">\(n\)</span>-form, which we denote by <span class="math">\(\omega_g\)</span>, on <span class="math">\(\mathcal{M}\)</span>.  First we'll show how to construct <span class="math">\(\omega_g\)</span> and show its uniqueness and then we'll show how to define volume.</p>
-<h2>Construction and uniqueness</h2>
-<p>Let <span class="math">\((E_1, \dots, E_n)\)</span> be an orthonormal frame over <span class="math">\(\mathcal{M}\)</span> and let <span class="math">\((\epsilon^1, \dots, \epsilon^n)\)</span> be the dual coframe.  If we let <span class="math">\(\omega_g = \epsilon^1 \wedge \dots \wedge \epsilon^n\)</span>, then <span class="math">\(\omega_g\)</span> clearly satisfies our definition.  Futhermore, let <span class="math">\((\tilde{E_1}, \dots, \tilde{E_n})\)</span> and <span class="math">\(\tilde{\epsilon}^1, \dots, \tilde{\epsilon}^n\)</span> be another orthogonal frame/coframe pair that we use to construct another form <span class="math">\(\tilde{w}_g\)</span> that satisfies our definition of a volume form.  Then we have that
+Comparing the two, we see that <span class="math">\(\epsilon^i_k = E_i^lg_{lk}\)</span>.  Multiplying by the inverse, we also have that <span class="math">\(E_i^l = \epsilon^i_kg^{kl}\)</span>.  So
 </p>
 <div class="math">$$
 \begin{align}
-  \omega_g(\tilde{E_1}, \dots, \tilde{E_n}) &amp;= \omega_g(\tilde{E_1}, \dots, \tilde{E_n}) \\
+  E_j &amp;= E_j^k \frac{\partial}{\partial x^k} \\
+      &amp;= \epsilon^j_l g^{lk} \frac{\partial}{\partial x^k} \\
+  \epsilon^i &amp;= E_i^lg_{lk} dx^k \\
+             &amp;= \epsilon^i_k dx^k
+\end{align}
+$$</div>
+<h2>Riemannian submanifolds</h2>
+<p>Let <span class="math">\(g\)</span> be a Riemannian metric on an n-dimensional smooth manifold <span class="math">\(\mathcal{M}\)</span> and let <span class="math">\(S\subset \mathcal{M}\)</span> be a k-dimensional embedded submanifold.  If <span class="math">\(\iota: S \to \mathcal{M}\)</span> is the inclusion map, then we can define a Riemannian metric on <span class="math">\(S\)</span> as the pullback metric of <span class="math">\(g\)</span> through <span class="math">\(\iota\)</span>,
+</p>
+<div class="math">$$
+  \tilde{g} = \iota^*g
+$$</div>
+<p>
+Let <span class="math">\(E_1,\dots,E_k\)</span> be a local orthonormal frame on <span class="math">\(S\)</span> with respect to <span class="math">\(\tilde{g}\)</span> and let <span class="math">\((\epsilon^1,\dots,\epsilon^k)\)</span> be the dual coframe.  Then we can see that
+</p>
+<div class="math">$$
+\begin{align}
+  \tilde{g}(E_i,E_j) &amp;= \iota^*g(E_i,E_j) \\
+  &amp;= g(\iota_*E_i,\iota_*E_j)
+\end{align}
+$$</div>
+<p>
+Furthermore, we can write the coordinates of <span class="math">\(\tilde{g}\)</span> in the ambient space by pulling back through the projection map <span class="math">\(\pi: \mathcal{M} \to S\)</span>:</p>
+<div class="math">$$
+\begin{align}
+  \pi^*\tilde{g} &amp;= \pi^* \left(\sum_{i=1}^k \epsilon^i \otimes \epsilon^i\right) \\
+  &amp;= \sum_{i=1}^k \epsilon^i \otimes \epsilon^i \\
+  &amp;= \epsilon_i^k \epsilon_j^k dx^i \otimes dx^j
+\end{align}
+$$</div>
+<h1>Riemannian volume form</h1>
+<p>A Riemannian volume form is a top form <span class="math">\(dV_g \in \Omega^n(\mathcal{M})\)</span> with the property that for every orthonormal frame <span class="math">\((E_1, \dots, E_n)\)</span> over <span class="math">\(\mathcal{M}\)</span>, we have that
+</p>
+<div class="math">$$
+\begin{align}
+  dV_g(E_1, \dots, E_n) = 1
+\end{align}
+$$</div>
+<p>
+It turns out that this property alone <strong>defines</strong> a unique <span class="math">\(n\)</span>-form, which we denote by <span class="math">\(dV_g\)</span>, on <span class="math">\(\mathcal{M}\)</span>.  First we'll show how to construct <span class="math">\(dV_g\)</span> and show its uniqueness and then we'll show how to define volume.  The <span class="math">\(d\)</span> at the front of <span class="math">\(dV_g\)</span> is not the exterior derivative, just a notation highlight the fact that <span class="math">\(dV_g\)</span> is closed <span class="math">\(d(dV_g) = 0\)</span> because <span class="math">\(dV_g\)</span> is a top form.  But it is not necessarily true that <span class="math">\(dV_g\)</span> is exact.</p>
+<h2>Construction and uniqueness</h2>
+<p>Let <span class="math">\((E_1, \dots, E_n)\)</span> be an orthonormal frame over <span class="math">\(\mathcal{M}\)</span> and let <span class="math">\((\epsilon^1, \dots, \epsilon^n)\)</span> be the dual coframe.  If we let <span class="math">\(dV_g = \epsilon^1 \wedge \dots \wedge \epsilon^n\)</span>, then <span class="math">\(dV_g\)</span> clearly satisfies our definition.  Futhermore, let <span class="math">\((\tilde{E_1}, \dots, \tilde{E_n})\)</span> and <span class="math">\(\tilde{\epsilon}^1, \dots, \tilde{\epsilon}^n\)</span> be another orthogonal frame/coframe pair that we use to construct another form <span class="math">\(\tilde{w}_g\)</span> that satisfies our definition of a volume form.  Then we have that
+</p>
+<div class="math">$$
+\begin{align}
+  dV_g(\tilde{E_1}, \dots, \tilde{E_n}) &amp;= dV_g(\tilde{E_1}, \dots, \tilde{E_n}) \\
   &amp;= \epsilon^1 \wedge \dots \wedge \epsilon^n(\tilde{E_1}, \dots, \tilde{E_n}) \\
   &amp;= \det(\epsilon^i(\tilde{E}_j)) \\
   &amp;= \det(\epsilon^i(Q^k_j E_k)) \\
@@ -141,35 +199,32 @@ It turns out that this property alone <strong>defines</strong> a unique <span cl
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(Q^i_j = \epsilon^i(\tilde{E}_j)\)</span> is the change of basis matrix from <span class="math">\((E_1, \dots, E_n)\)</span> to <span class="math">\((\tilde{E_1}, \dots, \tilde{E_n})\)</span>.  It has a determinant of 1 because both bases are orthonormal.  Thus we have that <span class="math">\(\omega_g = \tilde{w}_g\)</span>, so <span class="math">\(\omega_g\)</span> can be defined using any orthonormal frame.  In this setup, <span class="math">\(g\)</span> played a role in the construction of the orthonormal frames.  But to make its relation clearer, we can write <span class="math">\(\omega_g\)</span> in a coordinate chart <span class="math">\((U, (x^i))\)</span> as follows.  Assume that we can write the basis vectors for <span class="math">\(x\)</span> in terms of the orthogonal basis as <span class="math">\(\frac{d}{dx^i} = A^j_iE_j\)</span>.  Then we have that
+where <span class="math">\(Q^i_j = \epsilon^i(\tilde{E}_j)\)</span> is the change of basis matrix from <span class="math">\((E_1, \dots, E_n)\)</span> to <span class="math">\((\tilde{E_1}, \dots, \tilde{E_n})\)</span>.  It has a determinant of 1 because both bases are orthonormal.  Thus we have that <span class="math">\(dV_g = \tilde{w}_g\)</span>, so <span class="math">\(dV_g\)</span> can be defined using any orthonormal frame.  In this setup, <span class="math">\(g\)</span> played a role in the construction of the orthonormal frames.</p>
+<p>To make the relation clearer, we can write the volume form in terms of the Riemannian metric <span class="math">\(g\)</span>.  Let <span class="math">\((X_1,\dots,X^n)\)</span> be a frame.  Then
 </p>
 <div class="math">$$
 \begin{align}
-  \omega_g(\frac{d}{d x^1}, \dots, \frac{d}{d x^n}) &amp;= \epsilon^1 \wedge \dots \wedge \epsilon^n(\frac{d}{d x^1}, \dots, \frac{d}{d x^n}) \\
-  &amp;= \det(\epsilon^i(\frac{d}{d x^j})) \\
-  &amp;= \det(A^i_j) \\
-  &amp;= \det(A^k_i A^k_j)^\frac{1}{2} \\
-  &amp;= \det(A^k_i A^l_j \langle E_k, E_l \rangle_g)^\frac{1}{2} \\
-  &amp;= \det(\langle\frac{d}{d x^i}, \frac{d}{d x^j} \rangle_g)^\frac{1}{2} \\
-  &amp;= \det(g_{ij})^\frac{1}{2} \\
+  dV_g(X_1,\dots,X_n) &amp;= \epsilon^1 \wedge \dots \wedge \epsilon^n(X_1,\dots,X_n) \\
+  &amp;= \det(\epsilon^i(X_j)) \\
+  &amp;= \det(\epsilon^k(X_i)\epsilon^k(X_j))^\frac{1}{2} \quad (\det(A)=\det(A^TA)^\frac{1}{2}) \\
+  &amp;= \det(\epsilon^k\otimes \epsilon^k(X_i,X_j))^\frac{1}{2} \\
+  &amp;= \det(g(X_i,X_j))^\frac{1}{2} \\
 \end{align}
 $$</div>
 <p>
-So we have that
+Therefore if <span class="math">\((\omega^1,\dots,\omega^n)\)</span> is the coframe for <span class="math">\((X_1,\dots,X_n)\)</span>, then
 </p>
 <div class="math">$$
 \begin{align}
-  \omega_g = \det(g_{ij})^\frac{1}{2} dx^1 \wedge \dots \wedge dx^n
+  dV_g &amp;= \det(g(X_i,X_j))^\frac{1}{2} \omega^1 \wedge \dots \wedge \omega^n
 \end{align}
 $$</div>
-<p>
-So to recap, a volume form is defined as <span class="math">\(\omega_g = \epsilon^1 \wedge \dots \wedge \epsilon^n\)</span> where <span class="math">\((\epsilon^1, \dots, \epsilon^n)\)</span> is a dual coframe for an orthonormal frame with respect to <span class="math">\(g\)</span> and in a coordinate chart, we can write the volume form as <span class="math">\(\omega_g = \det(g_{ij})^\frac{1}{2} dx^1 \wedge \dots \wedge dx^n\)</span>.</p>
 <h2>Induced volume form on submanifolds</h2>
 <p>The volume form on <span class="math">\(\mathcal{M}\)</span> induces a volume form on any k-dimensional submanifold <span class="math">\(\mathcal{S} \subset \mathcal{M}\)</span>.  Let <span class="math">\(\iota_{\mathcal{S}}: \mathcal{S} \to \mathcal{M}\)</span> be the inclusion map and let <span class="math">\((E_1,\dots,E_{n-k})\)</span> be an orthonormal frame on the normal bundle of <span class="math">\(\mathcal{S}\)</span>.  Then the induced volume form on <span class="math">\(\mathcal{S}\)</span> is defined as
 </p>
 <div class="math">$$
 \begin{align}
-  \omega_{\tilde{g}} = \iota_{\mathcal{S}}^*(i_{E_{n-k}}\circ \dots \circ i_{E_1}\omega_g)
+  \omega_{\tilde{g}} = \iota_{\mathcal{S}}^*(i_{E_{n-k}}\circ \dots \circ i_{E_1}dV_g)
 \end{align}
 $$</div>
 <p>
@@ -177,25 +232,25 @@ where <span class="math">\(i_{E_i}\)</span> is the interior product with respect
 </p>
 <div class="math">$$
 \begin{align}
-  \omega_{\tilde{g}}(E_{n-k}, \dots, E_n) &amp;= \iota_{\mathcal{S}}^*(i_{E_{n-k}}\circ \dots \circ i_{E_1}\omega_g)(E_{n-k}, \dots, E_n) \\
-  &amp;= (i_{E_{n-k}}\circ \dots \circ i_{E_1}\omega_g)(\iota_{\mathcal{S}}(E_{n-k}), \dots, \iota_{\mathcal{S}}(E_n)) \\
-  &amp;= (i_{E_{n-k}}\circ \dots \circ i_{E_1}\omega_g)(E_{n-k}, \dots, E_n) \\
-  &amp;= \omega_g(E_1, \dots, E_n) \\
+  \omega_{\tilde{g}}(E_{n-k}, \dots, E_n) &amp;= \iota_{\mathcal{S}}^*(i_{E_{n-k}}\circ \dots \circ i_{E_1}dV_g)(E_{n-k}, \dots, E_n) \\
+  &amp;= (i_{E_{n-k}}\circ \dots \circ i_{E_1}dV_g)(\iota_{\mathcal{S}}(E_{n-k}), \dots, \iota_{\mathcal{S}}(E_n)) \\
+  &amp;= (i_{E_{n-k}}\circ \dots \circ i_{E_1}dV_g)(E_{n-k}, \dots, E_n) \\
+  &amp;= dV_g(E_1, \dots, E_n) \\
   &amp;= 1
 \end{align}
 $$</div>
 <p>
-where the last equality follows from the fact that <span class="math">\(\omega_g\)</span> is a volume form on <span class="math">\(\mathcal{M}\)</span>.</p>
+where the last equality follows from the fact that <span class="math">\(dV_g\)</span> is a volume form on <span class="math">\(\mathcal{M}\)</span>.</p>
 <h2>Pullback volume forms</h2>
-<p>Let <span class="math">\(F: \mathcal{N} \to \mathcal{M}\)</span> be a diffeomorphism and <span class="math">\(\omega_g\)</span> be a volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the volume form on <span class="math">\(\mathcal{N}\)</span> induced by <span class="math">\(F\)</span> and <span class="math">\(\omega_g\)</span> is:
+<p>Let <span class="math">\(F: \mathcal{N} \to \mathcal{M}\)</span> be a diffeomorphism and <span class="math">\(dV_g\)</span> be a volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the volume form on <span class="math">\(\mathcal{N}\)</span> induced by <span class="math">\(F\)</span> and <span class="math">\(dV_g\)</span> is:
 </p>
 <div class="math">$$
 \begin{align}
-  F^*\omega_g = \omega_{F^*g}
+  F^*dV_g = \omega_{F^*g}
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(F^*g\)</span> is the pullback metric of <span class="math">\(g\)</span> through <span class="math">\(F\)</span>.  We can see this by checking that <span class="math">\(F^*\omega_g\)</span> is a volume form on <span class="math">\(\mathcal{N}\)</span> with respect to the pullback metric <span class="math">\(F^*g\)</span>.  Let <span class="math">\((E_1, \dots, E_n)\)</span> be an orthonormal frame on <span class="math">\(\mathcal{M}\)</span>.  Then we can see that <span class="math">\((F^{-1}_*E_1, \dots, F^{-1}_*E_n)\)</span> is an orthonormal frame on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span> because
+where <span class="math">\(F^*g\)</span> is the pullback metric of <span class="math">\(g\)</span> through <span class="math">\(F\)</span>.  We can see this by checking that <span class="math">\(F^*dV_g\)</span> is a volume form on <span class="math">\(\mathcal{N}\)</span> with respect to the pullback metric <span class="math">\(F^*g\)</span>.  Let <span class="math">\((E_1, \dots, E_n)\)</span> be an orthonormal frame on <span class="math">\(\mathcal{M}\)</span>.  Then we can see that <span class="math">\((F^{-1}_*E_1, \dots, F^{-1}_*E_n)\)</span> is an orthonormal frame on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span> because
 </p>
 <div class="math">$$
 \begin{align}
@@ -216,11 +271,11 @@ Furthermore, the dual basis for <span class="math">\((F^{-1}_*E_1, \dots, F^{-1}
 \end{align}
 $$</div>
 <p>
-So now that we know that <span class="math">\((F^*\epsilon^1, \dots, F^*\epsilon^n)\)</span> forms an orthonormal dual frame on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span>, and we know that volume forms can be written as the wedge product of any orthonormal dual frame, we can immediately see that <span class="math">\(F^*\omega_g\)</span> is a volume form on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span>:
+So now that we know that <span class="math">\((F^*\epsilon^1, \dots, F^*\epsilon^n)\)</span> forms an orthonormal dual frame on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span>, and we know that volume forms can be written as the wedge product of any orthonormal dual frame, we can immediately see that <span class="math">\(F^*dV_g\)</span> is a volume form on <span class="math">\(\mathcal{N}\)</span> with respect to <span class="math">\(F^*g\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-  F^*\omega_g &amp;= F^*(\epsilon^1 \wedge \dots \wedge \epsilon^n) \\
+  F^*dV_g &amp;= F^*(\epsilon^1 \wedge \dots \wedge \epsilon^n) \\
   &amp;= (F^*\epsilon^1) \wedge \dots \wedge (F^*\epsilon^n)
 \end{align}
 $$</div>
@@ -229,8 +284,8 @@ $$</div>
 </p>
 <div class="math">$$
 \begin{align}
-  \text{Vol}(D) &amp;= \int_D \omega_g \\
-  &amp;= \pm \int_{\phi(D)}(\phi^{-1})^*\omega_g \\
+  \text{Vol}(D) &amp;= \int_D dV_g \\
+  &amp;= \pm \int_{\phi(D)}(\phi^{-1})^*dV_g \\
   &amp;= \pm \int_{\phi(D)}\underbrace{\omega_{(\phi^{-1})^*g}}_{\omega_{\bar{g}}} \\
   &amp;= \pm \int_{\phi(D)}\det(\bar{g}_{ij})^\frac{1}{2} dx^1 \wedge \dots \wedge dx^n \\
   &amp;= \pm \int_{\phi(D)}\det(\bar{g}_{ij})^\frac{1}{2} dx^1 \dots dx^n
@@ -241,11 +296,11 @@ So the volume of <span class="math">\(D\)</span> is defined as the integral of v
 <p>The plus or minus sign appears due to the orientation of the chart.  If the chart is orientation preserving, then the sign is positive and if the chart is orientation reversing, then the sign is negative.  This can be an issue for non-orientable manifolds.  For example if we wanted to find the volume of a Mobius strip, we would need to use two charts to cover the strip.  One chart would be orientation preserving and the other would be orientation reversing, so the volumes we compute on each chart would cancel.  A way to get around this is to use a Riemannian density instead of a volume form.</p>
 <h1>Riemannian densities</h1>
 <p>A Riemannian density is an object that is like the absolute value of a volume form and can be used to define an unsigned volume on a manifold.  See Chapter 16 of <a href="https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf">Lee 2013</a> for a reference.</p>
-<p>Let <span class="math">\(\omega_g\)</span> be a volume form over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  Then a Riemmanian density, <span class="math">\(\mu_g\)</span> can be constructed as the absolute value of <span class="math">\(\omega_g\)</span>:
+<p>Let <span class="math">\(dV_g\)</span> be a volume form over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  Then a Riemmanian density, <span class="math">\(\mu_g\)</span> can be constructed as the absolute value of <span class="math">\(dV_g\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-  \mu_g = |\omega_g|
+  \mu_g = |dV_g|
 \end{align}
 $$</div>
 <p>
@@ -253,8 +308,8 @@ where the absolute value sign means that we take the absolute value of the evalu
 </p>
 <div class="math">$$
 \begin{align}
-  \mu_g(E_1,\dots,D_n) &amp;= |\omega_g|(E_1,\dots,D_n) \\
-  &amp;= |\omega_g(E_1,\dots,D_n)|
+  \mu_g(E_1,\dots,D_n) &amp;= |dV_g|(E_1,\dots,D_n) \\
+  &amp;= |dV_g(E_1,\dots,D_n)|
 \end{align}
 $$</div>
 <p>
@@ -263,9 +318,9 @@ The Riemannian density, although they aren't tensors, have many of the same prop
 <div class="math">$$
 \begin{align}
   \text{Vol}(D) &amp;= \int_D \mu_g \\
-  &amp;= \int_D |\omega_g| \\
-  &amp;= \int_{\phi(D)} (\phi^{-1})^*|\omega_g| \\
-  &amp;= \int_{\phi(D)} |(\phi^{-1})^*\omega_g| \\
+  &amp;= \int_D |dV_g| \\
+  &amp;= \int_{\phi(D)} (\phi^{-1})^*|dV_g| \\
+  &amp;= \int_{\phi(D)} |(\phi^{-1})^*dV_g| \\
 \end{align}
 $$</div>
 <p>
@@ -356,10 +411,10 @@ The absolute value sign will cancel out the sign ambiguity that we had with the 
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
                 <li><a href="/tags.html#differential-geometry-ref">differential geometry
-                    <span>1</span>
+                    <span>3</span>
 </a></li>
                 <li><a href="/tags.html#riemannian-geometry-ref">riemannian geometry
-                    <span>1</span>
+                    <span>3</span>
 </a></li>
                 <li><a href="/tags.html#volume-form-ref">volume form
                     <span>1</span>
