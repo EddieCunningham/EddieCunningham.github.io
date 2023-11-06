@@ -1,5 +1,5 @@
 AUTHOR = 'Eddie Cunningham'
-SITENAME = 'The Weeds'
+SITENAME = ''
 SITEURL = ''
 
 STATIC_PATHS = ['generax']

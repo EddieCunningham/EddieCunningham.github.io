@@ -6,7 +6,7 @@ Tags: diffusion, sde, cnf, conditional probability paths
 Slug: gaussian-conditional-probability-path
 Summary: How Gaussian conditional probability paths are related to diffusion
 
-In my [previous post](flow_matching.md) on flow matching, we went over how to construct a [continuous normalizing flow](continuous_normalizing_flows.md) that transforms samples from a user specified prior, $p_{t=0}$, to a target probability distribution, $p_{t=1}$, that we can sample from.  In order to do this, we assumed that we could construct some probability path $p_t$ that can be written as a marginal distribution over a latent variable:
+In my [previous post]({filename}flow_matching.md) on flow matching, we went over how to construct a [continuous normalizing flow]({filename}continuous_normalizing_flows.md) that transforms samples from a user specified prior, $p_{t=0}$, to a target probability distribution, $p_{t=1}$, that we can sample from.  In order to do this, we assumed that we could construct some probability path $p_t$ that can be written as a marginal distribution over a latent variable:
 $$
 \begin{align}
 p_t(x_t) = \int p_y(y)p_{t|y}(x_t|y) dy

@@ -1,10 +1,25 @@
 Title: Continuous normalizing flows
-Date: 2023-07-15
-Modified: 2023-07-15
+Date: 2023-10-31
 Category: Blog
+status: published
 Tags: flows, matching, generative models
 Slug: continuous-normalizing-flows
 Summary: A tutorial on continuous normalizing flows
+
+Over the past few years the space of generative AI (formerly generative models) has been dominated by diffusion models due to their unconstrained neural network architecture, simulation based sample generation and fast, simulation-free training.  At the core of diffusion models is a neural network that serves as a parametric approximation of the score function, which is then used to construct an **SDE** whose solution yields samples.  However, there is a different class of generative models, called continuous normalizing flows (CNF), that have many of same benefits of diffusion models, but are based on parametrizing the **ODE** whose solution yields samples.  In this post, we'll go over a brief history of CNFs, how they are constructed, their existence and end with some training algorithms.
+
+![Evolution of a CNF]({static}/images/cnf_evolution.png)
+
+# Brief history
+Continuous normalizing flows were first introduced in the 2018 [Neural ODE](https://arxiv.org/pdf/1806.07366.pdf) paper.  The authors introduced the instantaneous change of variables formula, which opened the possibility to train CNFs via maximum likelihood.  In the following years, there was three main branches of research on CNFs.
+
+1) Improved training and sampling speed ([Grathwohl et al. 2019](https://arxiv.org/pdf/1810.01367.pdf), [Finlay et al. 2020](http://proceedings.mlr.press/v119/finlay20a/finlay20a.pdf), [Kidger et al. 2021](http://proceedings.mlr.press/v139/kidger21a/kidger21a.pdf) to name a few)
+
+2) Extensions to Riemannian manifolds ([Mathieu and Nickel 2020](https://arxiv.org/pdf/2006.10605.pdf), [Falorsi 2021](https://arxiv.org/pdf/2104.14959.pdf), [Lou et al. 2020](https://arxiv.org/pdf/2006.10254.pdf)).  However, CNFs were too difficult to train in practice which stopped them from receiving as much attention as other flow based methods for generative modeling.
+
+3) Alternatives to maximum likelihood for training ([Rozen et al. 2021](https://arxiv.org/pdf/2108.08052.pdf), [Ben-Hamu et al. 2022](https://arxiv.org/pdf/2207.04711.pdf), [Liu et al. 2022](https://arxiv.org/pdf/2209.03003.pdf), [Lipman et al. 2023](https://arxiv.org/pdf/2210.02747.pdf), [Albergo and Vanden-Eijnden 2023](https://arxiv.org/pdf/2209.15571.pdf))
+
+The latter led to breakthroughs in training CNFs that make them competitive with diffusion models in image generation and generative modeling on manifolds.
 
 # What problem are we trying to solve?
 We are interested in learning a parametric approximation of an unknown probability distribution that we can sample from and compute likelihood on.  Given a target probability distribution called $p_\text{data}(x)$, where $x\in \mathcal{M}$, we want to learn a parametric approximation called $p_\text{model}(x;\theta)$.  In our problem setup, we assume that we can sample from $p_\text{data}(x)$ and that $p_\text{data}(x)>0, \forall x\in \mathcal{M}$.  The second assumption ensures that a solution exists, as we will see later.

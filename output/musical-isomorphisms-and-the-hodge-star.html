@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Eddie Cunningham" />
+
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content=", Blog, " />
+
+<meta property="og:title" content="Musical isomorphisms and the Hodge star "/>
+<meta property="og:url" content="/musical-isomorphisms-and-the-hodge-star.html" />
+<meta property="og:description" content="Tags: riemannian geometry, differential geometry Slug: musical_isomorphisms_and_hodge_star Summary: Easy to understand explanation of the musical isomorphisms and the Hodge star operator. One application of the Riemannian metric is for transforming vectors to covectors and vice versa. We go from vector \(X\) to some covector \(\omega\) by filling the first argument …if (!document.getElementById(&#39;mathjaxscript_pelican_#%@#$@#&#39;)) { var align = &#34;center&#34;, indent = &#34;0em&#34;, linebreak = &#34;false&#34;; if (false) { align = (screen.width" />
+<meta property="og:site_name" content="" />
+<meta property="og:article:author" content="Eddie Cunningham" />
+<meta property="og:article:published_time" content="2023-07-16T00:00:00-05:00" />
+<meta property="og:article:modified_time" content="2023-07-16T00:00:00-05:00" />
+<meta name="twitter:title" content="Musical isomorphisms and the Hodge star ">
+<meta name="twitter:description" content="Tags: riemannian geometry, differential geometry Slug: musical_isomorphisms_and_hodge_star Summary: Easy to understand explanation of the musical isomorphisms and the Hodge star operator. One application of the Riemannian metric is for transforming vectors to covectors and vice versa. We go from vector \(X\) to some covector \(\omega\) by filling the first argument …if (!document.getElementById(&#39;mathjaxscript_pelican_#%@#$@#&#39;)) { var align = &#34;center&#34;, indent = &#34;0em&#34;, linebreak = &#34;false&#34;; if (false) { align = (screen.width">
+
+        <title>Musical isomorphisms and the Hodge star  · 
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="/theme/css/custom.css" media="screen">
+
+
+
+    </head>
+    <body>
+        <div id="content">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a class="brand" href="/"><span class=site-name></span></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right top-menu">
+                                <li >
+                                    <a href=
+                                       "/"
+                                    >Home</a>
+                                </li>
+                                <li ><a href="/pages/about.html">About</a></li>
+                                <li ><a href="/pages/research.html">Research</a></li>
+                                <li ><a href="/categories.html">Categories</a></li>
+                                <li ><a href="/tags.html">Tags</a></li>
+                                <li ><a href="/archives.html">Archives</a></li>
+                                <li><form class="navbar-search" action="/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span1"></div>
+                    <div class="span10">
+<article itemscope>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+        <h1>
+            <a href="/musical-isomorphisms-and-the-hodge-star.html">
+                Musical isomorphisms and the Hodge star
+            </a>
+        </h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+            
+            <!-- status: hidden -->
+<p>Tags: riemannian geometry, differential geometry
+Slug: musical_isomorphisms_and_hodge_star
+Summary: Easy to understand explanation of the musical isomorphisms and the Hodge star operator.</p>
+<p>One application of the Riemannian metric is for transforming vectors to covectors and vice versa.  We go from vector <span class="math">\(X\)</span> to some covector <span class="math">\(\omega\)</span> by filling the first argument of <span class="math">\(g\)</span> with <span class="math">\(X\)</span> so that <span class="math">\(\omega(.) = g(X,.)\)</span>.  This is main property that we can use to construct the musical isomophisms - the operations that transform vectors to covectors and vice versa.  In this post, we'll go over an easy to understand interpretation of the musical isomorphisms and look at how they can be used to define the Hodge star operator.</p>
+<h1>Riemannian metrics</h1>
+<p>Let <span class="math">\(M\)</span> be a smooth manifold and let <span class="math">\(g\)</span> be its Riemannian metric.  <span class="math">\(g\)</span> can be used to define the concept of orthogonality so that at each point on <span class="math">\(M\)</span>, we can find an orthonormal frame <span class="math">\((E_1,\dots,E_n)\)</span> locally around that point so that <span class="math">\(g(E_i,E_j)=\delta_{ij}\)</span>.  A direct consequence is that <span class="math">\(g\)</span> can be written in terms of the coframe that is dual to the orthonormal frame, <span class="math">\(\epsilon^1,\dots,\epsilon^n\)</span> as:
+</p>
+<div class="math">$$
+\begin{align}
+  g = \epsilon^i \otimes \epsilon^i
+\end{align}
+$$</div>
+<p>
+We can also write <span class="math">\(g\)</span> in terms of coordinates as :
+</p>
+<div class="math">$$
+\begin{align}
+  g = g_{ij}dx^i \otimes dx^j
+\end{align}
+$$</div>
+<p>With this in mind, we'll define the musical isomorphisms <span class="math">\(\flat: \mathfrak{X}(\mathcal{M}) \to \Omega(\mathcal{M})\)</span> and <span class="math">\(\sharp: \Omega(\mathcal{M}) \to \mathfrak{X}(\mathcal{M})\)</span> as follows:
+</p>
+<div class="math">$$
+\begin{align}
+  X^\flat(.) = g(X,.) \\
+  \omega(.) = g(\omega^\sharp,.)
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(X \in \mathfrak{X}(\mathcal{M})\)</span> and <span class="math">\(\omega \in \Omega(\mathcal{M})\)</span>.  We can see that the <span class="math">\(\flat\)</span> operator and <span class="math">\(\sharp\)</span> operator are inverses of each other.  Also because <span class="math">\(g(E_i,E_j)=\delta_{ij}\)</span>, we have that <span class="math">\(E_i^\flat = ϵ^i\)</span> because <span class="math">\(E_i^\flat(E_j) = \delta_{ij}\)</span>.  With logic, we get that <span class="math">\((\epsilon^i)^\sharp = E_i\)</span>.  By linearity, we can write the sharp and flat operators as the operations to transform the components of a vector to the components of a covector:
+</p>
+<div class="math">$$
+\begin{align}
+  X^\flat &amp;= (X^iE_i)^\flat = X^i\epsilon^i \\
+  \omega^\sharp &amp;= (\omega_i\epsilon^i)^\sharp = \omega_iE_i
+\end{align}
+$$</div>
+<p>We can also look at how coordinate vectors transform.  Let <span class="math">\(\frac{\partial}{\partial x^i}\)</span> be the coordinate vector field associated with the coordinate <span class="math">\(x^i\)</span>.  So say that <span class="math">\(\frac{\partial}{\partial x^i} = A^j_iE_j\)</span> and <span class="math">\(E_j = B^i_j\frac{\partial}{\partial x^i}\)</span> where <span class="math">\(AB = I\)</span>.  Then we have that:</p>
+<h3>Examples</h3>
+<p>Let's look at some examples of the musical isomorphisms in action.
+</p>
+<div class="math">$$
+\begin{align}
+  \text{grad}f = (df)^\sharp \\
+  *X^\flat = X \lrcorner dV_g \\
+  d*X^\flat = \text{div}(X)dV_g \\
+  *d*X^\flat = \text{div}(X)
+\end{align}
+$$</div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+
+             
+ 
+            
+            
+            
+
+
+
+
+
+
+            <hr/>
+        </div>
+        <section id="article-sidebar" class="span2">
+            <h4>Published</h4>
+            <time itemprop="dateCreated" datetime="2023-07-16T00:00:00-05:00">Jul 16, 2023</time>
+
+            <h4>Category</h4>
+            <a class="category-link" href="/categories.html#blog-ref">Blog</a>
+            
+
+
+
+
+
+            
+
+
+
+
+
+        </section>
+</div>
+</article>
+                    </div>
+                    <div class="span1"></div>
+                </div>
+            </div>
+        </div>
+<footer>
+
+
+
+
+    <div id="fpowered">
+        Powered by: <a href="http://getpelican.com/" title="Pelican Home Page" target="_blank" rel="nofollow noopener noreferrer">Pelican</a>
+        Theme: <a href="https://elegant.oncrashreboot.com/" title="Theme Elegant Home Page" target="_blank" rel="nofollow noopener noreferrer">Elegant</a>
+    </div>
+</footer>            <script src="//code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    <script>
+    (function () {
+        if (window.location.hash.match(/^#comment-\d+$/)) {
+            $('#comment_thread').collapse('show');
+        }
+    })();
+    window.onhashchange=function(){
+        if (window.location.hash.match(/^#comment-\d+$/))
+            window.location.reload(true);
+    }
+    $('#comment_thread').on('shown', function () {
+        var link = document.getElementById('comment-accordion-toggle');
+        var old_innerHTML = link.innerHTML;
+        $(link).fadeOut(200, function() {
+            $(this).text('Click here to hide comments').fadeIn(200);
+        });
+        $('#comment_thread').on('hidden', function () {
+            $(link).fadeOut(200, function() {
+                $(this).text(old_innerHTML).fadeIn(200);
+            });
+        })
+    })
+</script>
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+        License : MIT -->
+</html>

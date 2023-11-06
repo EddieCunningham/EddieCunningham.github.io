@@ -2,6 +2,7 @@ Title: Riemannian stein variational gradient descent
 Date: 2023-07-15
 Modified: 2023-07-15
 Category: Blog
+<!-- status: hidden -->
 Tags: stein discrepancy, kernels, stein variational gradient descent, rkhs
 Slug: stein-vi
 Summary: A tutorial on Stein variational gradient descent
@@ -54,7 +55,7 @@ $$
   \mathfrak{X} = \left\{V_t = \text{grad } f \mid f \in \mathcal{H}_K \right\}
 \end{align}
 $$
-where $\mathcal{H}_k$ is a reproducing kernel Hilbert space (RKHS) with kernel $K$.  Check out my [post on RKHS](reproducing_kernel_hilbert_space.md) for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that $V_t = \text{grad } f_t$.  Also recall that $\text{grad } f_t = \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K}$ and $\text{Div}(\text{grad } f_t) = \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}$.
+where $\mathcal{H}_k$ is a reproducing kernel Hilbert space (RKHS) with kernel $K$.  Check out my [post on RKHS]({filename}reproducing_kernel_hilbert_space.md) for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that $V_t = \text{grad } f_t$.  Also recall that $\text{grad } f_t = \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K}$ and $\text{Div}(\text{grad } f_t) = \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}$.
 
 Then we can simplify the objective further by rewriting $V_t$ in terms of $f_t$:
 $$

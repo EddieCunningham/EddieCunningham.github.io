@@ -2,6 +2,7 @@ Title: Musical isomorphisms and the Hodge star
 Date: 2023-07-16
 Modified: 2023-07-16
 Category: Blog
+<!-- status: hidden -->
 Tags: riemannian geometry, differential geometry
 Slug: musical_isomorphisms_and_hodge_star
 Summary: Easy to understand explanation of the musical isomorphisms and the Hodge star operator.

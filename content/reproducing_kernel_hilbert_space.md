@@ -2,6 +2,7 @@ Title: Reproducing Kernel Hilbert Space
 Date: 2023-07-16
 Modified: 2023-07-16
 Category: Blog
+<!-- status: hidden -->
 Tags: rkhs, mercer representation, kernels
 Slug: reproducing-kernel-hilbert-space
 Summary: A quick practical introduction into RKHS

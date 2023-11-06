@@ -1,4 +1,4 @@
 Title: About
 Slug: about
 
-This blog is about diving into the details of machine learning algorithms.  Each post will cover a concept or paper that I find interesting.
+I'm a 5th year PhD student at UMass Amherst working on finding useful coordinate systems for data using flow-based generative models.  My research interests include generative AI, probabilistic machine learning and geometric deep learning.

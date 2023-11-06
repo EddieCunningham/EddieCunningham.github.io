@@ -2,6 +2,7 @@ Title: KL-Divergence, Score Matching, and Flow Matching
 Date: 2023-07-15
 Modified: 2023-07-15
 Category: Blog
+status: hidden
 Tags: probability paths, KL-divergence, score matching, flow matching
 Slug: kl-div-and-matching
 Summary: The relationship between KL-divergence, score matching, and flow matching
@@ -39,7 +40,7 @@ $$
   \frac{dx_t}{dt} &= V_t(x_t),\text{ where }x_t := f_t(x_0)
 \end{align}
 $$
-The probability path and vector field are related via the continuity equation (see my [continuous normalizing flows post](continuous_normalizing_flows.md) to see where it comes from):
+The probability path and vector field are related via the continuity equation (see my [continuous normalizing flows post]({filename}continuous_normalizing_flows.md) to see where it comes from):
 $$
 \begin{align}
   \frac{\partial p_t}{\partial t} &= -\text{Div}(p_tV_t)
@@ -52,7 +53,7 @@ $$
 \end{align}
 $$
 
-But where do probability paths come from if we are trying to learn how to model some fixed probabiltiy distribution?  It turns out that as long as we can sample from our target distribution $p_\text{data}$, which is the case when we are trying to learn the unknown data generating probability distribution, then we can always construct a probability path from any starting distribution $p_{t=0}$ to the target at $t=1$.  See my [flow matching post](flow_matching.md) for more details.
+But where do probability paths come from if we are trying to learn how to model some fixed probabiltiy distribution?  It turns out that as long as we can sample from our target distribution $p_\text{data}$, which is the case when we are trying to learn the unknown data generating probability distribution, then we can always construct a probability path from any starting distribution $p_{t=0}$ to the target at $t=1$.  See my [flow matching post]({filename}flow_matching.md) for more details.
 
 
 ## Score matching
@@ -97,7 +98,7 @@ $$
 Before expanding the time derivative of the KL-divergence, lets go over the identities that we need to know.  Recall that we are assuming that $\mathcal{M}$ is a Riemannian manifold with metric $g$ and no boundary.  The identities we're using are:
 1. Continuity equation: $\frac{\partial p_t}{\partial t} = -\text{Div}(p_tV_t)$
 2. Integration by parts for boundryless manifolds: $-\int_{\mathcal{M}}f\text{Div}(V)dV_g = \int_\mathcal{M}\langle \nabla f, V\rangle_g dV_g$
-See my post on [continuous normalizing flows](continuous_normalizing_flows.md) for a derivation of the continuity equation and [problem 16-12 of Lee](https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf) for integration by parts.
+See my post on [continuous normalizing flows]({filename}continuous_normalizing_flows.md) for a derivation of the continuity equation and [problem 16-12 of Lee](https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf) for integration by parts.
 
 Next, lets expand the time derivative of KL-divergence:
 $$

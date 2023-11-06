@@ -14,14 +14,14 @@
 <meta property="og:title" content="KL-Divergence, Score Matching, and Flow Matching "/>
 <meta property="og:url" content="/kl-div-and-matching.html" />
 <meta property="og:description" content="The relationship between KL-divergence, score matching, and flow matching" />
-<meta property="og:site_name" content="The Weeds" />
+<meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
 <meta property="og:article:published_time" content="2023-07-15T00:00:00-05:00" />
 <meta property="og:article:modified_time" content="2023-07-15T00:00:00-05:00" />
 <meta name="twitter:title" content="KL-Divergence, Score Matching, and Flow Matching ">
 <meta name="twitter:description" content="The relationship between KL-divergence, score matching, and flow matching">
 
-        <title>KL-Divergence, Score Matching, and Flow Matching  · The Weeds
+        <title>KL-Divergence, Score Matching, and Flow Matching  · 
 </title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
@@ -40,7 +40,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </a>
-                        <a class="brand" href="/"><span class=site-name>The Weeds</span></a>
+                        <a class="brand" href="/"><span class=site-name></span></a>
                         <div class="nav-collapse collapse">
                             <ul class="nav pull-right top-menu">
                                 <li >
@@ -49,6 +49,7 @@
                                     >Home</a>
                                 </li>
                                 <li ><a href="/pages/about.html">About</a></li>
+                                <li ><a href="/pages/research.html">Research</a></li>
                                 <li ><a href="/categories.html">Categories</a></li>
                                 <li ><a href="/tags.html">Tags</a></li>
                                 <li ><a href="/archives.html">Archives</a></li>
@@ -111,7 +112,7 @@ Because the gradients of the KL divergence are equal to the gradients of the exp
 \end{align}
 $$</div>
 <p>
-The probability path and vector field are related via the continuity equation (see my <a href="continuous_normalizing_flows.md">continuous normalizing flows post</a> to see where it comes from):
+The probability path and vector field are related via the continuity equation (see my <a href="/continuous-normalizing-flows.html">continuous normalizing flows post</a> to see where it comes from):
 </p>
 <div class="math">$$
 \begin{align}
@@ -126,7 +127,7 @@ where <span class="math">\(\text{Div}\)</span> is the divergence operator on <sp
   \text{Div}(fV) &amp;= f\text{Div}(V) + \langle \nabla f, V \rangle_g
 \end{align}
 $$</div>
-<p>But where do probability paths come from if we are trying to learn how to model some fixed probabiltiy distribution?  It turns out that as long as we can sample from our target distribution <span class="math">\(p_\text{data}\)</span>, which is the case when we are trying to learn the unknown data generating probability distribution, then we can always construct a probability path from any starting distribution <span class="math">\(p_{t=0}\)</span> to the target at <span class="math">\(t=1\)</span>.  See my <a href="flow_matching.md">flow matching post</a> for more details.</p>
+<p>But where do probability paths come from if we are trying to learn how to model some fixed probabiltiy distribution?  It turns out that as long as we can sample from our target distribution <span class="math">\(p_\text{data}\)</span>, which is the case when we are trying to learn the unknown data generating probability distribution, then we can always construct a probability path from any starting distribution <span class="math">\(p_{t=0}\)</span> to the target at <span class="math">\(t=1\)</span>.  See my <a href="/flow-matching.html">flow matching post</a> for more details.</p>
 <h2>Score matching</h2>
 <p>Now that we know what probability paths are, lets introduce score matching.  The score of a probability density function, in the context of generative modeling, is the gradient of the log likelihood function <span class="math">\(\nabla_x \log p_t(x)\)</span>.  Score matching aims to minimize the norm between the score of the target distribution and the score of the model distribution at all times:
 </p>
@@ -174,7 +175,7 @@ $$</div>
 Before expanding the time derivative of the KL-divergence, lets go over the identities that we need to know.  Recall that we are assuming that <span class="math">\(\mathcal{M}\)</span> is a Riemannian manifold with metric <span class="math">\(g\)</span> and no boundary.  The identities we're using are:
 1. Continuity equation: <span class="math">\(\frac{\partial p_t}{\partial t} = -\text{Div}(p_tV_t)\)</span>
 2. Integration by parts for boundryless manifolds: <span class="math">\(-\int_{\mathcal{M}}f\text{Div}(V)dV_g = \int_\mathcal{M}\langle \nabla f, V\rangle_g dV_g\)</span>
-See my post on <a href="continuous_normalizing_flows.md">continuous normalizing flows</a> for a derivation of the continuity equation and <a href="https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf">problem 16-12 of Lee</a> for integration by parts.</p>
+See my post on <a href="/continuous-normalizing-flows.html">continuous normalizing flows</a> for a derivation of the continuity equation and <a href="https://math.berkeley.edu/~jchaidez/materials/reu/lee_smooth_manifolds.pdf">problem 16-12 of Lee</a> for integration by parts.</p>
 <p>Next, lets expand the time derivative of KL-divergence:
 </p>
 <div class="math">$$
@@ -285,16 +286,12 @@ KL divergence, score matching and flow matching all take an expectation with res
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
                 <li><a href="/tags.html#flow-matching-ref">flow matching
-                    <span>1</span>
 </a></li>
                 <li><a href="/tags.html#kl-divergence-ref">KL-divergence
-                    <span>1</span>
 </a></li>
                 <li><a href="/tags.html#probability-paths-ref">probability paths
-                    <span>1</span>
 </a></li>
                 <li><a href="/tags.html#score-matching-ref">score matching
-                    <span>1</span>
 </a></li>
             </ul>
             

@@ -14,14 +14,14 @@
 <meta property="og:title" content="Probability measures using Riemannian densities "/>
 <meta property="og:url" content="/probability_measure.html" />
 <meta property="og:description" content="A connection between generative models and Riemannian geometry." />
-<meta property="og:site_name" content="The Weeds" />
+<meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
 <meta property="og:article:published_time" content="2023-07-16T00:00:00-05:00" />
 <meta property="og:article:modified_time" content="2023-07-16T00:00:00-05:00" />
 <meta name="twitter:title" content="Probability measures using Riemannian densities ">
 <meta name="twitter:description" content="A connection between generative models and Riemannian geometry.">
 
-        <title>Probability measures using Riemannian densities  · The Weeds
+        <title>Probability measures using Riemannian densities  · 
 </title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
@@ -40,7 +40,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </a>
-                        <a class="brand" href="/"><span class=site-name>The Weeds</span></a>
+                        <a class="brand" href="/"><span class=site-name></span></a>
                         <div class="nav-collapse collapse">
                             <ul class="nav pull-right top-menu">
                                 <li >
@@ -49,6 +49,7 @@
                                     >Home</a>
                                 </li>
                                 <li ><a href="/pages/about.html">About</a></li>
+                                <li ><a href="/pages/research.html">Research</a></li>
                                 <li ><a href="/categories.html">Categories</a></li>
                                 <li ><a href="/tags.html">Tags</a></li>
                                 <li ><a href="/archives.html">Archives</a></li>
@@ -195,55 +196,50 @@ where <span class="math">\(F:\mathcal{X} \to \mathcal{Z}\)</span> is a diffeomor
 $$</div>
 <p>
 If <span class="math">\(F^{-1}(S)\)</span> is aligned with the coordinate axes, then this expression is equivalent to the change of variables formula on manifolds.</p>
-<h1>Probability form decomposition</h1>
-<p>Let <span class="math">\(S\subset \mathcal{X}\)</span> be a submanifold of <span class="math">\(\mathcal{M}\)</span> and let <span class="math">\(F:\mathcal{X} \to \mathcal{Z}\)</span> be a diffeomorphism.  Locally, let <span class="math">\(S^\perp\)</span> denote the submanifold with tangent space equal to the normal space of <span class="math">\(S\)</span>.  Then we can decompose the probability form on <span class="math">\(\mathcal{X}\)</span> into a product of probability forms on <span class="math">\(S\)</span>, <span class="math">\(S^\perp\)</span> and one other term.</p>
-<p>First, consider the matrix <span class="math">\(M = <div class="math">\begin{bmatrix}A^TA &amp; A^TB \\ B^TA &amp; B^TB\end{bmatrix}</div>\)</span>.  We can decompose <span class="math">\(\det(M)\)</span> into a product of matrices:
-</p>
-<div class="math">$$
+<!-- # Probability form decomposition
+Let $S\subset \mathcal{X}$ be a submanifold of $\mathcal{M}$ and let $F:\mathcal{X} \to \mathcal{Z}$ be a diffeomorphism.  Locally, let $S^\perp$ denote the submanifold with tangent space equal to the normal space of $S$.  Then we can decompose the probability form on $\mathcal{X}$ into a product of probability forms on $S$, $S^\perp$ and one other term.
+
+First, consider the matrix $M = \begin{bmatrix}A^TA & A^TB \\ B^TA & B^TB\end{bmatrix}$.  We can decompose $\det(M)$ into a product of matrices:
+$$
 \begin{align}
-  \det(M) &amp;= \det\begin{bmatrix}A^TA &amp; A^TB \\ B^TA &amp; B^TB\end{bmatrix}^\frac{1}{2} \\
-  &amp;= \det(A^TA)^\frac{1}{2}\det(B^TB - B^T\underbrace{A(A^TA)^{-1}A^T}_{A^\parallel}B)^\frac{1}{2} \\
-  &amp;= \det(A^TA)^\frac{1}{2}\det(B^TB)^\frac{1}{2}\det(I - A^\parallel \underbrace{B(B^TB)^{-1}B^T}_{B^\parallel})^\frac{1}{2} \\
-  &amp;= \det(A^TA)^\frac{1}{2}\det(B^TB)^\frac{1}{2}\det(I - A^\parallel B^\parallel)^\frac{1}{2}
+  \det(M) &= \det\begin{bmatrix}A^TA & A^TB \\ B^TA & B^TB\end{bmatrix}^\frac{1}{2} \\
+  &= \det(A^TA)^\frac{1}{2}\det(B^TB - B^T\underbrace{A(A^TA)^{-1}A^T}_{A^\parallel}B)^\frac{1}{2} \\
+  &= \det(A^TA)^\frac{1}{2}\det(B^TB)^\frac{1}{2}\det(I - A^\parallel \underbrace{B(B^TB)^{-1}B^T}_{B^\parallel})^\frac{1}{2} \\
+  &= \det(A^TA)^\frac{1}{2}\det(B^TB)^\frac{1}{2}\det(I - A^\parallel B^\parallel)^\frac{1}{2}
 \end{align}
-$$</div>
-<p>
+$$
 In log space, we can write this decomposition as:
-</p>
-<div class="math">$$
+$$
 \begin{align}
-  \log\det(M) &amp;= \frac{1}{2}\log\det(A^TA) + \frac{1}{2}\log\det(B^TB) + \frac{1}{2}\underbrace{\log\det(I - A^\parallel B^\parallel)}_{\mathcal{I}}
+  \log\det(M) &= \frac{1}{2}\log\det(A^TA) + \frac{1}{2}\log\det(B^TB) + \frac{1}{2}\underbrace{\log\det(I - A^\parallel B^\parallel)}_{\mathcal{I}}
 \end{align}
-$$</div>
-<p>
-We can show that <span class="math">\(\mathcal{I} \geq 0\)</span> and equals <span class="math">\(0\)</span> if and only if <span class="math">\(A^TB=0\)</span>.</p>
-<p>Next, let <span class="math">\(E_1,\dots,E_k\)</span> be a local orthonormal frame for <span class="math">\(S\)</span> and let <span class="math">\(N_{k+1},\dots,N_n\)</span> be a local orthonormal frame for <span class="math">\(S^\perp\)</span> that completes the basis for <span class="math">\(E_1,\dots,E_k\)</span>.  A probability form on <span class="math">\(dP_{g_z}\)</span> on <span class="math">\(\mathcal{Z}\)</span> can be used to induce probability forms on <span class="math">\(S\)</span> and <span class="math">\(S^\perp\)</span> using the pullback and restriction operations:
-</p>
-<div class="math">$$
+$$
+We can show that $\mathcal{I} \geq 0$ and equals $0$ if and only if $A^TB=0$.
+
+Next, let $E_1,\dots,E_k$ be a local orthonormal frame for $S$ and let $N_{k+1},\dots,N_n$ be a local orthonormal frame for $S^\perp$ that completes the basis for $E_1,\dots,E_k$.  A probability form on $dP_{g_z}$ on $\mathcal{Z}$ can be used to induce probability forms on $S$ and $S^\perp$ using the pullback and restriction operations:
+$$
 \begin{align}
-  dP_{F^*\tilde{g}_z^\parallel} &amp;= \frac{1}{Z^\parallel}\iota_S^* (N_n\lrcorner \dots \lrcorner N_{k+1} dP_{\tilde{g}}) \\
-  dP_{F^*\tilde{g}_z^\perp} &amp;= \frac{1}{Z^\perp}\iota_{S^\perp}^* (E_k\lrcorner \dots \lrcorner E_{1} dP_{\tilde{g}})
+  dP_{F^*\tilde{g}_z^\parallel} &= \frac{1}{Z^\parallel}\iota_S^* (N_n\lrcorner \dots \lrcorner N_{k+1} dP_{\tilde{g}}) \\
+  dP_{F^*\tilde{g}_z^\perp} &= \frac{1}{Z^\perp}\iota_{S^\perp}^* (E_k\lrcorner \dots \lrcorner E_{1} dP_{\tilde{g}})
 \end{align}
-$$</div>
-<p>
+$$
 The probability densities associated with the probability forms can be computed be evaluating the forms on the orthonormal frames which yields:
-</p>
-<div class="math">$$
+$$
   \log\rho^\parallel = \log(\rho_z \circ F) + \frac{1}{2}\log\det(F^*g_z(E_i,E_j)) - \log Z^\parallel \\
   \log\rho^\perp = \log(\rho_z \circ F) + \frac{1}{2}\log\det(F^*g_z(N_i,N_j)) - \log Z^\perp
-$$</div>
-<p>
+$$
 Now, notice that we can factor the ambient space probability density in block form:
-</p>
-<div class="math">$$
+$$
 \begin{align}
-  \log\rho &amp;= \log(\rho_z \circ F) + \frac{1}{2}\log\det\begin{bmatrix}F^*g_z(E_i,E_j) &amp; F^*g_z(E_i,N_j) \\ F^*g_z(N_i,E_j) &amp; F^*g_z(N_i,N_j)\end{bmatrix} \\
-       &amp;= \log(\rho_z \circ F) + \frac{1}{2}\log\det(F^*g_z(E_i,E_j)) + \frac{1}{2}\log\det(F^*g_z(N_i,N_j)) + \mathcal{I} \\
-       &amp;= \log \rho^\parallel + \log \rho^\perp + (\mathcal{I} + \log Z^\parallel + \log Z^\perp - \log(\rho_z \circ F))
+  \log\rho &= \log(\rho_z \circ F) + \frac{1}{2}\log\det\begin{bmatrix}F^*g_z(E_i,E_j) & F^*g_z(E_i,N_j) \\ F^*g_z(N_i,E_j) & F^*g_z(N_i,N_j)\end{bmatrix} \\
+       &= \log(\rho_z \circ F) + \frac{1}{2}\log\det(F^*g_z(E_i,E_j)) + \frac{1}{2}\log\det(F^*g_z(N_i,N_j)) + \mathcal{I} \\
+       &= \log \rho^\parallel + \log \rho^\perp + (\mathcal{I} + \log Z^\parallel + \log Z^\perp - \log(\rho_z \circ F))
 \end{align}
-$$</div>
-<h1>Incorporating geometric information into generative models</h1>
-<p>Our goal is to learn the mapping <span class="math">\(F: \mathcal{X} \to \mathcal{Z}\)</span> so that we maximize the probability density of the data under the pullback metric <span class="math">\(F^*g_z\)</span>, with the additional constraint that the the likelihood on <span class="math">\(S\)</span> and <span class="math">\(S^\perp\)</span> are maximized.</p>
+$$
+
+# Incorporating geometric information into generative models
+Our goal is to learn the mapping $F: \mathcal{X} \to \mathcal{Z}$ so that we maximize the probability density of the data under the pullback metric $F^*g_z$, with the additional constraint that the the likelihood on $S$ and $S^\perp$ are maximized. -->
+
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -330,10 +326,8 @@ $$</div>
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
                 <li><a href="/tags.html#differential-geometry-ref">differential geometry
-                    <span>3</span>
 </a></li>
                 <li><a href="/tags.html#riemannian-geometry-ref">riemannian geometry
-                    <span>3</span>
 </a></li>
             </ul>
             

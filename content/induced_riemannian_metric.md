@@ -2,6 +2,7 @@ Title: Geometry on submanifolds
 Date: 2023-07-16
 Modified: 2023-07-16
 Category: Blog
+<!-- status: hidden -->
 Tags: riemannian metric
 Slug: submanifolds
 Summary: A look at how the Riemannian metric on a manifold can be used to define a Riemannian metric on a submanifold.
@@ -28,12 +29,5 @@ $$
   &= \epsilon^i \otimes \epsilon^i \\
   &= (E_i^u g_{ua}dx^a) \otimes (E_i^v g_{vb}dx^b) \\
   &= g_{bv} E_i^v E_i^u g_{ua} dx^a \otimes dx^b
-\end{align}
-$$
-
-# Gradient on submanifolds
-$$
-\begin{align}
-    \text{grad}_{\tilde{g}} f &= \tilde{g}^{ij} \frac{\partial f}{\partial x^i} E_j \\
 \end{align}
 $$
