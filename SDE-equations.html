@@ -9,19 +9,19 @@
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary">
 
-<meta name="keywords" content="mcmc, differential equations, Blog, " />
+<meta name="keywords" content="SDE, Blog, " />
 
-<meta property="og:title" content="The Dynamics of SDE based MCMC "/>
-<meta property="og:url" content="/mcmc_dynamics.html" />
-<meta property="og:description" content="A look at the probability path of MCMC" />
+<meta property="og:title" content="Equations for SDEs "/>
+<meta property="og:url" content="/SDE-equations.html" />
+<meta property="og:description" content="Some equations for SDEs" />
 <meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
-<meta property="og:article:published_time" content="2023-07-16T00:00:00-05:00" />
-<meta property="og:article:modified_time" content="2023-07-16T00:00:00-05:00" />
-<meta name="twitter:title" content="The Dynamics of SDE based MCMC ">
-<meta name="twitter:description" content="A look at the probability path of MCMC">
+<meta property="og:article:published_time" content="2023-07-15T00:00:00-05:00" />
+<meta property="og:article:modified_time" content="2023-07-15T00:00:00-05:00" />
+<meta name="twitter:title" content="Equations for SDEs ">
+<meta name="twitter:description" content="Some equations for SDEs">
 
-        <title>The Dynamics of SDE based MCMC  · 
+        <title>Equations for SDEs  · 
 </title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
@@ -67,8 +67,8 @@
 <div class="row-fluid">
     <header class="page-header span10 offset2">
         <h1>
-            <a href="/mcmc_dynamics.html">
-                The Dynamics of SDE based MCMC
+            <a href="/SDE-equations.html">
+                Equations for SDEs
             </a>
         </h1>
     </header>
@@ -77,79 +77,160 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <p>In this post we'll be looking at the dynamics of MCMC following <a href="https://arxiv.org/pdf/1506.04696.pdf">Ma et al. 2015</a> by looking at how to construct stationary distributions for MCMC using stochastic differential equations.</p>
-<h1>MCMC and SGMCMC</h1>
-<p>Markov chain monte carlo (MCMC) is an algorithm to samples from a target probability density function <span class="math">\(p^*(x)\)</span>.  Assume that we can evaluate <span class="math">\(p^*(x)\)</span> up to a normalizing constant, there are a variety of MCMC algorithms that can be used to sample from <span class="math">\(p^*(x)\)</span>.  The one that we'll look at is stochastic gradient MCMC (SGMCMC).  These algorithms access the score function, <span class="math">\(\nabla \log p^*(x)\)</span>, and use it to construct a stochastic differential equation (SDE) that has <span class="math">\(p^*(x)\)</span> as its stationary distribution.  The SDE is then discretized and run until it reaches a stationary distribution which will be constructed to be <span class="math">\(p^*(x)\)</span>.  In this post, we'll go through how to come up with SGMCMC from first principals.</p>
-<p>Consider the multivariate Ito SDE:
+            <h1>Ito formula</h1>
+<p>Let <span class="math">\(x(t)\)</span> be an Ito process and consider a scalar function <span class="math">\(\phi(x(t))\)</span>.  Then the Ito differential of <span class="math">\(\phi\)</span> is given by:
 </p>
 <div class="math">$$
 \begin{align}
-  dx_t = \mu(x_t,t) dt + \sigma(x_t,t) dW_t
+  d\phi &amp;= \frac{\partial \phi}{\partial x_i}dx_i + \frac{1}{2}\frac{\partial^2 \phi}{\partial x_i \partial x_j}dx_i dx_j
 \end{align}
 $$</div>
 <p>
-Our goal will be to figure out how to choose <span class="math">\(\mu\)</span> so that the stationary distribution is <span class="math">\(p^*(x)\)</span>.  In order to do so, we first need to look at the marginal distribution of the SDE at any time <span class="math">\(t\)</span>, <span class="math">\(p_t(x)\)</span>.  This is given by the Fokker-Planck equation.  Let <span class="math">\(D_{ij}
- = \sigma_{ik}\sigma_{jk}\)</span>.  Then the Fokker-Planck equation is:
+where mixed differentials are combined according to
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{\partial p_t}{\partial t} = -\frac{\partial p_t \mu_i}{\partial x_i} + \frac{1}{2} \frac{\partial^2 p_t D_{ij}}{\partial x_i \partial x_j}
+    d\beta dt &amp;= 0 \\
+    dt d\beta &amp;= 0 \\
+    d\beta d\beta^T &amp;= Qdt
 \end{align}
 $$</div>
-<p>
-It is also true that if <span class="math">\(Q_{ij}(x,t)\)</span> is a skew symmetric matrix <span class="math">\((Q=-Q^T)\)</span>, then <span class="math">\(\frac{\partial^2 f Q_{ij}}{\partial x^i \partial x^j} = 0\)</span> for any function <span class="math">\(f\)</span>, so we also have that
+<p>We can go further with this expression by recalling that <span class="math">\(dx_i = f_i dt + L_{ij}d\beta_j\)</span>.  We can compute <span class="math">\(dx_i dx_j\)</span> as
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{\partial p_t}{\partial t} &amp;= -\frac{\partial p_t \mu_i}{\partial x_i} + \frac{1}{2} \frac{\partial^2 p_t D_{ij}}{\partial x_i \partial x_j}  + \frac{1}{2} \frac{\partial^2 p_t Q_{ij}}{\partial x_i \partial x_j} \\
-  &amp;= -\frac{\partial p_t \mu_i}{\partial x_i} + \frac{1}{2} \frac{\partial^2 p_t (D_{ij} + Q_{ij})}{\partial x_i \partial x_j} \\
-  &amp;= \frac{\partial p_t}{\partial x_i}(-\mu_i + \frac{1}{2} \frac{1}{p_t}\frac{\partial p_t(D_{ij} + Q_{ij})}{\partial x_j}) \\
-  &amp;= \frac{\partial p_t}{\partial x_i}(-\mu_i + \frac{1}{2}\left[\frac{\partial \log p_t}{\partial x_j}(D_{ij} + Q_{ij}) + \frac{\partial D_{ij} + Q_{ij}}{\partial x_j}\right]) \\
+  dx_i dx_j &amp;= (f_i dt + L_{ik}d\beta_k)(f_j dt + L_{jl}d\beta_l) \\
+  &amp;= f_i f_j \underbrace{dt^2}_{0?} + f_i L_{jl}\underbrace{dt d\beta_l}_{0} + f_j L_{ik}\underbrace{d\beta_k dt}_{0} + L_{ik}d\beta_k L_{jl}d\beta_l \\
+  &amp;= L_{ik}L_{jl}d\beta_k d\beta_l \\
+  &amp;= L_{ik}L_{jl}Q_{kl}dt \quad \text{(somehow?)}
 \end{align}
 $$</div>
 <p>
-Notice that this equation now resembles the continuity equation, <span class="math">\(\frac{\partial p_t}{\partial t} + \frac{\partial p_tV_i}{\partial x_i} = 0\)</span> where <span class="math">\(V\)</span> is the vector field that determines how particles evolve.  So in the case of the SDE, we have that:
+Plugging this into the Ito formula yields:
 </p>
 <div class="math">$$
 \begin{align}
-  V_i = \mu_i - \frac{1}{2}\left[\frac{\partial \log p_t}{\partial x_j}(D_{ij} + Q_{ij}) + \frac{\partial D_{ij} + Q_{ij}}{\partial x_j}\right]
+  d\phi &amp;= \frac{\partial \phi}{\partial x_i}(f_i dt + L_{ij}d\beta_j) + \frac{1}{2}\frac{\partial^2 \phi}{\partial x_i \partial x_j}L_{ik}L_{jl}Q_{kl}dt \\
 \end{align}
 $$</div>
 <p>
-The stationary distribution of the SDE is achieved when <span class="math">\(V=0\)</span> (which leaves <span class="math">\(p_t\)</span> constant) which will clearly be equal to our target when we set
-</p>
-<div class="math">$$
-  \mu_i = \frac{1}{2}\left[\frac{\partial \log p^*}{\partial x_j}(D_{ij} + Q_{ij}) + \frac{\partial D_{ij} + Q_{ij}}{\partial x_j}\right]
-$$</div>
-<p>
-This is the "complete recipe" described in <a href="https://arxiv.org/pdf/1506.04696.pdf">Ma et al.</a> for constructing SGMCMC algorithms.  The proof that this is complete (describes all MCMC algorithms) is given in the appendix of the paper and basically shows how to construct <span class="math">\(Q\)</span>.  Now we can take a lookg at the dynamics of MCMC.</p>
-<h1>MCMC dynamics</h1>
-<p>In the first part we saw that the SDE with the form
+Because the above equation is shorthand for an integral, we can "divide" by <span class="math">\(dt\)</span> to get to simplify terms:
 </p>
 <div class="math">$$
 \begin{align}
-  dx_t &amp;= \mu(x_t,t) dt + \sigma(x_t,t) dW_t
+  \frac{d\phi}{dt} &amp;= \frac{\partial \phi}{\partial x_i}f_i + L_{ij}\frac{d\beta_j}{dt} + \frac{1}{2}\frac{\partial^2 \phi}{\partial x_i \partial x_j}L_{ik}L_{jl}Q_{kl}
 \end{align}
 $$</div>
 <p>
-where
+Finally, taking the expectation of both sides removes the stochastic term because <span class="math">\(\mathbb{E}\left[\frac{d\beta_j}{dt}\right] = 0\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-  \mu_i &amp;= \frac{1}{2}\left[\frac{\partial \log p^*}{\partial x_j}(D_{ij} + Q_{ij}) + \frac{\partial D_{ij} + Q_{ij}}{\partial x_j}\right]
+  \frac{d\mathbb{E}\left[\phi\right]}{dt} &amp;= \mathbb{E}\left[\frac{\partial \phi}{\partial x_i}f_i + \frac{1}{2}\frac{\partial^2 \phi}{\partial x_i \partial x_j}L_{ik}L_{jl}Q_{kl}\right]
 \end{align}
 $$</div>
-<p>
-will have <span class="math">\(p^*(x)\)</span> as its stationary distribution and that the dynamics of the SDE are given by
+<h1>Infinitesmal generator</h1>
+<p>The generalized infinitesmal generator of a stochastic process <span class="math">\(x(t)\)</span> for a function <span class="math">\(\phi(x)\)</span> is defined as
 </p>
 <div class="math">$$
 \begin{align}
-  V_i &amp;= \mu_i - \frac{1}{2}\left[\frac{\partial \log p_t}{\partial x_j}(D_{ij} + Q_{ij}) + \frac{\partial D_{ij} + Q_{ij}}{\partial x_j}\right] \\
-  &amp;= \frac{1}{2}(\frac{\partial \log p^*}{\partial x_j} - \frac{\partial \log p_t}{\partial x_j})(D_{ij} + Q_{ij}) \\
+  \mathcal{A}\phi(x) = \lim_{s\to 0+}\frac{\mathbb{E}\left[\phi(x(t+s))\right] - \phi(x(t))}{s}
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(p_t\)</span> is the marginal distribution of the SDE at time <span class="math">\(t\)</span>.</p>
+for which the solution of the time dependent SDE
+</p>
+<div class="math">$$
+\begin{align}
+  dx = f(x,t)dt + L(x,t)d\beta
+\end{align}
+$$</div>
+<p>
+is given as
+</p>
+<div class="math">$$
+\begin{align}
+  \mathcal{A}\phi = f_i\frac{\partial\phi}{\partial x_i} + \frac{1}{2}L_{iu}Q_{uv}L_{jv}\frac{\partial^2\phi}{\partial x_i \partial x_j}
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(Q\)</span> is the diffusion matrix for <span class="math">\(\beta\)</span>.  Note the similarity between this and the expected value of the derivative of the Ito formula from before.  We can see that
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{d\mathbb{E}\left[\phi\right]}{dt} &amp;= \mathbb{E}\left[ \mathcal{A}\phi \right]
+\end{align}
+$$</div>
+<h2>Adjoint infinitesmal generator</h2>
+<p>Let <span class="math">\(\langle \phi, \theta \rangle := \int \phi(x) \varphi(x) dx\)</span>.  The adjoint of <span class="math">\(\mathcal{A}\)</span>, denoted by <span class="math">\(\mathcal{A}^*\)</span>, is defined as the operator such that <span class="math">\(\langle \mathcal{A}\phi, \theta \rangle = \langle \phi, \mathcal{A}^*\theta \rangle\)</span>.  Lets derive <span class="math">\(\mathcal{A}^\theta\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  \langle \mathcal{A}\phi, \theta \rangle &amp;= \int \mathcal{A}\phi(x) \theta(x) dx \\
+  &amp;= \int \left(f_i\frac{\partial \phi}{\partial x_i} + \frac{1}{2}L_{iu}Q_{uv}L_{jv}\frac{\partial^2 \phi}{\partial x_i \partial x_j}\right)\theta dx \\
+  &amp;= \int \frac{\partial \phi}{\partial x_i}(f_i\theta) dx + \frac{1}{2}\int \frac{\partial}{\partial x_i}\frac{\partial \phi}{\partial x_j}L_{iu}Q_{uv}L_{jv}\theta dx \\
+  &amp;= -\int \phi \frac{\partial}{\partial x_i}(f_i\theta) dx - \frac{1}{2}\int \frac{\partial \phi}{\partial x_j}\frac{\partial}{\partial x_i}(L_{iu}Q_{uv}L_{jv}\theta) dx \quad \text{ (integration by parts)}\\
+  &amp;= -\langle \phi, \frac{\partial f_i\theta}{\partial x_i} \rangle + \frac{1}{2}\int \phi \frac{\partial^2}{\partial x_i \partial x_j}(L_{iu}Q_{uv}L_{jv}\theta) dx \\
+  &amp;= -\langle \phi, \frac{\partial f_i\theta}{\partial x_i} \rangle + \langle \phi,\frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}(L_{iu}Q_{uv}L_{jv}\theta) \rangle \\
+  &amp;= \langle \phi, -\frac{\partial f_i\theta}{\partial x_i} + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}(L_{iu}Q_{uv}L_{jv}\theta) \rangle \\
+  &amp;:= \langle \phi, \mathcal{A}^*\theta \rangle
+\end{align}
+$$</div>
+<p>
+So we have that
+</p>
+<div class="math">$$
+\begin{align}
+  \mathcal{A}^*\theta &amp;= -\frac{\partial f_i\theta}{\partial x_i} + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}(L_{iu}Q_{uv}L_{jv}\theta)
+\end{align}
+$$</div>
+<h1>Fokker-Planck equation (Kolmogorov forward equation)</h1>
+<p>Next, lets look at how we can write expectations using the infinitesmal generator.
+</p>
+<div class="math">$$
+\begin{align}
+  \mathbb{E}\left[\phi(x(t)) \right] &amp;= \int p(x,t)\phi(x(t))dx \\
+  &amp;= \langle p, \phi \rangle
+\end{align}
+$$</div>
+<p>From earlier, we saw that <span class="math">\(\frac{d\mathbb{E}\left[\phi\right]}{dt} = \mathbb{E}\left[ \mathcal{A}\phi \right]\)</span>.  So we can see that
+</p>
+<div class="math">$$
+\begin{align}
+  \langle \frac{\partial p}{\partial t}, \phi \rangle &amp;= \langle p_t, \mathcal{A}\phi \rangle \\
+  &amp;= \langle \mathcal{A}^*p_t, \phi \rangle
+\end{align}
+$$</div>
+<p>
+So we're left with the final result:
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{\partial p_t}{\partial t} &amp;= \mathcal{A}^*p_t \\
+  &amp;= -\frac{\partial f_ip_t}{\partial x_i} + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}(L_{iu}Q_{uv}L_{jv}p_t)
+\end{align}
+$$</div>
+<p>Note that <span class="math">\(p_t(x)\)</span> is technically a conditional distribution conditioned on a starting state <span class="math">\(x_0\)</span> at time <span class="math">\(t=0\)</span>.</p>
+<p>We can also see how the vector field looks like for SDEs by pulling out <span class="math">\(\frac{\partial}{\partial x^i}\)</span> (and letting <span class="math">\(Q=I\)</span> for simplicity):
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{\partial p_t}{\partial t} &amp;= -\frac{\partial}{\partial x_i}\left[f_ip_t - \frac{1}{2} \frac{\partial}{\partial x_j}(L_{ik}L_{jk}p_t) \right] \\
+  &amp;= -\frac{\partial}{\partial x_i}\left[p_t \left(f_i - \frac{1}{2} \frac{\partial}{\partial x_j}(L_{ik}L_{jk}\log p_t) \right) \right] \\
+  &amp;= -\frac{\partial}{\partial x_i}\left[p_t \left(f_i - \frac{1}{2} L_{ik}L_{jk}\frac{\partial \log p_t}{\partial x_j} \right) \right] \quad \text{if $L$ doesn't depend on $x$}
+\end{align}
+$$</div>
+<h1>Kolmogorov backward equation</h1>
+<p>The Kolmogorov backward equation is given by
+</p>
+<div class="math">$$
+\begin{align}
+  -\frac{\partial p(x,t|x_0,t_0)}{\partial t_0} &amp;= \mathcal{A}p(x,t|x_0,t_0) \\
+  &amp;= f_i\frac{\partial p(x,t|x_0,t_0)}{\partial {x_0}_i} + \frac{1}{2}L_{iu}Q_{uv}L_{jv}\frac{\partial^2 p(x,t|x_0,t_0)}{\partial {x_0}_i \partial {x_0}_j}
+\end{align}
+$$</div>
+<p>*** HOW DO WE DERIVE THIS?</p>
+<p>*** HOW CAN THE DRIFT AND DIFFUSION COEFFICIENTS BE WRITTEN AS EXPECTED VALUES?</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -229,15 +310,14 @@ where <span class="math">\(p_t\)</span> is the marginal distribution of the SDE 
         </div>
         <section id="article-sidebar" class="span2">
             <h4>Published</h4>
-            <time itemprop="dateCreated" datetime="2023-07-16T00:00:00-05:00">Jul 16, 2023</time>
+            <time itemprop="dateCreated" datetime="2023-07-15T00:00:00-05:00">Jul 15, 2023</time>
 
             <h4>Category</h4>
             <a class="category-link" href="/categories.html#blog-ref">Blog</a>
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
-                <li><a href="/tags.html#differential-equations-ref">differential equations
-</a></li>
-                <li><a href="/tags.html#mcmc-ref">mcmc
+                <li><a href="/tags.html#sde-ref">SDE
+                    <span>1</span>
 </a></li>
             </ul>
             
