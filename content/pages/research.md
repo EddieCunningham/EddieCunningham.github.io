@@ -7,7 +7,7 @@ Edmond Cunningham, Adam D Cobb, Susmit Jha<br>
 39th International Conference on Machine Learning (ICML 2022)<br>
 [Read](https://proceedings.mlr.press/v162/cunningham22a.html)
 
-**RealMVP**<br>
+**A Change of Variables Method For Rectangular Matrix-Vector Products**<br>
 Edmond Cunningham, Madalina Fiterau<br>
 The 24th International Conference on Artificial Intelligence and Statistics (AIStats 2021)<br>
 [Read](https://proceedings.mlr.press/v130/cunningham21a.html)

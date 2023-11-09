@@ -123,8 +123,7 @@ html {
   display: none;
 }
 
-/* Change default colours for <a> status: hidden
-Tags */
+/* Change default colours for <a> tags */
 
 [data-md-color-scheme="default"] {
   --md-typeset-a-color: rgb(0, 189, 164) !important;
