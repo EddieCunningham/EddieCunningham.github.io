@@ -11,17 +11,16 @@
 
 <meta name="keywords" content=", Blog, " />
 
-<meta property="og:title" content="Riemannian stein variational gradient descent "/>
-<meta property="og:url" content="/riemannian-stein-variational-gradient-descent.html" />
-<meta property="og:description" content="Tags: stein discrepancy, kernels, stein variational gradient descent, rkhs Slug: stein-vi Summary: A tutorial on Stein variational gradient descent The Stein discrepancy measure is a way of measuring the distance between two probability distributions. It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the …" />
+<meta property="og:title" content="The dynamics of temperature sampling "/>
+<meta property="og:url" content="/temperature-sampling.html" />
+<meta property="og:description" content="The dynamics of temperature sampling" />
 <meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
-<meta property="og:article:published_time" content="2023-07-15T00:00:00-05:00" />
-<meta property="og:article:modified_time" content="2023-07-15T00:00:00-05:00" />
-<meta name="twitter:title" content="Riemannian stein variational gradient descent ">
-<meta name="twitter:description" content="Tags: stein discrepancy, kernels, stein variational gradient descent, rkhs Slug: stein-vi Summary: A tutorial on Stein variational gradient descent The Stein discrepancy measure is a way of measuring the distance between two probability distributions. It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the …">
+<meta property="og:article:published_time" content="2023-11-15T00:00:00-05:00" />
+<meta name="twitter:title" content="The dynamics of temperature sampling ">
+<meta name="twitter:description" content="The dynamics of temperature sampling">
 
-        <title>Riemannian stein variational gradient descent  · 
+        <title>The dynamics of temperature sampling  · 
 </title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
@@ -67,8 +66,8 @@
 <div class="row-fluid">
     <header class="page-header span10 offset2">
         <h1>
-            <a href="/riemannian-stein-variational-gradient-descent.html">
-                Riemannian stein variational gradient descent
+            <a href="/temperature-sampling.html">
+                The dynamics of temperature sampling
             </a>
         </h1>
     </header>
@@ -77,78 +76,108 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <!-- status: hidden -->
-<p>Tags: stein discrepancy, kernels, stein variational gradient descent, rkhs
-Slug: stein-vi
-Summary: A tutorial on Stein variational gradient descent</p>
-<p>The Stein discrepancy measure is a way of measuring the distance between two probability distributions.  It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the reverse KL divergence to a target distribution.  In this post, we'll go over the kernel Stein discrepancy as introduced by <a href="https://arxiv.org/pdf/1602.03253.pdf">Liu et al.</a> and the extensions in <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu and Zhu</a>.</p>
-<h1>Motivation</h1>
-<p>Consider the task of minimizing the reverse KL divergence between a target distribution <span class="math">\(p\)</span> and a model distribution <span class="math">\(q\)</span> over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  If we have a probability path as the solution where <span class="math">\(q_t\)</span> where <span class="math">\(q_0\)</span> is arbitrary and <span class="math">\(q_1 = p\)</span>, then we could be interested in seeing how the reverse KL divergence between <span class="math">\(q_t\)</span> and <span class="math">\(p\)</span> changes as <span class="math">\(t\)</span> changes.</p>
-<p>Let <span class="math">\((q_t, V_t)\)</span> be a probability path between <span class="math">\(q_0\)</span> and <span class="math">\(q_1\)</span> where <span class="math">\(V_t\in \mathfrak{X}(\mathcal{M})\)</span> is the vector field that generates the flow of <span class="math">\(q_t\)</span> and let <span class="math">\(dV_g\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the time derivative of the reverse KL divergence is:
+            <p>Given a probability distribution <span class="math">\(p(x)\)</span>, temperature sampling is about finding a way to sample from <span class="math">\(\frac{1}{Z_t} p(x)^t\)</span> where <span class="math">\(Z_t\)</span> is a normalization constant.  This is an interesting problem because it allows us to sample from a distribution that is more peakedthan <span class="math">\(p(x)\)</span> (when <span class="math">\(t &gt; 1\)</span>) or less peakedthan <span class="math">\(p(x)\)</span> (when <span class="math">\(t &lt; 1\)</span>).  This is trivial when we use a sampling procedure that depends on the score function because the tempered score function is simply <span class="math">\(t \nabla \log p(x)\)</span>.  However, for flow based generative models it is not as straight forward.  The goal of this post is to derive the dynamics of temperature sampling for continuous normalizing flows.</p>
+<p>Let <span class="math">\(p_t(x) := \frac{1}{Z_t}p(x)^t\)</span>.  The first thing that we can notice is that we can write <span class="math">\(\log p(x)\)</span> in terms of <span class="math">\(p_t\)</span> and <span class="math">\(Z_t\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{d}{dt}\text{KL}\left[q_t||p\right] &amp;= \int \frac{d}{dt}q_t\log \frac{q_t}{p}dV_g \\
-  &amp;= \int \left((\frac{d q_t}{dt})\log \frac{q_t}{p} + q_t\frac{d \log q}{dt}\right)dV_g \\
-  &amp;= \int \left(-\text{Div}(q_t V_t) \log \frac{q_t}{p} + \underbrace{\frac{d q}{dt}}_{\text{$0$ in expectation}}\right)dV_g \\
-  &amp;= \int \langle \text{grad } \log \frac{q_t}{p} , q_t V_t\rangle_gdV_g \\
-  &amp;= \int q_t\left( \langle \text{grad } \log q_t , V_t\rangle_g - \langle \text{grad } \log p, V_t\rangle_g \right)dV_g \\
-  &amp;= \int \langle \text{grad } q_t , V_t\rangle_g dV_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g dV_g \\
-  &amp;= -\int q_t \text{Div}(V_t) dV_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g dV_g \\
-  &amp;= -\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right]
+  \log p_t(x) &amp;= -\log Z_t + t \log p(x) \\
+  \nabla \log p_t(x) &amp;= t \nabla \log p(x) \\
 \end{align}
 $$</div>
-<p>Notice that if <span class="math">\(V_t\)</span> is nonvanishing except when <span class="math">\(\text{KL}\left[q_t||p\right] = 0\)</span>, then <span class="math">\(\text{KL}\left[q_t||p\right] = 0\)</span> if and only if <span class="math">\(\frac{d}{dt}\text{KL}\left[q_t||p\right] = 0\)</span> which only happens at <span class="math">\(t=1\)</span>, which implies that
+<h1>Likelihood dynamics</h1>
+<p>Lets look at how the log normalization constant changes with respect to <span class="math">\(t\)</span>:
 </p>
 <div class="math">$$
 \begin{align}
-\mathbb{E}_{p}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right] = 0
+  \frac{\partial\log Z_t}{\partial t} &amp;= \frac{1}{Z_t}\frac{\partial}{\partial t} \int p(x)^t dx \\
+  &amp;= \frac{1}{Z_t}\int \frac{\partial}{\partial t}\exp\{\log p(x) t\} dx \\
+  &amp;= \frac{1}{Z_t}\int \exp\{\log p(x) t\}\frac{\partial}{\partial t}(\log p(x) t) dx \\
+  &amp;= \frac{1}{Z_t}\int p(x)^t\log p(x) dx \\
+  &amp;= \int p_t(x)\log p(x) dx \\
+  &amp;= \mathbb{E}_{p_t}\left[\log p\right]
 \end{align}
 $$</div>
 <p>
-This is called the result in theorem 2 of <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu et al.</a>.  The integrand is called the generalized Stein operator:
+This means that
 </p>
 <div class="math">$$
 \begin{align}
-\mathcal{A}_p V_t = \langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)
+  \frac{\partial\log p_t(x)}{\partial t} &amp;= \frac{\partial}{\partial t}t \log p(x) - \frac{\partial}{\partial t}\log Z_t \\
+  &amp;= \log p(x) - \mathbb{E}_{p_t}\left[\log p\right]
 \end{align}
 $$</div>
-<h2>Finding the direction of steepest descent</h2>
-<p>Next we'll show how to construct the <span class="math">\(V_t\)</span> that maximizes the time derivative of the reverse KL divergence.  Specifically, we want to choose a space called <span class="math">\(\mathfrak{X}\)</span> that is equipped with some metric so to find
+<p>Next, lets look at the total derivative.
 </p>
 <div class="math">$$
 \begin{align}
-  \text{Loss}\left(V_t\right) &amp;= \min_{V_t\in \mathfrak{X}} \frac{d}{dt}\text{KL}\left[q_t||p\right] \\
-  &amp;= \min_{V_t\in \mathfrak{X}}-\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right] \\
-  &amp;= \max_{V_t\in \mathfrak{X}}\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right]
+\frac{d \log p_t(x_t)}{dt} &amp;= \frac{\partial \log p_t(x_t)}{\partial t} + \nabla \log p_t(x_t)^Tu_t(x_t) \\
+-\text{Div}(u_t(x_t)) &amp;= \log p(x_t) - \mathbb{E}_{p_t}\left[\log p\right] + \nabla \log p_t(x_t)^Tu_t(x_t) \\
+&amp;= \log p(x_t) - \mathbb{E}_{p_t}\left[\log p\right] + t\nabla \log p(x_t)^Tu_t(x_t) \\
 \end{align}
 $$</div>
-<p><a href="https://arxiv.org/pdf/1711.11216.pdf">Liu et al.</a> proposes looking at the space of vector fields that are the gradient of some function <span class="math">\(f\)</span>:
+<h1>Gradient dynamics</h1>
+<p>Next, lets look at the gradient dynamics.  We already have seen that
 </p>
 <div class="math">$$
 \begin{align}
-  \mathfrak{X} = \left\{V_t = \text{grad } f \mid f \in \mathcal{H}_K \right\}
+\nabla \log p_t(x) = t \nabla \log p(x)
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(\mathcal{H}_k\)</span> is a reproducing kernel Hilbert space (RKHS) with kernel <span class="math">\(K\)</span>.  Check out my <a href="/reproducing-kernel-hilbert-space.html">post on RKHS</a> for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that <span class="math">\(V_t = \text{grad } f_t\)</span>.  Also recall that <span class="math">\(\text{grad } f_t = \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K}\)</span> and <span class="math">\(\text{Div}(\text{grad } f_t) = \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}\)</span>.</p>
-<p>Then we can simplify the objective further by rewriting <span class="math">\(V_t\)</span> in terms of <span class="math">\(f_t\)</span>:
+So the partial derivative w.r.t. <span class="math">\(t\)</span> is
 </p>
 <div class="math">$$
 \begin{align}
-  \text{Loss}\left(f_t\right) &amp;= \max_{f_t \in \mathcal{H}_K}\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \text{grad } f_t \rangle_g + \text{Div}(\text{grad } f_t)\right] \\
-  &amp;= \max_{f_t \in \mathcal{H}_K}\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K} \rangle_g + \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}\right] \\
-  &amp;= \max_{f_t \in \mathcal{H}_K}\langle f_t, \mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \text{grad }  K_x \rangle_g \right]\rangle_{\mathcal{H}_K} + \langle f_t, \mathbb{E}_{q_t}\left[\text{Div}(\text{grad }  K_x) \right] \rangle_{\mathcal{H}_K} \\
-  &amp;= \max_{f_t \in \mathcal{H}_K} \langle f_t, \underbrace{\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \text{grad }  K_x \rangle_g + \text{Div}(\text{grad }  K_x)\right]}_{\hat{f}_t}\rangle_{\mathcal{H}_K} \\
-  &amp;= \max_{f_t \in \mathcal{H}_K} \langle f_t, \hat{f}_t\rangle_{\mathcal{H}_K}
+\frac{\partial \nabla \log p_t(x)}{\partial t} = \nabla \log p(x)
 \end{align}
 $$</div>
-<p>Clearly we obtain best loss when we choose <span class="math">\(f_t = \hat{f}_t\)</span> (up to a scaling constant), so the vector field that minimizes the rate of change of the reverse KL divergence is
+<p>
+Next, lets look at the total derivative.  We can expand the total derivative in 3 different ways:</p>
+<h4>1.</h4>
+<div class="math">$$
+\begin{align}
+  \frac{d\nabla \log p_t(x_t)}{dt} &amp;= -\nabla u_t(x_t)^T\nabla \log p_t(x_t) + \nabla \frac{d \log p_t(x_t)}{dt} \\
+  &amp;= -\nabla u_t(x_t)^T\nabla \log p_t(x_t) + \nabla (\log p(x_t) - \mathbb{E}_{p_t}\left[\log p\right] + \nabla \log p_t(x_t)^Tu_t(x_t)) \\
+  &amp;= \nabla \log p(x_t) + \nabla^2 \log p_t(x_t)^Tu_t(x_t) \\
+  &amp;= \nabla \log p(x_t) + t \nabla^2 \log p(x_t)^Tu_t(x_t) \\
+\end{align}
+$$</div>
+<h4>2.</h4>
+<div class="math">$$
+\begin{align}
+  \frac{d\nabla \log p_t(x_t)}{dt} &amp;= -\nabla u_t(x_t)^T\nabla \log p_t(x_t) + \nabla \frac{d \log p_t(x_t)}{dt} \\
+   &amp;= -\nabla u_t(x_t)^T\nabla \log p_t(x_t) - \nabla \text{Div}(u_t)
+\end{align}
+$$</div>
+<h4>3.</h4>
+<div class="math">$$
+\begin{align}
+  \frac{d\nabla \log p_t(x_t)}{dt} &amp;= \frac{dt \nabla \log p(x_t)}{dt} \\
+  &amp;= \nabla \log p(x_t) + t\frac{d\nabla \log p(x_t)}{dt} \\
+\end{align}
+$$</div>
+<p>Setting 1 and 2 equal to each other and noting that <span class="math">\(\nabla^2 \log p\)</span> is symmetric yields
 </p>
 <div class="math">$$
 \begin{align}
-  V_t^* &amp;= \text{grad } \hat{f}_t \\
-  &amp;= \text{grad } \mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \text{grad }  K_x \rangle_g + \text{Div}(\text{grad }  K_x)\right]
+  \nabla^2 \log p(x_t)u_t(x_t) &amp;= \frac{d\nabla \log p(x_t)}{dt}
+\end{align}
+$$</div>
+<p>
+Then plugging in 2 for the rhs yields
+</p>
+<div class="math">$$
+\begin{align}
+  \nabla^2 \log p(x_t)u_t(x_t) &amp;= -\nabla u_t(x_t)^T\nabla \log p_t(x_t) - \nabla \text{Div}(u_t)
+\end{align}
+$$</div>
+<p>
+Rerranging terms gives the final expression for <span class="math">\(u_t\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  \nabla^2 \log p(x_t)u_t(x_t) + \nabla u_t(x_t)^T\nabla \log p_t(x_t) + \nabla \text{Div}(u_t) = 0
 \end{align}
 $$</div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
@@ -230,8 +259,7 @@ $$</div>
         </div>
         <section id="article-sidebar" class="span2">
             <h4>Published</h4>
-            <time itemprop="dateCreated" datetime="2023-07-15T00:00:00-05:00">Jul 15, 2023</time>
-
+            <time itemprop="dateCreated" datetime="2023-11-15T00:00:00-05:00">Nov 15, 2023</time>
             <h4>Category</h4>
             <a class="category-link" href="/categories.html#blog-ref">Blog</a>
             

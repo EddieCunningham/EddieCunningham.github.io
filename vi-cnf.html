@@ -11,17 +11,17 @@
 
 <meta name="keywords" content=", Blog, " />
 
-<meta property="og:title" content="Riemannian stein variational gradient descent "/>
-<meta property="og:url" content="/riemannian-stein-variational-gradient-descent.html" />
-<meta property="og:description" content="Tags: stein discrepancy, kernels, stein variational gradient descent, rkhs Slug: stein-vi Summary: A tutorial on Stein variational gradient descent The Stein discrepancy measure is a way of measuring the distance between two probability distributions. It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the …" />
+<meta property="og:title" content="VI with CNFs "/>
+<meta property="og:url" content="/vi-cnf.html" />
+<meta property="og:description" content="How to do variational inference with continuous normalizing flows" />
 <meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
-<meta property="og:article:published_time" content="2023-07-15T00:00:00-05:00" />
-<meta property="og:article:modified_time" content="2023-07-15T00:00:00-05:00" />
-<meta name="twitter:title" content="Riemannian stein variational gradient descent ">
-<meta name="twitter:description" content="Tags: stein discrepancy, kernels, stein variational gradient descent, rkhs Slug: stein-vi Summary: A tutorial on Stein variational gradient descent The Stein discrepancy measure is a way of measuring the distance between two probability distributions. It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the …">
+<meta property="og:article:published_time" content="2023-11-17T00:00:00-05:00" />
+<meta property="og:article:modified_time" content="2023-11-17T00:00:00-05:00" />
+<meta name="twitter:title" content="VI with CNFs ">
+<meta name="twitter:description" content="How to do variational inference with continuous normalizing flows">
 
-        <title>Riemannian stein variational gradient descent  · 
+        <title>VI with CNFs  · 
 </title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
@@ -67,8 +67,8 @@
 <div class="row-fluid">
     <header class="page-header span10 offset2">
         <h1>
-            <a href="/riemannian-stein-variational-gradient-descent.html">
-                Riemannian stein variational gradient descent
+            <a href="/vi-cnf.html">
+                VI with CNFs
             </a>
         </h1>
     </header>
@@ -77,78 +77,40 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <!-- status: hidden -->
-<p>Tags: stein discrepancy, kernels, stein variational gradient descent, rkhs
-Slug: stein-vi
-Summary: A tutorial on Stein variational gradient descent</p>
-<p>The Stein discrepancy measure is a way of measuring the distance between two probability distributions.  It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the reverse KL divergence to a target distribution.  In this post, we'll go over the kernel Stein discrepancy as introduced by <a href="https://arxiv.org/pdf/1602.03253.pdf">Liu et al.</a> and the extensions in <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu and Zhu</a>.</p>
-<h1>Motivation</h1>
-<p>Consider the task of minimizing the reverse KL divergence between a target distribution <span class="math">\(p\)</span> and a model distribution <span class="math">\(q\)</span> over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  If we have a probability path as the solution where <span class="math">\(q_t\)</span> where <span class="math">\(q_0\)</span> is arbitrary and <span class="math">\(q_1 = p\)</span>, then we could be interested in seeing how the reverse KL divergence between <span class="math">\(q_t\)</span> and <span class="math">\(p\)</span> changes as <span class="math">\(t\)</span> changes.</p>
-<p>Let <span class="math">\((q_t, V_t)\)</span> be a probability path between <span class="math">\(q_0\)</span> and <span class="math">\(q_1\)</span> where <span class="math">\(V_t\in \mathfrak{X}(\mathcal{M})\)</span> is the vector field that generates the flow of <span class="math">\(q_t\)</span> and let <span class="math">\(dV_g\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the time derivative of the reverse KL divergence is:
+            <h1>Motivation</h1>
+<p>Consider the task of minimizing the reverse KL divergence between a target distribution <span class="math">\(p\)</span> and a model distribution <span class="math">\(q\)</span> over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  If we have a probability path as the solution where <span class="math">\(q_t(z)\)</span> where <span class="math">\(q_0\)</span> is arbitrary and <span class="math">\(q_1 = p\)</span>, then we could be interested in seeing how the reverse KL divergence between <span class="math">\(q_t(z)\)</span> and <span class="math">\(p\)</span> changes as <span class="math">\(t\)</span> changes.</p>
+<p>Let <span class="math">\((q_t(z), V_t(z))\)</span> be a probability path between <span class="math">\(q_0\)</span> and <span class="math">\(q_1\)</span> where <span class="math">\(V_t(z)\in \mathfrak{X}(\mathcal{M})\)</span> is the vector field that generates the flow of <span class="math">\(q_t(z)\)</span> and let <span class="math">\(dz\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the time derivative of the reverse KL divergence is:
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{d}{dt}\text{KL}\left[q_t||p\right] &amp;= \int \frac{d}{dt}q_t\log \frac{q_t}{p}dV_g \\
-  &amp;= \int \left((\frac{d q_t}{dt})\log \frac{q_t}{p} + q_t\frac{d \log q}{dt}\right)dV_g \\
-  &amp;= \int \left(-\text{Div}(q_t V_t) \log \frac{q_t}{p} + \underbrace{\frac{d q}{dt}}_{\text{$0$ in expectation}}\right)dV_g \\
-  &amp;= \int \langle \text{grad } \log \frac{q_t}{p} , q_t V_t\rangle_gdV_g \\
-  &amp;= \int q_t\left( \langle \text{grad } \log q_t , V_t\rangle_g - \langle \text{grad } \log p, V_t\rangle_g \right)dV_g \\
-  &amp;= \int \langle \text{grad } q_t , V_t\rangle_g dV_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g dV_g \\
-  &amp;= -\int q_t \text{Div}(V_t) dV_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g dV_g \\
-  &amp;= -\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right]
+  \frac{d}{dt}\text{KL}\left[q_t(z_t)||p(z_t|x)\right] &amp;= \int \frac{d}{dt}q_t(z_t)\log \frac{q_t(z_t)}{p(z_t|x)}dz_t \\
+  &amp;= \int \left((\frac{d q_t(z_t)}{dt})\log \frac{q_t(z_t)}{p(z_t|x)} + q_t(z_t)\frac{d \log q_t(z_t)}{dt}\right)dz_t \\
+  &amp;= \int \left(-\text{Div}(q_t(z_t) V_t(z_t)) \log \frac{q_t(z_t)}{p(z_t|x)} + \underbrace{\frac{d q(z_t)}{dt}}_{\text{$0$ in expectation}}\right)dz_t \\
+  &amp;= \int \langle \text{grad } \log \frac{q_t(z_t)}{p(z_t|x)} , q_t(z_t) V_t(z_t)\rangle dz \\
+  &amp;= \int q_t(z_t)\left( \langle \text{grad } \log q_t(z_t) , V_t(z_t)\rangle  - \langle \text{grad } \log p(z_t|x), V_t(z_t)\rangle  \right)dz_t \\
+  &amp;= \int \langle \text{grad } q_t(z_t) , V_t(z_t)\rangle  dz_t - \int q_t(z_t)\langle \text{grad } \log p(z_t|x), V_t(z_t)\rangle  dz_t \\
+  &amp;= -\int q_t(z_t) \text{Div}(V_t(z_t)) dz_t - \int q_t(z_t)\langle \text{grad } \log p(z_t|x), V_t(z_t)\rangle  dz_t \\
+  &amp;= -\mathbb{E}_{q_t(z_t)}\left[\langle \text{grad } \log p(z_t|x), V_t(z_t) \rangle  + \text{Div}(V_t(z_t))\right]
 \end{align}
 $$</div>
-<p>Notice that if <span class="math">\(V_t\)</span> is nonvanishing except when <span class="math">\(\text{KL}\left[q_t||p\right] = 0\)</span>, then <span class="math">\(\text{KL}\left[q_t||p\right] = 0\)</span> if and only if <span class="math">\(\frac{d}{dt}\text{KL}\left[q_t||p\right] = 0\)</span> which only happens at <span class="math">\(t=1\)</span>, which implies that
+<p>So the full KL divergence is
 </p>
 <div class="math">$$
 \begin{align}
-\mathbb{E}_{p}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right] = 0
+  \text{KL}\left[q_1(z_1)||p(z_1|x)\right] &amp;= \text{KL}\left[q_0(z_0)||p(z_0|x)\right] + \int_0^1 \frac{d}{dt}\text{KL}\left[q_t(z_t)||p(z_t|x)\right]dt \\
+  &amp;= \text{KL}\left[q_0(z_0)||p(z_0|x)\right] - \int_0^1 \mathbb{E}_{q_t(z_t)}\left[\langle \text{grad } \log p(z_t|x), V_t(z_t) \rangle  + \text{Div}(V_t(z_t))\right]dt
 \end{align}
 $$</div>
-<p>
-This is called the result in theorem 2 of <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu et al.</a>.  The integrand is called the generalized Stein operator:
+<h1>Comparison to ELBO maximization</h1>
+<p>Lets see how this compares to maximizing the ELBO
 </p>
 <div class="math">$$
 \begin{align}
-\mathcal{A}_p V_t = \langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)
-\end{align}
-$$</div>
-<h2>Finding the direction of steepest descent</h2>
-<p>Next we'll show how to construct the <span class="math">\(V_t\)</span> that maximizes the time derivative of the reverse KL divergence.  Specifically, we want to choose a space called <span class="math">\(\mathfrak{X}\)</span> that is equipped with some metric so to find
-</p>
-<div class="math">$$
-\begin{align}
-  \text{Loss}\left(V_t\right) &amp;= \min_{V_t\in \mathfrak{X}} \frac{d}{dt}\text{KL}\left[q_t||p\right] \\
-  &amp;= \min_{V_t\in \mathfrak{X}}-\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right] \\
-  &amp;= \max_{V_t\in \mathfrak{X}}\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right]
-\end{align}
-$$</div>
-<p><a href="https://arxiv.org/pdf/1711.11216.pdf">Liu et al.</a> proposes looking at the space of vector fields that are the gradient of some function <span class="math">\(f\)</span>:
-</p>
-<div class="math">$$
-\begin{align}
-  \mathfrak{X} = \left\{V_t = \text{grad } f \mid f \in \mathcal{H}_K \right\}
-\end{align}
-$$</div>
-<p>
-where <span class="math">\(\mathcal{H}_k\)</span> is a reproducing kernel Hilbert space (RKHS) with kernel <span class="math">\(K\)</span>.  Check out my <a href="/reproducing-kernel-hilbert-space.html">post on RKHS</a> for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that <span class="math">\(V_t = \text{grad } f_t\)</span>.  Also recall that <span class="math">\(\text{grad } f_t = \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K}\)</span> and <span class="math">\(\text{Div}(\text{grad } f_t) = \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}\)</span>.</p>
-<p>Then we can simplify the objective further by rewriting <span class="math">\(V_t\)</span> in terms of <span class="math">\(f_t\)</span>:
-</p>
-<div class="math">$$
-\begin{align}
-  \text{Loss}\left(f_t\right) &amp;= \max_{f_t \in \mathcal{H}_K}\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \text{grad } f_t \rangle_g + \text{Div}(\text{grad } f_t)\right] \\
-  &amp;= \max_{f_t \in \mathcal{H}_K}\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K} \rangle_g + \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}\right] \\
-  &amp;= \max_{f_t \in \mathcal{H}_K}\langle f_t, \mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \text{grad }  K_x \rangle_g \right]\rangle_{\mathcal{H}_K} + \langle f_t, \mathbb{E}_{q_t}\left[\text{Div}(\text{grad }  K_x) \right] \rangle_{\mathcal{H}_K} \\
-  &amp;= \max_{f_t \in \mathcal{H}_K} \langle f_t, \underbrace{\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \text{grad }  K_x \rangle_g + \text{Div}(\text{grad }  K_x)\right]}_{\hat{f}_t}\rangle_{\mathcal{H}_K} \\
-  &amp;= \max_{f_t \in \mathcal{H}_K} \langle f_t, \hat{f}_t\rangle_{\mathcal{H}_K}
-\end{align}
-$$</div>
-<p>Clearly we obtain best loss when we choose <span class="math">\(f_t = \hat{f}_t\)</span> (up to a scaling constant), so the vector field that minimizes the rate of change of the reverse KL divergence is
-</p>
-<div class="math">$$
-\begin{align}
-  V_t^* &amp;= \text{grad } \hat{f}_t \\
-  &amp;= \text{grad } \mathbb{E}_{q_t}\left[\langle \text{grad } \log p, \text{grad }  K_x \rangle_g + \text{Div}(\text{grad }  K_x)\right]
+  -\log p(x) &amp;= \int q_1(z_1)\log \frac{q_1(z_1)}{p(x,z_1)}dz_1 - \text{KL}\left[q_1(z_1)||p(z_1|x)\right] \\
+  &amp;\leq \int q_1(z_1)\log \frac{q_1(z_1)}{p(x,z_1)}dz_1 \\
+  &amp;= \int q_0(z_0)\log q_1(F_1(z_0))dz_0 - \int q_1(z_1)\log p(x,z_1)dz_1 \\
+  &amp;= \int q_0(z_0)\left[\log q_0(z_0) + \int_0^1 \frac{d\log q_t(z_t)}{dt}dt\right]dz_0 - \int q_1(z_1)\log p(x,z_1)dz_1 \\
+  &amp;= \int q_0(z_0)\left[\log q_0(z_0) - \int_0^1 \text{Div}(V_t(z_t))\right]dz_0 - \int q_1(z_1)\log p(x,z_1)dz_1 \\
 \end{align}
 $$</div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
@@ -230,7 +192,7 @@ $$</div>
         </div>
         <section id="article-sidebar" class="span2">
             <h4>Published</h4>
-            <time itemprop="dateCreated" datetime="2023-07-15T00:00:00-05:00">Jul 15, 2023</time>
+            <time itemprop="dateCreated" datetime="2023-11-17T00:00:00-05:00">Nov 17, 2023</time>
 
             <h4>Category</h4>
             <a class="category-link" href="/categories.html#blog-ref">Blog</a>
