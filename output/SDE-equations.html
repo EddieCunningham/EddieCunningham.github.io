@@ -211,13 +211,23 @@ So we're left with the final result:
 \end{align}
 $$</div>
 <p>Note that <span class="math">\(p_t(x)\)</span> is technically a conditional distribution conditioned on a starting state <span class="math">\(x_0\)</span> at time <span class="math">\(t=0\)</span>.</p>
-<p>We can also see how the vector field looks like for SDEs by pulling out <span class="math">\(\frac{\partial}{\partial x^i}\)</span> (and letting <span class="math">\(Q=I\)</span> for simplicity):
+<h3>Vector field associated with SDEs</h3>
+<p>We can also take a look at the vector field that generates the probability path by manipulating the Fokker-Planck equation to look like the continuity equation.  To derive this in the full generality, first let <span class="math">\(R_{ij}(x,t)\)</span> be a skew symmetric matrix <span class="math">\((R=-R^T)\)</span>. Then <span class="math">\(\frac{\partial^2 f R_{ij}}{\partial x^i \partial x^j} = 0\)</span> for any function <span class="math">\(f\)</span>.  Next, let <span class="math">\(\Sigma_{ij} = L_{iu}Q_{uv}L_{jv}\)</span>.  Then we can write the Fokker-Planck equation as</p>
+<div class="math">$$
+\begin{align}
+  \frac{\partial p_t}{\partial t} &amp;= -\frac{\partial f_ip_t}{\partial x_i} + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}(\Sigma_{ij}p_t) + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}(R_{ij}p_t) \\
+  &amp;= -\frac{\partial f_ip_t}{\partial x_i} + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}((\Sigma_{ij} + R_{ij})p_t) \\
+  &amp;= -\frac{\partial}{\partial x^i}\left[f_ip_t - \frac{1}{2} \frac{\partial}{\partial x_j}((\Sigma_{ij} + R_{ij})p_t) \right] \\
+  &amp;= -\frac{\partial}{\partial x^i}p_t\left[f_i - \frac{1}{2} \frac{1}{p_t} \frac{\partial}{\partial x_j}((\Sigma_{ij} + R_{ij})p_t) \right] \\
+  &amp;= -\frac{\partial}{\partial x^i}p_t\left[\underbrace{f_i - \frac{1}{2}\left((\Sigma_{ij} + R_{ij})\frac{\partial\log p_t}{\partial x_j} + \frac{\partial\Sigma_{ij} + R_{ij}}{\partial x_j}\right)}_{u_t} \right]
+\end{align}
+$$</div>
+<p>
+So we can see that the vector field that generates the probability path is given by
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{\partial p_t}{\partial t} &amp;= -\frac{\partial}{\partial x_i}\left[f_ip_t - \frac{1}{2} \frac{\partial}{\partial x_j}(L_{ik}L_{jk}p_t) \right] \\
-  &amp;= -\frac{\partial}{\partial x_i}\left[p_t \left(f_i - \frac{1}{2} \frac{\partial}{\partial x_j}(L_{ik}L_{jk}\log p_t) \right) \right] \\
-  &amp;= -\frac{\partial}{\partial x_i}\left[p_t \left(f_i - \frac{1}{2} L_{ik}L_{jk}\frac{\partial \log p_t}{\partial x_j} \right) \right] \quad \text{if $L$ doesn't depend on $x$}
+  u_i &amp;= f_i - \frac{1}{2}\left((\Sigma_{ij} + R_{ij})\frac{\partial\log p_t}{\partial x_j} + \frac{\partial\Sigma_{ij} + R_{ij}}{\partial x_j}\right)
 \end{align}
 $$</div>
 <h1>Kolmogorov backward equation</h1>

@@ -107,7 +107,7 @@ $$
 $$
 If $F^{-1}(S)$ is aligned with the coordinate axes, then this expression is equivalent to the change of variables formula on manifolds.
 
-# Probability form decomposition
+<!-- # Probability form decomposition
 Let $S\subset \mathcal{X}$ be a submanifold of $\mathcal{M}$ and let $F:\mathcal{X} \to \mathcal{Z}$ be a diffeomorphism.  Locally, let $S^\perp$ denote the submanifold with tangent space equal to the normal space of $S$.  Then we can decompose the probability form on $\mathcal{X}$ into a product of probability forms on $S$, $S^\perp$ and one other term.
 
 First, consider the matrix $M = \begin{bmatrix}A^TA & A^TB \\ B^TA & B^TB\end{bmatrix}$.  We can decompose $\det(M)$ into a product of matrices:
@@ -147,6 +147,6 @@ $$
        &= \log \rho^\parallel + \log \rho^\perp + (\mathcal{I} + \log Z^\parallel + \log Z^\perp - \log(\rho_z \circ F))
 \end{align}
 $$
-
+<!--
 # Incorporating geometric information into generative models
-Our goal is to learn the mapping $F: \mathcal{X} \to \mathcal{Z}$ so that we maximize the probability density of the data under the pullback metric $F^*g_z$, with the additional constraint that the the likelihood on $S$ and $S^\perp$ are maximized.
+Our goal is to learn the mapping $F: \mathcal{X} \to \mathcal{Z}$ so that we maximize the probability density of the data under the pullback metric $F^*g_z$, with the additional constraint that the the likelihood on $S$ and $S^\perp$ are maximized. -->

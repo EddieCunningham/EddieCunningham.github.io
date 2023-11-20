@@ -125,12 +125,22 @@ $$
 
 Note that $p_t(x)$ is technically a conditional distribution conditioned on a starting state $x_0$ at time $t=0$.
 
-We can also see how the vector field looks like for SDEs by pulling out $\frac{\partial}{\partial x^i}$ (and letting $Q=I$ for simplicity):
+### Vector field associated with SDEs
+We can also take a look at the vector field that generates the probability path by manipulating the Fokker-Planck equation to look like the continuity equation.  To derive this in the full generality, first let $R_{ij}(x,t)$ be a skew symmetric matrix $(R=-R^T)$. Then $\frac{\partial^2 f R_{ij}}{\partial x^i \partial x^j} = 0$ for any function $f$.  Next, let $\Sigma_{ij} = L_{iu}Q_{uv}L_{jv}$.  Then we can write the Fokker-Planck equation as
+
 $$
 \begin{align}
-  \frac{\partial p_t}{\partial t} &= -\frac{\partial}{\partial x_i}\left[f_ip_t - \frac{1}{2} \frac{\partial}{\partial x_j}(L_{ik}L_{jk}p_t) \right] \\
-  &= -\frac{\partial}{\partial x_i}\left[p_t \left(f_i - \frac{1}{2} \frac{\partial}{\partial x_j}(L_{ik}L_{jk}\log p_t) \right) \right] \\
-  &= -\frac{\partial}{\partial x_i}\left[p_t \left(f_i - \frac{1}{2} L_{ik}L_{jk}\frac{\partial \log p_t}{\partial x_j} \right) \right] \quad \text{if $L$ doesn't depend on $x$}
+  \frac{\partial p_t}{\partial t} &= -\frac{\partial f_ip_t}{\partial x_i} + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}(\Sigma_{ij}p_t) + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}(R_{ij}p_t) \\
+  &= -\frac{\partial f_ip_t}{\partial x_i} + \frac{1}{2} \frac{\partial^2}{\partial x_i \partial x_j}((\Sigma_{ij} + R_{ij})p_t) \\
+  &= -\frac{\partial}{\partial x^i}\left[f_ip_t - \frac{1}{2} \frac{\partial}{\partial x_j}((\Sigma_{ij} + R_{ij})p_t) \right] \\
+  &= -\frac{\partial}{\partial x^i}p_t\left[f_i - \frac{1}{2} \frac{1}{p_t} \frac{\partial}{\partial x_j}((\Sigma_{ij} + R_{ij})p_t) \right] \\
+  &= -\frac{\partial}{\partial x^i}p_t\left[\underbrace{f_i - \frac{1}{2}\left((\Sigma_{ij} + R_{ij})\frac{\partial\log p_t}{\partial x_j} + \frac{\partial\Sigma_{ij} + R_{ij}}{\partial x_j}\right)}_{u_t} \right]
+\end{align}
+$$
+So we can see that the vector field that generates the probability path is given by
+$$
+\begin{align}
+  u_i &= f_i - \frac{1}{2}\left((\Sigma_{ij} + R_{ij})\frac{\partial\log p_t}{\partial x_j} + \frac{\partial\Sigma_{ij} + R_{ij}}{\partial x_j}\right)
 \end{align}
 $$
 

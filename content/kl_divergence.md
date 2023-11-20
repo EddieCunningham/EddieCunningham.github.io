@@ -2,7 +2,7 @@ Title: KL-Divergence, Score Matching, and Flow Matching
 Date: 2023-07-15
 Modified: 2023-07-15
 Category: Blog
-status: hidden
+<!-- status: hidden -->
 Tags: probability paths, KL-divergence, score matching, flow matching
 Slug: kl-div-and-matching
 Summary: The relationship between KL-divergence, score matching, and flow matching

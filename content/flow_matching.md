@@ -33,6 +33,9 @@ $$
 \begin{align}
   \frac{\partial p_t}{\partial t} &= \frac{d}{dt}\int p_y(y)p_{t|y}(x_t|y) dy \\
   &= \int p_y(y)\frac{d}{dt}p_{t|y}(x_t|y) dy \\
+  &= -\int p_y(y)\text{Div}(p_{t|y}(x_t|y)\tilde{V}_t(x_t|y))dy \\
+  &= -\text{Div}(\int p_y(y)p_{t|y}(x_t|y)\tilde{V}_t(x_t|y)dy) \\
+  &= -\text{Div}(p_t \underbrace{\int \frac{1}{p_t}p_y(y)p_{t|y}(x_t|y)\tilde{V}_t(x_t|y)dy}_{V_t})
 \end{align}
 $$
 

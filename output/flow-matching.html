@@ -109,6 +109,9 @@ We can check that this is true by checking that the continuity equation is satis
 \begin{align}
   \frac{\partial p_t}{\partial t} &amp;= \frac{d}{dt}\int p_y(y)p_{t|y}(x_t|y) dy \\
   &amp;= \int p_y(y)\frac{d}{dt}p_{t|y}(x_t|y) dy \\
+  &amp;= -\int p_y(y)\text{Div}(p_{t|y}(x_t|y)\tilde{V}_t(x_t|y))dy \\
+  &amp;= -\text{Div}(\int p_y(y)p_{t|y}(x_t|y)\tilde{V}_t(x_t|y)dy) \\
+  &amp;= -\text{Div}(p_t \underbrace{\int \frac{1}{p_t}p_y(y)p_{t|y}(x_t|y)\tilde{V}_t(x_t|y)dy}_{V_t})
 \end{align}
 $$</div>
 <p>Thus, we have constructed a continuous normalizing flow that takes <span class="math">\(p_0\)</span> to <span class="math">\(p_1=p_\text{data}\)</span>.  So far this doesn't seem too useful, but there are two reasons main reasons that will lead us to a simulation free training algorithm:</p>

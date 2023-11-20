@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Eddie Cunningham" />
+
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary">
+
+<meta name="keywords" content=", Blog, " />
+
+<meta property="og:title" content="Singular value decomposition derivatives "/>
+<meta property="og:url" content="/singular-value-decomposition-derivatives.html" />
+<meta property="og:description" content="Tags: svd Slug: svd-derivatives Summary: Derivatives of the singular value decomposition The singular value decomposition (SVD) is a matrix decomposition that is used in many applications. It is defined as: $$ \begin{align} A &amp;= U \Sigma V^T \end{align} $$ where \(U\) and \(V\) are orthogonal matrices and \(\Sigma\) is a …if (!document.getElementById(&#39;mathjaxscript_pelican_#%@#$@#&#39;)) { var align = &#34;center&#34;, indent = &#34;0em&#34;, linebreak = &#34;false&#34;; if (false) { align = (screen.width" />
+<meta property="og:site_name" content="" />
+<meta property="og:article:author" content="Eddie Cunningham" />
+<meta property="og:article:published_time" content="2023-11-10T00:00:00-05:00" />
+<meta name="twitter:title" content="Singular value decomposition derivatives ">
+<meta name="twitter:description" content="Tags: svd Slug: svd-derivatives Summary: Derivatives of the singular value decomposition The singular value decomposition (SVD) is a matrix decomposition that is used in many applications. It is defined as: $$ \begin{align} A &amp;= U \Sigma V^T \end{align} $$ where \(U\) and \(V\) are orthogonal matrices and \(\Sigma\) is a …if (!document.getElementById(&#39;mathjaxscript_pelican_#%@#$@#&#39;)) { var align = &#34;center&#34;, indent = &#34;0em&#34;, linebreak = &#34;false&#34;; if (false) { align = (screen.width">
+
+        <title>Singular value decomposition derivatives  · 
+</title>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
+        <link rel="stylesheet" type="text/css" href="/theme/css/custom.css" media="screen">
+
+
+
+    </head>
+    <body>
+        <div id="content">
+            <div class="navbar navbar-static-top">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <a class="brand" href="/"><span class=site-name></span></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right top-menu">
+                                <li >
+                                    <a href=
+                                       "/"
+                                    >Home</a>
+                                </li>
+                                <li ><a href="/pages/about.html">About</a></li>
+                                <li ><a href="/pages/research.html">Research</a></li>
+                                <li ><a href="/categories.html">Categories</a></li>
+                                <li ><a href="/tags.html">Tags</a></li>
+                                <li ><a href="/archives.html">Archives</a></li>
+                                <li><form class="navbar-search" action="/search.html" onsubmit="return validateForm(this.elements['q'].value);"> <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input"></form></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span1"></div>
+                    <div class="span10">
+<article itemscope>
+<div class="row-fluid">
+    <header class="page-header span10 offset2">
+        <h1>
+            <a href="/singular-value-decomposition-derivatives.html">
+                Singular value decomposition derivatives
+            </a>
+        </h1>
+    </header>
+</div>
+
+<div class="row-fluid">
+        <div class="span8 offset2 article-content">
+            
+            <!-- status: published -->
+<p>Tags: svd
+Slug: svd-derivatives
+Summary: Derivatives of the singular value decomposition</p>
+<p>The singular value decomposition (SVD) is a matrix decomposition that is used in many applications.  It is defined as:
+</p>
+<div class="math">$$
+\begin{align}
+  A &amp;= U \Sigma V^T
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(U\)</span> and <span class="math">\(V\)</span> are orthogonal matrices and <span class="math">\(\Sigma\)</span> is a diagonal matrix with non-negative entries.  The diagonal entries of <span class="math">\(\Sigma\)</span> are called the singular values of <span class="math">\(A\)</span> and are denoted as <span class="math">\(\sigma_1,\dots,\sigma_n\)</span>.  The singular values are the square roots of the eigenvalues of <span class="math">\(A^TA\)</span>.  In this post we're going to go over how to differentiate the elements of the SVD under the assumption that the singular values are all distinct and non-zero.</p>
+<h3>Einstein notation</h3>
+<p>Before proceeding, we need to understand Einstein notation.  Einstein notation is an alternative way of writing matrix equations where we undo the matrix notation and remove the summation symbol.  For example, lets write the equation <span class="math">\(Ax = b\)</span> in Einstein notation.
+  - Step 1: Undo the matrix notation
+    - <span class="math">\(Ax = b \to \sum_j A_{ij}x_j = b_i\)</span>
+  - Step 2: Remove the summation symbol
+    - <span class="math">\(\sum_j A_{ij}x_j = b_i \to A_{ij}x_j = b_i\)</span></p>
+<p>And thats it!  All we did was remove the summation symbol.  When we see Einstein notation in practice, we implicitly assume that there is a summation over indices that only appear on one side of the equality.  Also in Einstein notation, we will make use of the Kronecker delta function <span class="math">\(\delta_{ij}\)</span> which is <span class="math">\(1\)</span> when <span class="math">\(i=j\)</span> and <span class="math">\(0\)</span> otherwise.</p>
+<h3>Orthogonal matrices</h3>
+<p>Next, we need to know how to differentiate orthogonal matrices.  Let <span class="math">\(Q\)</span> be an orthogonal matrix, then by definition <span class="math">\(Q_{ki}Q_{kj} = \delta_{ij}\)</span>.  Taking the derivative yields:
+</p>
+<div class="math">$$
+\begin{align}
+  \partial (Q_{ki}Q_{kj}) = \partial \delta_{ij} \\
+  \implies \partial Q_{ki} Q_{kj} + Q_{ki} \partial Q_{kj} = 0 \\
+  \implies \partial Q_{ki} Q_{kj} = -Q_{ki} \partial Q_{kj} \\
+\end{align}
+$$</div>
+<p>
+To make this equations clearer, we can undo some of the Einstein notation by letting <span class="math">\(q_i := Q_{:,i}\)</span> be the <span class="math">\(i\)</span>th column of <span class="math">\(Q\)</span>.  Then we have:
+</p>
+<div class="math">$$
+\begin{align}
+  \partial q_i \cdot q_j = -\partial q_j \cdot q_i
+\end{align}
+$$</div>
+<p>
+Note that when <span class="math">\(i=j\)</span>, <span class="math">\(\partial q_i \cdot q_i = 0\)</span>.  This will be useful when we differentiate the SVD.</p>
+<h1>Singular value decomposition derivatives</h1>
+<p>Lets start by writing the SVD using Einstein notation
+</p>
+<div class="math">$$
+\begin{align}
+    A_{ij} &amp;= U_{iu} \sigma_u V_{ju} \\
+\end{align}
+$$</div>
+<p>
+with some term rearrangement, we can write two equations:
+</p>
+<div class="math">$$
+\begin{align}
+    A_{ij}U_{iu} &amp;= \sigma_u V_{ju} \\
+    A_{ij}V_{ju} &amp;= \sigma_u U_{iu}
+\end{align}
+$$</div>
+<p>
+by applying a derivative, we get
+</p>
+<div class="math">$$
+\begin{align}
+    \partial A_{ij}U_{iu} + A_{ij}\partial U_{iu} &amp;= \partial \sigma_u V_{ju} + \sigma_u \partial V_{ju} \\
+    \partial A_{ij}V_{ju} + A_{ij}\partial V_{ju} &amp;= \partial \sigma_u U_{iu} + \sigma_u \partial U_{iu}
+\end{align}
+$$</div>
+<p>
+We'll call the first equation, equation 1 and the second equation, equation 2.</p>
+<h2>Singular value derivaties</h2>
+<p>To get the derivatives of the singular values, we can multiply both sides of equation 2 by <span class="math">\(U_{iu}\)</span> and summing over <span class="math">\(i\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+    \partial A_{ij}V_{ju} U_{iu} + \underbrace{A_{ij}\partial V_{ju} U_{iu}}_{\sigma_u V_{ju} \partial V_{ju}=0} &amp;= \partial \sigma_u \underbrace{U_{iu} U_{iu}}_{1} + \sigma_u \underbrace{\partial U_{iu} U_{iu}}_{0} \\
+    \implies \partial \sigma_u &amp;= \partial A_{ij}U_{iu} V_{ju}
+\end{align}
+$$</div>
+<h2>Singular vector derivatives</h2>
+<p>Next, to isolate the derivatives of the singular vecotrs, we'll first multiply both sides of equation 1 by <span class="math">\(V_{jv}\)</span>, where <span class="math">\(v \neq u\)</span> and sum over <span class="math">\(j\)</span>:</p>
+<div class="math">$$
+\begin{align}
+    \partial A_{ij}U_{iu} V_{jv} + \underbrace{A_{ij}\partial U_{iu} V_{jv}}_{\sigma_v \partial U_{iu} U_{iv}} &amp;= \partial \sigma_u \underbrace{V_{ju} V_{jv}}_{0} + \sigma_u \partial V_{ju} V_{jv} \\
+    \partial A_{ij}U_{iu} V_{jv} &amp;= -\sigma_v \partial U_{iu} U_{iv} + \sigma_u \partial V_{ju} V_{jv}
+\end{align}
+$$</div>
+<p>
+Similarly we can do the same with equation 2 but multiply by <span class="math">\(U_{iv}\)</span> where <span class="math">\(v\neq u\)</span> and sum over <span class="math">\(i\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+    \partial A_{ij}V_{ju} U_{iv} + \underbrace{A_{ij}\partial V_{ju} U_{iv}}_{\sigma_v \partial V_{ju} V_{jv}} &amp;= \partial \sigma_u \underbrace{U_{iu} U_{iv}}_{0} + \sigma_u \partial U_{iu} U_{iv} \\
+    \partial A_{ij}U_{iv} V_{ju} &amp;= \sigma_u \partial U_{iu} U_{iv} - \sigma_v \partial V_{ju} V_{jv}
+\end{align}
+$$</div>
+<p>So we're left with the equation
+</p>
+<div class="math">$$
+\begin{align}
+  \partial A_{ij}U_{iu} V_{jv} &amp;= -\sigma_v \partial U_{iu} U_{iv} + \sigma_u \partial V_{ju} V_{jv} \\
+  \partial A_{ij}U_{iv} V_{ju} &amp;= \sigma_u \partial U_{iu} U_{iv} - \sigma_v \partial V_{ju} V_{jv}
+\end{align}
+$$</div>
+<h3>Left singular vectors</h3>
+<p>Lets multiply the above equations by <span class="math">\(\sigma_v\)</span> and <span class="math">\(\sigma_u\)</span> respectively:
+</p>
+<div class="math">$$
+\begin{align}
+    \sigma_v \partial A_{ij}U_{iu} V_{jv} &amp;= -{\sigma_v}^2 \partial U_{iu} U_{iv} + \sigma_v \sigma_u \partial V_{ju} V_{jv} \\
+    \sigma_u \partial A_{ij}U_{iv} V_{ju} &amp;= {\sigma_u}^2 \partial U_{iu} U_{iv} - \sigma_v \sigma_u \partial V_{ju} V_{jv}
+\end{align}
+$$</div>
+<p>
+If we sum the equations, the last terms cancel and we're left with
+</p>
+<div class="math">$$
+\begin{align}
+    \partial A_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) = ({\sigma_u}^2 - {\sigma_v}^2) \partial U_{iu} U_{iv} \\
+    \implies \partial U_{iu} U_{iv} = \frac{1}{\sigma_u^2 - \sigma_v^2} \partial A_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right)
+\end{align}
+$$</div>
+<h3>Right singular vectors</h3>
+<p>Similarly, if we multiplied by <span class="math">\(\sigma_u\)</span> and <span class="math">\(\sigma_v\)</span> respectively, we get
+</p>
+<div class="math">$$
+\begin{align}
+    \sigma_u \partial A_{ij}U_{iu} V_{jv} &amp;= -{\sigma_v} \sigma_u \partial U_{iu} U_{iv} + {\sigma_u}^2 \partial V_{ju} V_{jv} \\
+    \sigma_v\partial A_{ij}U_{iv} V_{ju} &amp;= \sigma_v\sigma_u \partial U_{iu} U_{iv} - {\sigma_v}^2 \partial V_{ju} V_{jv}
+\end{align}
+$$</div>
+<p>
+If we sum the equations, the first terms on the RHS cancel and we're left with
+</p>
+<div class="math">$$
+\begin{align}
+    \partial A_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) = ({\sigma_u}^2 - {\sigma_v}^2) \partial V_{ju} V_{jv} \\
+    \implies \partial V_{ju} V_{jv} = \frac{1}{\sigma_u^2 - \sigma_v^2} \partial A_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right)
+\end{align}
+$$</div>
+<h2>Summary</h2>
+<p>To simplify the expressions, we'll use the notation <span class="math">\(U_i := U_{:,i}\)</span> and <span class="math">\(V_i := V_{:,i}\)</span> to denote the <span class="math">\(i\)</span>th column of <span class="math">\(U\)</span> and <span class="math">\(V\)</span> respectively.  Then returning to matrix notation yields:
+</p>
+<div class="math">$$
+\begin{align}
+  \partial \sigma_u &amp;= \partial A_{ij}U_{iu} V_{ju} \\
+  \partial U_u \cdot U_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial A_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
+  \partial V_u \cdot V_v &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial A_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right)
+\end{align}
+$$</div>
+<p>Note that to isolate the derivatives of <span class="math">\(U\)</span> and <span class="math">\(V\)</span>, we can write them as a linear combination of the singular vectors:
+</p>
+<div class="math">$$
+\begin{align}
+  \partial U_u = (\partial U_u \cdot U_{v\neq u}) U_u \\
+  \partial V_u = (\partial V_u \cdot V_{v\neq u}) V_u
+\end{align}
+$$</div>
+<p>
+Because <span class="math">\(U\)</span> and <span class="math">\(V\)</span> are orthogonal, <span class="math">\(\partial U_u \cdot U_u = \partial V_u \cdot V_u = 0\)</span>.</p>
+<h1>Lie derivative</h1>
+<p>We can also see how the singular vectors and singular values evolve on the flow of the vector field:
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{dx_t}{dt} = X_t(x_t)
+\end{align}
+$$</div>
+<p>
+i.e., we can evaluate the Lie derivative of the singular vectors and singular values with respect to <span class="math">\(X_t\)</span>.  To do this, recall that we can write the time derivative of the components of <span class="math">\(A\)</span> as:
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{dA}{dt} = \nabla X_t A
+\end{align}
+$$</div>
+<p>
+Then we can look at the time derivative of the SVD derivatives.</p>
+<h3>Singular value derivatives</h3>
+<div class="math">$$
+\begin{align}
+  \frac{d\sigma_u}{dt} &amp;= \frac{dA_{ij}}{dt}U_{iu} V_{ju} \\
+  &amp;= (\nabla X_t)_{ik} A_{kj} U_{iu} V_{ju} \\
+  &amp;= (\nabla X_t)_{ik} U_{iu} \sigma_u U_{ku} \\
+\end{align}
+$$</div>
+<p>
+This is more simply expressed using the log of the singular values:
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{d\log \sigma_u}{dt} = (\nabla X_t)_{ik} U_{iu} U_{ku}
+\end{align}
+$$</div>
+<h3>Left singular vector derivatives</h3>
+<div class="math">$$
+\begin{align}
+  \frac{dU_u}{dt} \cdot U_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \frac{dA_{ij}}{dt}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
+  &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik} A_{kj}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
+  &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik}\left(\sigma_u^2 U_{iv} U_{ku} + \sigma_v^2 U_{iu} U_{kv}\right) \\
+  &amp;= \frac{\sigma_u^2}{\sigma_u^2 - \sigma_v^2} U_v^T(\nabla X_t)U_u + \frac{\sigma_v^2}{\sigma_u^2 - \sigma_v^2} U_u^T(\nabla X_t)U_v \\
+  &amp;= U_v^T(\frac{\sigma_u^2}{\sigma_u^2 - \sigma_v^2}\nabla X_t + \frac{\sigma_v^2}{\sigma_u^2 - \sigma_v^2} \nabla X_t^T)U_u
+\end{align}
+$$</div>
+<h3>Right singular vector derivatives</h3>
+<div class="math">$$
+\begin{align}
+  \frac{dV_u}{dt} \cdot V_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \frac{dA_{ij}}{dt}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) \\
+  &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik} A_{kj}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) \\
+  &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik}\left(\sigma_u\sigma_v U_{iv} U_{ku} + \sigma_u\sigma_v U_{iu} U_{kv}\right) \\
+  &amp;= \frac{\sigma_u \sigma_v}{\sigma_u^2 - \sigma_v^2}\left( U_v^T(\nabla X_t)U_u + U_u^T(\nabla X_t)U_v \right) \\
+  &amp;= \frac{\sigma_u \sigma_v}{\sigma_u^2 - \sigma_v^2} U_v^T(\nabla X_t + \nabla X_t^T)U_u
+\end{align}
+$$</div>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+
+             
+ 
+            
+            
+            
+
+
+
+
+
+
+            <hr/>
+        </div>
+        <section id="article-sidebar" class="span2">
+            <h4>Published</h4>
+            <time itemprop="dateCreated" datetime="2023-11-10T00:00:00-05:00">Nov 10, 2023</time>
+            <h4>Category</h4>
+            <a class="category-link" href="/categories.html#blog-ref">Blog</a>
+            
+
+
+
+
+
+            
+
+
+
+
+
+        </section>
+</div>
+</article>
+                    </div>
+                    <div class="span1"></div>
+                </div>
+            </div>
+        </div>
+<footer>
+
+
+
+
+    <div id="fpowered">
+        Powered by: <a href="http://getpelican.com/" title="Pelican Home Page" target="_blank" rel="nofollow noopener noreferrer">Pelican</a>
+        Theme: <a href="https://elegant.oncrashreboot.com/" title="Theme Elegant Home Page" target="_blank" rel="nofollow noopener noreferrer">Elegant</a>
+    </div>
+</footer>            <script src="//code.jquery.com/jquery.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script>
+            function validateForm(query)
+            {
+                return (query.length > 0);
+            }
+        </script>
+
+    <script>
+    (function () {
+        if (window.location.hash.match(/^#comment-\d+$/)) {
+            $('#comment_thread').collapse('show');
+        }
+    })();
+    window.onhashchange=function(){
+        if (window.location.hash.match(/^#comment-\d+$/))
+            window.location.reload(true);
+    }
+    $('#comment_thread').on('shown', function () {
+        var link = document.getElementById('comment-accordion-toggle');
+        var old_innerHTML = link.innerHTML;
+        $(link).fadeOut(200, function() {
+            $(this).text('Click here to hide comments').fadeIn(200);
+        });
+        $('#comment_thread').on('hidden', function () {
+            $(link).fadeOut(200, function() {
+                $(this).text(old_innerHTML).fadeIn(200);
+            });
+        })
+    })
+</script>
+
+    </body>
+    <!-- Theme: Elegant built for Pelican
+        License : MIT -->
+</html>
