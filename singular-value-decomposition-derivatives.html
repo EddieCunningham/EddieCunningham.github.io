@@ -13,12 +13,12 @@
 
 <meta property="og:title" content="Singular value decomposition derivatives "/>
 <meta property="og:url" content="/singular-value-decomposition-derivatives.html" />
-<meta property="og:description" content="Tags: svd Slug: svd-derivatives Summary: Derivatives of the singular value decomposition The singular value decomposition (SVD) is a matrix decomposition that is used in many applications. It is defined as: $$ \begin{align} A &amp;= U \Sigma V^T \end{align} $$ where \(U\) and \(V\) are orthogonal matrices and \(\Sigma\) is a …if (!document.getElementById(&#39;mathjaxscript_pelican_#%@#$@#&#39;)) { var align = &#34;center&#34;, indent = &#34;0em&#34;, linebreak = &#34;false&#34;; if (false) { align = (screen.width" />
+<meta property="og:description" content="Tags: svd Slug: svd-derivatives Summary: Derivatives of the singular value decomposition The singular value decomposition (SVD) is a matrix decomposition that is used in many applications. It is defined as: $$ \begin{align} J &amp;= U \Sigma V^T \end{align} $$ where \(U\) and \(V\) are orthogonal matrices and \(\Sigma\) is a …if (!document.getElementById(&#39;mathjaxscript_pelican_#%@#$@#&#39;)) { var align = &#34;center&#34;, indent = &#34;0em&#34;, linebreak = &#34;false&#34;; if (false) { align = (screen.width" />
 <meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
 <meta property="og:article:published_time" content="2023-11-10T00:00:00-05:00" />
 <meta name="twitter:title" content="Singular value decomposition derivatives ">
-<meta name="twitter:description" content="Tags: svd Slug: svd-derivatives Summary: Derivatives of the singular value decomposition The singular value decomposition (SVD) is a matrix decomposition that is used in many applications. It is defined as: $$ \begin{align} A &amp;= U \Sigma V^T \end{align} $$ where \(U\) and \(V\) are orthogonal matrices and \(\Sigma\) is a …if (!document.getElementById(&#39;mathjaxscript_pelican_#%@#$@#&#39;)) { var align = &#34;center&#34;, indent = &#34;0em&#34;, linebreak = &#34;false&#34;; if (false) { align = (screen.width">
+<meta name="twitter:description" content="Tags: svd Slug: svd-derivatives Summary: Derivatives of the singular value decomposition The singular value decomposition (SVD) is a matrix decomposition that is used in many applications. It is defined as: $$ \begin{align} J &amp;= U \Sigma V^T \end{align} $$ where \(U\) and \(V\) are orthogonal matrices and \(\Sigma\) is a …if (!document.getElementById(&#39;mathjaxscript_pelican_#%@#$@#&#39;)) { var align = &#34;center&#34;, indent = &#34;0em&#34;, linebreak = &#34;false&#34;; if (false) { align = (screen.width">
 
         <title>Singular value decomposition derivatives  · 
 </title>
@@ -84,17 +84,17 @@ Summary: Derivatives of the singular value decomposition</p>
 </p>
 <div class="math">$$
 \begin{align}
-  A &amp;= U \Sigma V^T
+  J &amp;= U \Sigma V^T
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(U\)</span> and <span class="math">\(V\)</span> are orthogonal matrices and <span class="math">\(\Sigma\)</span> is a diagonal matrix with non-negative entries.  The diagonal entries of <span class="math">\(\Sigma\)</span> are called the singular values of <span class="math">\(A\)</span> and are denoted as <span class="math">\(\sigma_1,\dots,\sigma_n\)</span>.  The singular values are the square roots of the eigenvalues of <span class="math">\(A^TA\)</span>.  In this post we're going to go over how to differentiate the elements of the SVD under the assumption that the singular values are all distinct and non-zero.</p>
+where <span class="math">\(U\)</span> and <span class="math">\(V\)</span> are orthogonal matrices and <span class="math">\(\Sigma\)</span> is a diagonal matrix with non-negative entries.  The diagonal entries of <span class="math">\(\Sigma\)</span> are called the singular values of <span class="math">\(J\)</span> and are denoted as <span class="math">\(\sigma_1,\dots,\sigma_n\)</span>.  The singular values are the square roots of the eigenvalues of <span class="math">\(J^TJ\)</span>.  In this post we're going to go over how to differentiate the elements of the SVD under the assumption that the singular values are all distinct and non-zero.</p>
 <h3>Einstein notation</h3>
 <p>Before proceeding, we need to understand Einstein notation.  Einstein notation is an alternative way of writing matrix equations where we undo the matrix notation and remove the summation symbol.  For example, lets write the equation <span class="math">\(Ax = b\)</span> in Einstein notation.
   - Step 1: Undo the matrix notation
-    - <span class="math">\(Ax = b \to \sum_j A_{ij}x_j = b_i\)</span>
+    - <span class="math">\(Ax = b \to \sum_j J_{ij}x_j = b_i\)</span>
   - Step 2: Remove the summation symbol
-    - <span class="math">\(\sum_j A_{ij}x_j = b_i \to A_{ij}x_j = b_i\)</span></p>
+    - <span class="math">\(\sum_j J_{ij}x_j = b_i \to J_{ij}x_j = b_i\)</span></p>
 <p>And thats it!  All we did was remove the summation symbol.  When we see Einstein notation in practice, we implicitly assume that there is a summation over indices that only appear on one side of the equality.  Also in Einstein notation, we will make use of the Kronecker delta function <span class="math">\(\delta_{ij}\)</span> which is <span class="math">\(1\)</span> when <span class="math">\(i=j\)</span> and <span class="math">\(0\)</span> otherwise.</p>
 <h3>Orthogonal matrices</h3>
 <p>Next, we need to know how to differentiate orthogonal matrices.  Let <span class="math">\(Q\)</span> be an orthogonal matrix, then by definition <span class="math">\(Q_{ki}Q_{kj} = \delta_{ij}\)</span>.  Taking the derivative yields:
@@ -121,7 +121,7 @@ Note that when <span class="math">\(i=j\)</span>, <span class="math">\(\partial 
 </p>
 <div class="math">$$
 \begin{align}
-    A_{ij} &amp;= U_{iu} \sigma_u V_{ju} \\
+    J_{ij} &amp;= U_{iu} \sigma_u V_{ju} \\
 \end{align}
 $$</div>
 <p>
@@ -129,8 +129,8 @@ with some term rearrangement, we can write two equations:
 </p>
 <div class="math">$$
 \begin{align}
-    A_{ij}U_{iu} &amp;= \sigma_u V_{ju} \\
-    A_{ij}V_{ju} &amp;= \sigma_u U_{iu}
+    J_{ij}U_{iu} &amp;= \sigma_u V_{ju} \\
+    J_{ij}V_{ju} &amp;= \sigma_u U_{iu}
 \end{align}
 $$</div>
 <p>
@@ -138,8 +138,8 @@ by applying a derivative, we get
 </p>
 <div class="math">$$
 \begin{align}
-    \partial A_{ij}U_{iu} + A_{ij}\partial U_{iu} &amp;= \partial \sigma_u V_{ju} + \sigma_u \partial V_{ju} \\
-    \partial A_{ij}V_{ju} + A_{ij}\partial V_{ju} &amp;= \partial \sigma_u U_{iu} + \sigma_u \partial U_{iu}
+    \partial J_{ij}U_{iu} + J_{ij}\partial U_{iu} &amp;= \partial \sigma_u V_{ju} + \sigma_u \partial V_{ju} \\
+    \partial J_{ij}V_{ju} + J_{ij}\partial V_{ju} &amp;= \partial \sigma_u U_{iu} + \sigma_u \partial U_{iu}
 \end{align}
 $$</div>
 <p>
@@ -149,16 +149,16 @@ We'll call the first equation, equation 1 and the second equation, equation 2.</
 </p>
 <div class="math">$$
 \begin{align}
-    \partial A_{ij}V_{ju} U_{iu} + \underbrace{A_{ij}\partial V_{ju} U_{iu}}_{\sigma_u V_{ju} \partial V_{ju}=0} &amp;= \partial \sigma_u \underbrace{U_{iu} U_{iu}}_{1} + \sigma_u \underbrace{\partial U_{iu} U_{iu}}_{0} \\
-    \implies \partial \sigma_u &amp;= \partial A_{ij}U_{iu} V_{ju}
+    \partial J_{ij}V_{ju} U_{iu} + \underbrace{J_{ij}\partial V_{ju} U_{iu}}_{\sigma_u V_{ju} \partial V_{ju}=0} &amp;= \partial \sigma_u \underbrace{U_{iu} U_{iu}}_{1} + \sigma_u \underbrace{\partial U_{iu} U_{iu}}_{0} \\
+    \implies \partial \sigma_u &amp;= \partial J_{ij}U_{iu} V_{ju}
 \end{align}
 $$</div>
 <h2>Singular vector derivatives</h2>
 <p>Next, to isolate the derivatives of the singular vecotrs, we'll first multiply both sides of equation 1 by <span class="math">\(V_{jv}\)</span>, where <span class="math">\(v \neq u\)</span> and sum over <span class="math">\(j\)</span>:</p>
 <div class="math">$$
 \begin{align}
-    \partial A_{ij}U_{iu} V_{jv} + \underbrace{A_{ij}\partial U_{iu} V_{jv}}_{\sigma_v \partial U_{iu} U_{iv}} &amp;= \partial \sigma_u \underbrace{V_{ju} V_{jv}}_{0} + \sigma_u \partial V_{ju} V_{jv} \\
-    \partial A_{ij}U_{iu} V_{jv} &amp;= -\sigma_v \partial U_{iu} U_{iv} + \sigma_u \partial V_{ju} V_{jv}
+    \partial J_{ij}U_{iu} V_{jv} + \underbrace{J_{ij}\partial U_{iu} V_{jv}}_{\sigma_v \partial U_{iu} U_{iv}} &amp;= \partial \sigma_u \underbrace{V_{ju} V_{jv}}_{0} + \sigma_u \partial V_{ju} V_{jv} \\
+    \partial J_{ij}U_{iu} V_{jv} &amp;= -\sigma_v \partial U_{iu} U_{iv} + \sigma_u \partial V_{ju} V_{jv}
 \end{align}
 $$</div>
 <p>
@@ -166,16 +166,16 @@ Similarly we can do the same with equation 2 but multiply by <span class="math">
 </p>
 <div class="math">$$
 \begin{align}
-    \partial A_{ij}V_{ju} U_{iv} + \underbrace{A_{ij}\partial V_{ju} U_{iv}}_{\sigma_v \partial V_{ju} V_{jv}} &amp;= \partial \sigma_u \underbrace{U_{iu} U_{iv}}_{0} + \sigma_u \partial U_{iu} U_{iv} \\
-    \partial A_{ij}U_{iv} V_{ju} &amp;= \sigma_u \partial U_{iu} U_{iv} - \sigma_v \partial V_{ju} V_{jv}
+    \partial J_{ij}V_{ju} U_{iv} + \underbrace{J_{ij}\partial V_{ju} U_{iv}}_{\sigma_v \partial V_{ju} V_{jv}} &amp;= \partial \sigma_u \underbrace{U_{iu} U_{iv}}_{0} + \sigma_u \partial U_{iu} U_{iv} \\
+    \partial J_{ij}U_{iv} V_{ju} &amp;= \sigma_u \partial U_{iu} U_{iv} - \sigma_v \partial V_{ju} V_{jv}
 \end{align}
 $$</div>
 <p>So we're left with the equation
 </p>
 <div class="math">$$
 \begin{align}
-  \partial A_{ij}U_{iu} V_{jv} &amp;= -\sigma_v \partial U_{iu} U_{iv} + \sigma_u \partial V_{ju} V_{jv} \\
-  \partial A_{ij}U_{iv} V_{ju} &amp;= \sigma_u \partial U_{iu} U_{iv} - \sigma_v \partial V_{ju} V_{jv}
+  \partial J_{ij}U_{iu} V_{jv} &amp;= -\sigma_v \partial U_{iu} U_{iv} + \sigma_u \partial V_{ju} V_{jv} \\
+  \partial J_{ij}U_{iv} V_{ju} &amp;= \sigma_u \partial U_{iu} U_{iv} - \sigma_v \partial V_{ju} V_{jv}
 \end{align}
 $$</div>
 <h3>Left singular vectors</h3>
@@ -183,8 +183,8 @@ $$</div>
 </p>
 <div class="math">$$
 \begin{align}
-    \sigma_v \partial A_{ij}U_{iu} V_{jv} &amp;= -{\sigma_v}^2 \partial U_{iu} U_{iv} + \sigma_v \sigma_u \partial V_{ju} V_{jv} \\
-    \sigma_u \partial A_{ij}U_{iv} V_{ju} &amp;= {\sigma_u}^2 \partial U_{iu} U_{iv} - \sigma_v \sigma_u \partial V_{ju} V_{jv}
+    \sigma_v \partial J_{ij}U_{iu} V_{jv} &amp;= -{\sigma_v}^2 \partial U_{iu} U_{iv} + \sigma_v \sigma_u \partial V_{ju} V_{jv} \\
+    \sigma_u \partial J_{ij}U_{iv} V_{ju} &amp;= {\sigma_u}^2 \partial U_{iu} U_{iv} - \sigma_v \sigma_u \partial V_{ju} V_{jv}
 \end{align}
 $$</div>
 <p>
@@ -192,8 +192,8 @@ If we sum the equations, the last terms cancel and we're left with
 </p>
 <div class="math">$$
 \begin{align}
-    \partial A_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) = ({\sigma_u}^2 - {\sigma_v}^2) \partial U_{iu} U_{iv} \\
-    \implies \partial U_{iu} U_{iv} = \frac{1}{\sigma_u^2 - \sigma_v^2} \partial A_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right)
+    \partial J_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) = ({\sigma_u}^2 - {\sigma_v}^2) \partial U_{iu} U_{iv} \\
+    \implies \partial U_{iu} U_{iv} = \frac{1}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right)
 \end{align}
 $$</div>
 <h3>Right singular vectors</h3>
@@ -201,8 +201,8 @@ $$</div>
 </p>
 <div class="math">$$
 \begin{align}
-    \sigma_u \partial A_{ij}U_{iu} V_{jv} &amp;= -{\sigma_v} \sigma_u \partial U_{iu} U_{iv} + {\sigma_u}^2 \partial V_{ju} V_{jv} \\
-    \sigma_v\partial A_{ij}U_{iv} V_{ju} &amp;= \sigma_v\sigma_u \partial U_{iu} U_{iv} - {\sigma_v}^2 \partial V_{ju} V_{jv}
+    \sigma_u \partial J_{ij}U_{iu} V_{jv} &amp;= -{\sigma_v} \sigma_u \partial U_{iu} U_{iv} + {\sigma_u}^2 \partial V_{ju} V_{jv} \\
+    \sigma_v\partial J_{ij}U_{iv} V_{ju} &amp;= \sigma_v\sigma_u \partial U_{iu} U_{iv} - {\sigma_v}^2 \partial V_{ju} V_{jv}
 \end{align}
 $$</div>
 <p>
@@ -210,8 +210,8 @@ If we sum the equations, the first terms on the RHS cancel and we're left with
 </p>
 <div class="math">$$
 \begin{align}
-    \partial A_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) = ({\sigma_u}^2 - {\sigma_v}^2) \partial V_{ju} V_{jv} \\
-    \implies \partial V_{ju} V_{jv} = \frac{1}{\sigma_u^2 - \sigma_v^2} \partial A_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right)
+    \partial J_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) = ({\sigma_u}^2 - {\sigma_v}^2) \partial V_{ju} V_{jv} \\
+    \implies \partial V_{ju} V_{jv} = \frac{1}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right)
 \end{align}
 $$</div>
 <h2>Summary</h2>
@@ -219,9 +219,9 @@ $$</div>
 </p>
 <div class="math">$$
 \begin{align}
-  \partial \sigma_u &amp;= \partial A_{ij}U_{iu} V_{ju} \\
-  \partial U_u \cdot U_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial A_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
-  \partial V_u \cdot V_v &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial A_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right)
+  \partial \sigma_u &amp;= \partial J_{ij}U_{iu} V_{ju} \\
+  \partial U_u \cdot U_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
+  \partial V_u \cdot V_v &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right)
 \end{align}
 $$</div>
 <p>Note that to isolate the derivatives of <span class="math">\(U\)</span> and <span class="math">\(V\)</span>, we can write them as a linear combination of the singular vectors:
@@ -243,11 +243,11 @@ Because <span class="math">\(U\)</span> and <span class="math">\(V\)</span> are 
 \end{align}
 $$</div>
 <p>
-i.e., we can evaluate the Lie derivative of the singular vectors and singular values with respect to <span class="math">\(X_t\)</span>.  To do this, recall that we can write the time derivative of the components of <span class="math">\(A\)</span> as:
+i.e., we can evaluate the Lie derivative of the singular vectors and singular values with respect to <span class="math">\(X_t\)</span>.  To do this, recall that we can write the time derivative of the components of <span class="math">\(J\)</span> as:
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{dA}{dt} = \nabla X_t A
+  \frac{dJ}{dt} = \nabla X_t J
 \end{align}
 $$</div>
 <p>
@@ -255,8 +255,8 @@ Then we can look at the time derivative of the SVD derivatives.</p>
 <h3>Singular value derivatives</h3>
 <div class="math">$$
 \begin{align}
-  \frac{d\sigma_u}{dt} &amp;= \frac{dA_{ij}}{dt}U_{iu} V_{ju} \\
-  &amp;= (\nabla X_t)_{ik} A_{kj} U_{iu} V_{ju} \\
+  \frac{d\sigma_u}{dt} &amp;= \frac{dJ_{ij}}{dt}U_{iu} V_{ju} \\
+  &amp;= (\nabla X_t)_{ik} J_{kj} U_{iu} V_{ju} \\
   &amp;= (\nabla X_t)_{ik} U_{iu} \sigma_u U_{ku} \\
 \end{align}
 $$</div>
@@ -271,8 +271,8 @@ $$</div>
 <h3>Left singular vector derivatives</h3>
 <div class="math">$$
 \begin{align}
-  \frac{dU_u}{dt} \cdot U_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \frac{dA_{ij}}{dt}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
-  &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik} A_{kj}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
+  \frac{dU_u}{dt} \cdot U_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \frac{dJ_{ij}}{dt}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
+  &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik} J_{kj}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
   &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik}\left(\sigma_u^2 U_{iv} U_{ku} + \sigma_v^2 U_{iu} U_{kv}\right) \\
   &amp;= \frac{\sigma_u^2}{\sigma_u^2 - \sigma_v^2} U_v^T(\nabla X_t)U_u + \frac{\sigma_v^2}{\sigma_u^2 - \sigma_v^2} U_u^T(\nabla X_t)U_v \\
   &amp;= U_v^T(\frac{\sigma_u^2}{\sigma_u^2 - \sigma_v^2}\nabla X_t + \frac{\sigma_v^2}{\sigma_u^2 - \sigma_v^2} \nabla X_t^T)U_u
@@ -281,8 +281,8 @@ $$</div>
 <h3>Right singular vector derivatives</h3>
 <div class="math">$$
 \begin{align}
-  \frac{dV_u}{dt} \cdot V_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \frac{dA_{ij}}{dt}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) \\
-  &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik} A_{kj}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) \\
+  \frac{dV_u}{dt} \cdot V_{v\neq u} &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} \frac{dJ_{ij}}{dt}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) \\
+  &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik} J_{kj}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right) \\
   &amp;= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik}\left(\sigma_u\sigma_v U_{iv} U_{ku} + \sigma_u\sigma_v U_{iu} U_{kv}\right) \\
   &amp;= \frac{\sigma_u \sigma_v}{\sigma_u^2 - \sigma_v^2}\left( U_v^T(\nabla X_t)U_u + U_u^T(\nabla X_t)U_v \right) \\
   &amp;= \frac{\sigma_u \sigma_v}{\sigma_u^2 - \sigma_v^2} U_v^T(\nabla X_t + \nabla X_t^T)U_u

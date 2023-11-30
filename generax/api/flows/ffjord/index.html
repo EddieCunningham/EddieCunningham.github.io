@@ -446,6 +446,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../conv/" class="md-nav__link">
+        Convolution
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../coupling/" class="md-nav__link">
         Coupling
       </a>
@@ -504,6 +518,13 @@
         <li class="md-nav__item">
   <a href="#generax.nn.neural_ode.NeuralODE" class="md-nav__link">
     NeuralODE
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generax.nn.neural_ode.NeuralODESolution" class="md-nav__link">
+    NeuralODESolution
   </a>
   
 </li>
@@ -830,7 +851,6 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
 <li><code>cond_shape</code>: The shape of the conditioning information.  If there is no
                 conditioning information, this is None.</li>
 <li><code>neural_ode</code>: The neural ODE</li>
-<li><code>trace_estimate_likelihood</code>: Whether to use a trace estimate for the likelihood.</li>
 <li><code>adjoint</code>: The adjoint method to use.  Can be one of the following:</li>
 <li><code>key</code>: The random key to use for initialization</li>
 </ul>
@@ -847,13 +867,11 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
 <span class="sd">  - `cond_shape`: The shape of the conditioning information.  If there is no</span>
 <span class="sd">                  conditioning information, this is None.</span>
 <span class="sd">  - `neural_ode`: The neural ODE</span>
-<span class="sd">  - `trace_estimate_likelihood`: Whether to use a trace estimate for the likelihood.</span>
 <span class="sd">  - `adjoint`: The adjoint method to use.  Can be one of the following:</span>
 <span class="sd">  - `key`: The random key to use for initialization</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="n">neural_ode</span><span class="p">:</span> <span class="n">NeuralODE</span>
-  <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="nb">bool</span>
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -867,7 +885,6 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
                <span class="o">*</span><span class="p">,</span>
                <span class="n">controller_rtol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
                <span class="n">controller_atol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
-               <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                <span class="n">adjoint</span><span class="o">=</span><span class="s1">&#39;recursive_checkpoint&#39;</span><span class="p">,</span>
                <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -901,7 +918,6 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
                                 <span class="n">adjoint</span><span class="o">=</span><span class="n">adjoint</span><span class="p">,</span>
                                 <span class="n">controller_rtol</span><span class="o">=</span><span class="n">controller_rtol</span><span class="p">,</span>
                                 <span class="n">controller_atol</span><span class="o">=</span><span class="n">controller_atol</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">trace_estimate_likelihood</span> <span class="o">=</span> <span class="n">trace_estimate_likelihood</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -915,6 +931,8 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
                <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                <span class="n">log_likelihood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="n">save_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
@@ -923,29 +941,29 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
 <span class="sd">    - `y`: The conditioning information</span>
 <span class="sd">    - `inverse`: Whether to inverse the transformation</span>
 <span class="sd">    - `log_likelihood`: Whether to compute the log likelihood of the transformation</span>
+<span class="sd">    - `trace_estimate_likelihood`: Whether to compute a trace estimate of the likelihood of the neural ODE.</span>
+<span class="sd">    - `save_at`: The times to save the neural ODE at.</span>
 <span class="sd">    - `key`: The random key to use for initialization</span>
 
 <span class="sd">    **Returns**:</span>
 <span class="sd">    `(z, log_det)`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
-    <span class="k">if</span> <span class="n">log_likelihood</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_estimate_likelihood</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">log_likelihood</span> <span class="ow">and</span> <span class="p">(</span><span class="n">trace_estimate_likelihood</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
       <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;When using trace estimation, must pass random key&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">log_likelihood</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
       <span class="n">trace_estimate_likelihood</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="n">trace_estimate_likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_estimate_likelihood</span>
 
-    <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_ode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
+    <span class="n">solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_ode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
                                  <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
                                  <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
                                  <span class="n">log_likelihood</span><span class="o">=</span><span class="n">log_likelihood</span><span class="p">,</span>
                                  <span class="n">trace_estimate_likelihood</span><span class="o">=</span><span class="n">trace_estimate_likelihood</span><span class="p">,</span>
-                                 <span class="n">save_at</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">save_at</span><span class="o">=</span><span class="n">save_at</span><span class="p">,</span>
                                  <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+    <span class="k">return</span> <span class="n">solution</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="n">solution</span><span class="o">.</span><span class="n">log_det</span>
 </code></pre></div>
         </details>
 
@@ -955,6 +973,27 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
 
 
 
+
+
+
+  <div class="doc doc-object doc-attribute">
+
+
+
+<h5 id="generax.flows.ffjord.FFJORDTransform.neural_ode" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">neural_ode</span><span class="p">:</span> <span class="n">NeuralODE</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-dataclass-field"><code>dataclass-field</code></small>
+  </span>
+
+<a href="#generax.flows.ffjord.FFJORDTransform.neural_ode" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+    </div>
+
+  </div>
 
 
 
@@ -988,7 +1027,7 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
 
 
 <h5 id="generax.flows.ffjord.FFJORDTransform.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">net</span><span class="p">:</span> <span class="n">Module</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">working_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">time_embedding_size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">n_time_features</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">controller_rtol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span><span class="p">,</span> <span class="n">controller_atol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span><span class="p">,</span> <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">adjoint</span> <span class="o">=</span> <span class="s1">&#39;recursive_checkpoint&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">net</span><span class="p">:</span> <span class="n">Module</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">working_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">time_embedding_size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">n_time_features</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">controller_rtol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span><span class="p">,</span> <span class="n">controller_atol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-08</span><span class="p">,</span> <span class="n">adjoint</span> <span class="o">=</span> <span class="s1">&#39;recursive_checkpoint&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.flows.ffjord.FFJORDTransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1026,7 +1065,6 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
              <span class="o">*</span><span class="p">,</span>
              <span class="n">controller_rtol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
              <span class="n">controller_atol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">,</span>
-             <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
              <span class="n">adjoint</span><span class="o">=</span><span class="s1">&#39;recursive_checkpoint&#39;</span><span class="p">,</span>
              <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1060,7 +1098,6 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
                               <span class="n">adjoint</span><span class="o">=</span><span class="n">adjoint</span><span class="p">,</span>
                               <span class="n">controller_rtol</span><span class="o">=</span><span class="n">controller_rtol</span><span class="p">,</span>
                               <span class="n">controller_atol</span><span class="o">=</span><span class="n">controller_atol</span><span class="p">)</span>
-  <span class="bp">self</span><span class="o">.</span><span class="n">trace_estimate_likelihood</span> <span class="o">=</span> <span class="n">trace_estimate_likelihood</span>
 
   <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1116,6 +1153,79 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
 
 
 
+<h5 id="generax.flows.ffjord.FFJORDTransform.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">log_likelihood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">save_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.ffjord.FFJORDTransform.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>inverse</code>: Whether to inverse the transformation</li>
+<li><code>log_likelihood</code>: Whether to compute the log likelihood of the transformation</li>
+<li><code>trace_estimate_likelihood</code>: Whether to compute a trace estimate of the likelihood of the neural ODE.</li>
+<li><code>save_at</code>: The times to save the neural ODE at.</li>
+<li><code>key</code>: The random key to use for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+<code>(z, log_det)</code></p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/ffjord.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="n">log_likelihood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+             <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="n">save_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+<span class="sd">  - `log_likelihood`: Whether to compute the log likelihood of the transformation</span>
+<span class="sd">  - `trace_estimate_likelihood`: Whether to compute a trace estimate of the likelihood of the neural ODE.</span>
+<span class="sd">  - `save_at`: The times to save the neural ODE at.</span>
+<span class="sd">  - `key`: The random key to use for initialization</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  `(z, log_det)`</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+  <span class="k">if</span> <span class="n">log_likelihood</span> <span class="ow">and</span> <span class="p">(</span><span class="n">trace_estimate_likelihood</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;When using trace estimation, must pass random key&#39;</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">log_likelihood</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="n">trace_estimate_likelihood</span> <span class="o">=</span> <span class="kc">False</span>
+
+  <span class="n">solution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_ode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
+                               <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+                               <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
+                               <span class="n">log_likelihood</span><span class="o">=</span><span class="n">log_likelihood</span><span class="p">,</span>
+                               <span class="n">trace_estimate_likelihood</span><span class="o">=</span><span class="n">trace_estimate_likelihood</span><span class="p">,</span>
+                               <span class="n">save_at</span><span class="o">=</span><span class="n">save_at</span><span class="p">,</span>
+                               <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">solution</span><span class="o">.</span><span class="n">ys</span><span class="p">,</span> <span class="n">solution</span><span class="o">.</span><span class="n">log_det</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h5 id="generax.flows.ffjord.FFJORDTransform.inverse" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
 
@@ -1143,75 +1253,6 @@ generax.flows.ffjord.FFJORDTransform            (<a class="autorefs autorefs-int
 <span class="sd">  (z, log_det)</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
-<h5 id="generax.flows.ffjord.FFJORDTransform.__call__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">log_likelihood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
-
-
-<a href="#generax.flows.ffjord.FFJORDTransform.__call__" class="headerlink" title="Permanent link">¤</a></h5>
-
-    <div class="doc doc-contents ">
-
-      <p><strong>Arguments</strong>:</p>
-<ul>
-<li><code>x</code>: The input to the transformation</li>
-<li><code>y</code>: The conditioning information</li>
-<li><code>inverse</code>: Whether to inverse the transformation</li>
-<li><code>log_likelihood</code>: Whether to compute the log likelihood of the transformation</li>
-<li><code>key</code>: The random key to use for initialization</li>
-</ul>
-<p><strong>Returns</strong>:
-<code>(z, log_det)</code></p>
-
-        <details class="quote">
-          <summary>Source code in <code>generax/flows/ffjord.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-             <span class="n">log_likelihood</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-             <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
-
-<span class="sd">  - `x`: The input to the transformation</span>
-<span class="sd">  - `y`: The conditioning information</span>
-<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
-<span class="sd">  - `log_likelihood`: Whether to compute the log likelihood of the transformation</span>
-<span class="sd">  - `key`: The random key to use for initialization</span>
-
-<span class="sd">  **Returns**:</span>
-<span class="sd">  `(z, log_det)`</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
-  <span class="k">if</span> <span class="n">log_likelihood</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_estimate_likelihood</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
-    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;When using trace estimation, must pass random key&#39;</span><span class="p">)</span>
-
-  <span class="k">if</span> <span class="n">log_likelihood</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
-    <span class="n">trace_estimate_likelihood</span> <span class="o">=</span> <span class="kc">False</span>
-  <span class="k">else</span><span class="p">:</span>
-    <span class="n">trace_estimate_likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_estimate_likelihood</span>
-
-  <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_ode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
-                               <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
-                               <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span>
-                               <span class="n">log_likelihood</span><span class="o">=</span><span class="n">log_likelihood</span><span class="p">,</span>
-                               <span class="n">trace_estimate_likelihood</span><span class="o">=</span><span class="n">trace_estimate_likelihood</span><span class="p">,</span>
-                               <span class="n">save_at</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                               <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
-                               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
 </code></pre></div>
         </details>
     </div>
@@ -1279,8 +1320,6 @@ generax.nn.neural_ode.NeuralODE        </code>
     <span class="k">elif</span> <span class="n">adjoint</span> <span class="o">==</span> <span class="s1">&#39;direct&#39;</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">adjoint</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">DirectAdjoint</span><span class="p">()</span>
     <span class="k">elif</span> <span class="n">adjoint</span> <span class="o">==</span> <span class="s1">&#39;seminorm&#39;</span><span class="p">:</span>
-      <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;There is a tracer leak somewhere &quot;</span>
-      <span class="c1"># TODO: Make a bug report</span>
       <span class="n">adjoint_controller</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">PIDController</span><span class="p">(</span>
           <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">diffrax</span><span class="o">.</span><span class="n">adjoint_rms_seminorm</span><span class="p">)</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">adjoint</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">BacksolveAdjoint</span><span class="p">(</span><span class="n">stepsize_controller</span><span class="o">=</span><span class="n">adjoint_controller</span><span class="p">)</span>
@@ -1326,12 +1365,12 @@ generax.nn.neural_ode.NeuralODE        </code>
     <span class="c1"># through the ode solver can be faster.</span>
     <span class="n">params</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_field</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x_and_logpx</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-      <span class="n">x</span><span class="p">,</span> <span class="n">log_px</span> <span class="o">=</span> <span class="n">x_and_logpx</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">carry</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+      <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span><span class="p">,</span> <span class="n">total_vf_norm</span><span class="p">,</span> <span class="n">total_jac_frob_norm</span> <span class="o">=</span> <span class="n">carry</span>
 
       <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
         <span class="c1"># If we&#39;re inverting the flow, we need to adjust the time</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">t</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">t1</span> <span class="o">-</span> <span class="n">t</span>
 
       <span class="c1"># Recombine the model</span>
       <span class="n">model</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
@@ -1345,6 +1384,7 @@ generax.nn.neural_ode.NeuralODE        </code>
           <span class="c1"># Hutchinsons trace estimator.  See ContinuousNormalizingFlow https://arxiv.org/pdf/1810.01367.pdf</span>
           <span class="n">dxdt</span><span class="p">,</span> <span class="n">dudxv</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jvp</span><span class="p">(</span><span class="n">apply_vf</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,),</span> <span class="p">(</span><span class="n">v</span><span class="p">,))</span>
           <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dudxv</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
+          <span class="n">dtjfndt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dudxv</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
           <span class="c1"># Brute force dlogpx/dt.  See NeuralODE https://arxiv.org/pdf/1806.07366.pdf</span>
           <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -1360,16 +1400,24 @@ generax.nn.neural_ode.NeuralODE        </code>
           <span class="n">dxdt</span><span class="p">,</span> <span class="n">d2dx_dtdx_flat</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">jvp_flat</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">))(</span><span class="n">x_flat</span><span class="p">,</span> <span class="n">eye</span><span class="p">)</span>
           <span class="n">dxdt</span> <span class="o">=</span> <span class="n">dxdt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
           <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">d2dx_dtdx_flat</span><span class="p">)</span>
+          <span class="n">dtjfndt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">d2dx_dtdx_flat</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
       <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Don&#39;t worry about the log likelihood</span>
         <span class="n">dxdt</span> <span class="o">=</span> <span class="n">apply_vf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">log_px</span><span class="p">)</span>
+        <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">log_det</span><span class="p">)</span>
+        <span class="n">dtjfndt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">total_jac_frob_norm</span><span class="p">)</span>
 
       <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
         <span class="c1"># If we&#39;re inverting the flow, we need to flip the sign of dxdt</span>
         <span class="n">dxdt</span> <span class="o">=</span> <span class="o">-</span><span class="n">dxdt</span>
-      <span class="k">return</span> <span class="n">dxdt</span><span class="p">,</span> <span class="n">dlogpxdt</span>
+
+      <span class="c1"># Accumulate the norm of the vector field</span>
+      <span class="n">dvfnormdt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dxdt</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
+        <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="o">-</span><span class="n">dlogpxdt</span>
+      <span class="k">return</span> <span class="n">dxdt</span><span class="p">,</span> <span class="n">dlogpxdt</span><span class="p">,</span> <span class="n">dvfnormdt</span><span class="p">,</span> <span class="n">dtjfndt</span>
 
     <span class="n">term</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">ODETerm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="n">solver</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">Dopri5</span><span class="p">()</span>
@@ -1380,6 +1428,10 @@ generax.nn.neural_ode.NeuralODE        </code>
     <span class="k">else</span><span class="p">:</span>
       <span class="n">saveat</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">SaveAt</span><span class="p">(</span><span class="n">ts</span><span class="o">=</span><span class="n">save_at</span><span class="p">)</span>
 
+    <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">total_vf_norm</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">total_jac_frob_norm</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
     <span class="c1"># Run the ODE solver</span>
     <span class="n">solution</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">diffeqsolve</span><span class="p">(</span><span class="n">term</span><span class="p">,</span>
                                    <span class="n">solver</span><span class="p">,</span>
@@ -1387,7 +1439,10 @@ generax.nn.neural_ode.NeuralODE        </code>
                                    <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span>
                                    <span class="n">t1</span><span class="o">=</span><span class="n">t1</span><span class="p">,</span>
                                    <span class="n">dt0</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
-                                   <span class="n">y0</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)),</span>
+                                   <span class="n">y0</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
+                                       <span class="n">log_det</span><span class="p">,</span>
+                                       <span class="n">total_vf_norm</span><span class="p">,</span>
+                                       <span class="n">total_jac_frob_norm</span><span class="p">),</span>
                                    <span class="n">args</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
                                    <span class="n">adjoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjoint</span><span class="p">,</span>
                                    <span class="n">stepsize_controller</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stepsize_controller</span><span class="p">,</span>
@@ -1398,12 +1453,18 @@ generax.nn.neural_ode.NeuralODE        </code>
       <span class="c1"># Only take the first time</span>
       <span class="n">outs</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">outs</span><span class="p">)</span>
 
-    <span class="n">z</span><span class="p">,</span> <span class="n">log_px</span> <span class="o">=</span> <span class="n">outs</span>
+    <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span><span class="p">,</span> <span class="n">total_vf_norm</span><span class="p">,</span> <span class="n">total_jac_frob_norm</span> <span class="o">=</span> <span class="n">outs</span>
 
-    <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
-      <span class="n">log_px</span> <span class="o">=</span> <span class="o">-</span><span class="n">log_px</span>
+    <span class="c1"># Construct the new solution</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+              <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">solution</span><span class="p">)}</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>
 
-    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_px</span>
+    <span class="n">new_solution</span> <span class="o">=</span> <span class="n">NeuralODESolution</span><span class="p">(</span><span class="n">log_det</span><span class="o">=</span><span class="n">log_det</span><span class="p">,</span>
+                                     <span class="n">total_vf_norm</span><span class="o">=</span><span class="n">total_vf_norm</span><span class="p">,</span>
+                                     <span class="n">total_jac_frob_norm</span><span class="o">=</span><span class="n">total_jac_frob_norm</span><span class="p">,</span>
+                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_solution</span>
 </code></pre></div>
         </details>
 
@@ -1469,8 +1530,6 @@ generax.nn.neural_ode.NeuralODE        </code>
   <span class="k">elif</span> <span class="n">adjoint</span> <span class="o">==</span> <span class="s1">&#39;direct&#39;</span><span class="p">:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">adjoint</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">DirectAdjoint</span><span class="p">()</span>
   <span class="k">elif</span> <span class="n">adjoint</span> <span class="o">==</span> <span class="s1">&#39;seminorm&#39;</span><span class="p">:</span>
-    <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;There is a tracer leak somewhere &quot;</span>
-    <span class="c1"># TODO: Make a bug report</span>
     <span class="n">adjoint_controller</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">PIDController</span><span class="p">(</span>
         <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">diffrax</span><span class="o">.</span><span class="n">adjoint_rms_seminorm</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">adjoint</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">BacksolveAdjoint</span><span class="p">(</span><span class="n">stepsize_controller</span><span class="o">=</span><span class="n">adjoint_controller</span><span class="p">)</span>
@@ -1554,12 +1613,12 @@ generax.nn.neural_ode.NeuralODE        </code>
   <span class="c1"># through the ode solver can be faster.</span>
   <span class="n">params</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vector_field</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
 
-  <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x_and_logpx</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">log_px</span> <span class="o">=</span> <span class="n">x_and_logpx</span>
+  <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">carry</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span><span class="p">,</span> <span class="n">total_vf_norm</span><span class="p">,</span> <span class="n">total_jac_frob_norm</span> <span class="o">=</span> <span class="n">carry</span>
 
     <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
       <span class="c1"># If we&#39;re inverting the flow, we need to adjust the time</span>
-      <span class="n">t</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">t</span>
+      <span class="n">t</span> <span class="o">=</span> <span class="n">t1</span> <span class="o">-</span> <span class="n">t</span>
 
     <span class="c1"># Recombine the model</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
@@ -1573,6 +1632,7 @@ generax.nn.neural_ode.NeuralODE        </code>
         <span class="c1"># Hutchinsons trace estimator.  See ContinuousNormalizingFlow https://arxiv.org/pdf/1810.01367.pdf</span>
         <span class="n">dxdt</span><span class="p">,</span> <span class="n">dudxv</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jvp</span><span class="p">(</span><span class="n">apply_vf</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,),</span> <span class="p">(</span><span class="n">v</span><span class="p">,))</span>
         <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dudxv</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">dtjfndt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dudxv</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
       <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Brute force dlogpx/dt.  See NeuralODE https://arxiv.org/pdf/1806.07366.pdf</span>
         <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -1588,16 +1648,24 @@ generax.nn.neural_ode.NeuralODE        </code>
         <span class="n">dxdt</span><span class="p">,</span> <span class="n">d2dx_dtdx_flat</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">jvp_flat</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">))(</span><span class="n">x_flat</span><span class="p">,</span> <span class="n">eye</span><span class="p">)</span>
         <span class="n">dxdt</span> <span class="o">=</span> <span class="n">dxdt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="o">-</span><span class="n">jnp</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">d2dx_dtdx_flat</span><span class="p">)</span>
+        <span class="n">dtjfndt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">d2dx_dtdx_flat</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
       <span class="c1"># Don&#39;t worry about the log likelihood</span>
       <span class="n">dxdt</span> <span class="o">=</span> <span class="n">apply_vf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-      <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">log_px</span><span class="p">)</span>
+      <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">log_det</span><span class="p">)</span>
+      <span class="n">dtjfndt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">total_jac_frob_norm</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
       <span class="c1"># If we&#39;re inverting the flow, we need to flip the sign of dxdt</span>
       <span class="n">dxdt</span> <span class="o">=</span> <span class="o">-</span><span class="n">dxdt</span>
-    <span class="k">return</span> <span class="n">dxdt</span><span class="p">,</span> <span class="n">dlogpxdt</span>
+
+    <span class="c1"># Accumulate the norm of the vector field</span>
+    <span class="n">dvfnormdt</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dxdt</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
+      <span class="n">dlogpxdt</span> <span class="o">=</span> <span class="o">-</span><span class="n">dlogpxdt</span>
+    <span class="k">return</span> <span class="n">dxdt</span><span class="p">,</span> <span class="n">dlogpxdt</span><span class="p">,</span> <span class="n">dvfnormdt</span><span class="p">,</span> <span class="n">dtjfndt</span>
 
   <span class="n">term</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">ODETerm</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
   <span class="n">solver</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">Dopri5</span><span class="p">()</span>
@@ -1608,6 +1676,10 @@ generax.nn.neural_ode.NeuralODE        </code>
   <span class="k">else</span><span class="p">:</span>
     <span class="n">saveat</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">SaveAt</span><span class="p">(</span><span class="n">ts</span><span class="o">=</span><span class="n">save_at</span><span class="p">)</span>
 
+  <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+  <span class="n">total_vf_norm</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+  <span class="n">total_jac_frob_norm</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
   <span class="c1"># Run the ODE solver</span>
   <span class="n">solution</span> <span class="o">=</span> <span class="n">diffrax</span><span class="o">.</span><span class="n">diffeqsolve</span><span class="p">(</span><span class="n">term</span><span class="p">,</span>
                                  <span class="n">solver</span><span class="p">,</span>
@@ -1615,7 +1687,10 @@ generax.nn.neural_ode.NeuralODE        </code>
                                  <span class="n">t0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span>
                                  <span class="n">t1</span><span class="o">=</span><span class="n">t1</span><span class="p">,</span>
                                  <span class="n">dt0</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
-                                 <span class="n">y0</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)),</span>
+                                 <span class="n">y0</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
+                                     <span class="n">log_det</span><span class="p">,</span>
+                                     <span class="n">total_vf_norm</span><span class="p">,</span>
+                                     <span class="n">total_jac_frob_norm</span><span class="p">),</span>
                                  <span class="n">args</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
                                  <span class="n">adjoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">adjoint</span><span class="p">,</span>
                                  <span class="n">stepsize_controller</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stepsize_controller</span><span class="p">,</span>
@@ -1626,14 +1701,109 @@ generax.nn.neural_ode.NeuralODE        </code>
     <span class="c1"># Only take the first time</span>
     <span class="n">outs</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">outs</span><span class="p">)</span>
 
-  <span class="n">z</span><span class="p">,</span> <span class="n">log_px</span> <span class="o">=</span> <span class="n">outs</span>
+  <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span><span class="p">,</span> <span class="n">total_vf_norm</span><span class="p">,</span> <span class="n">total_jac_frob_norm</span> <span class="o">=</span> <span class="n">outs</span>
 
-  <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
-    <span class="n">log_px</span> <span class="o">=</span> <span class="o">-</span><span class="n">log_px</span>
+  <span class="c1"># Construct the new solution</span>
+  <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">solution</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="n">solution</span><span class="p">)}</span>
+  <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>
 
-  <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_px</span>
+  <span class="n">new_solution</span> <span class="o">=</span> <span class="n">NeuralODESolution</span><span class="p">(</span><span class="n">log_det</span><span class="o">=</span><span class="n">log_det</span><span class="p">,</span>
+                                   <span class="n">total_vf_norm</span><span class="o">=</span><span class="n">total_vf_norm</span><span class="p">,</span>
+                                   <span class="n">total_jac_frob_norm</span><span class="o">=</span><span class="n">total_jac_frob_norm</span><span class="p">,</span>
+                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">new_solution</span>
 </code></pre></div>
         </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.nn.neural_ode.NeuralODESolution" class="doc doc-heading">
+        <code>
+generax.nn.neural_ode.NeuralODESolution        </code>
+
+
+
+<a href="#generax.nn.neural_ode.NeuralODESolution" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>The solution to a neural ODE.  This wraps the diffrax solution
+class and adds the log determinant of the transformation and some
+other items from http://proceedings.mlr.press/v119/finlay20a/finlay20a.pdf</p>
+<p><strong>Attributes</strong>:</p>
+<ul>
+<li><code>log_det</code>: The log determinant of the transformation.</li>
+<li><code>total_vf_norm</code>: The total norm of the vector on the path.
+                   This can help determine how straight the path is.</li>
+<li><code>total_jac_frob_norm</code>: The total norm of the jacobian of the vector field.
+                         This</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/nn/neural_ode.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">NeuralODESolution</span><span class="p">(</span><span class="n">Solution</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;The solution to a neural ODE.  This wraps the diffrax solution</span>
+<span class="sd">  class and adds the log determinant of the transformation and some</span>
+<span class="sd">  other items from http://proceedings.mlr.press/v119/finlay20a/finlay20a.pdf</span>
+
+<span class="sd">  **Attributes**:</span>
+
+<span class="sd">  - `log_det`: The log determinant of the transformation.</span>
+<span class="sd">  - `total_vf_norm`: The total norm of the vector on the path.</span>
+<span class="sd">                     This can help determine how straight the path is.</span>
+<span class="sd">  - `total_jac_frob_norm`: The total norm of the jacobian of the vector field.</span>
+<span class="sd">                           This</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">log_det</span><span class="p">:</span> <span class="n">Array</span>
+  <span class="n">total_vf_norm</span><span class="p">:</span> <span class="n">Array</span>
+  <span class="n">total_jac_frob_norm</span><span class="p">:</span> <span class="n">Array</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.nn.neural_ode.NeuralODESolution.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t0</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">,</span> <span class="n">t1</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">,</span> <span class="n">ts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">]],</span> <span class="n">ys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PyTree</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">]],</span> <span class="n">interpolation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">diffrax</span><span class="o">.</span><span class="n">global_interpolation</span><span class="o">.</span><span class="n">DenseInterpolation</span><span class="p">],</span> <span class="n">stats</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">result</span><span class="p">:</span> <span class="n">RESULTS</span><span class="p">,</span> <span class="n">solver_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">controller_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PyTree</span><span class="p">],</span> <span class="n">made_jump</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">],</span> <span class="n">log_det</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">total_vf_norm</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">total_jac_frob_norm</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span></code>
+
+
+<a href="#generax.nn.neural_ode.NeuralODESolution.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+
     </div>
 
   </div>

@@ -444,6 +444,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../flows/conv/" class="md-nav__link">
+        Convolution
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../flows/coupling/" class="md-nav__link">
         Coupling
       </a>
@@ -626,8 +640,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#generax.nn.unet.TimeDependentUNet" class="md-nav__link">
-    TimeDependentUNet
+  <a href="#generax.nn.unet.UNet" class="md-nav__link">
+    UNet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generax.nn.unet.Encoder" class="md-nav__link">
+    Encoder
   </a>
   
 </li>
@@ -804,21 +825,23 @@
 
 
 
-<h4 id="generax.nn.unet.TimeDependentUNet" class="doc doc-heading">
+<h4 id="generax.nn.unet.UNet" class="doc doc-heading">
         <code>
-generax.nn.unet.TimeDependentUNet        </code>
+generax.nn.unet.UNet        </code>
 
 
 
-<a href="#generax.nn.unet.TimeDependentUNet" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#generax.nn.unet.UNet" class="headerlink" title="Permanent link">¤</a></h4>
 
     <div class="doc doc-contents first">
 
-      <p>TimeDependentUNet(<em>args, </em>*kwargs)</p>
+      <p>Unet architecture.</p>
 
         <details class="quote">
           <summary>Source code in <code>generax/nn/unet.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TimeDependentUNet</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">UNet</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Unet architecture.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -833,6 +856,10 @@ generax.nn.unet.TimeDependentUNet        </code>
   <span class="n">final_block</span><span class="p">:</span> <span class="n">ImageResBlock</span>
   <span class="n">proj_out</span><span class="p">:</span> <span class="n">WeightNormConv</span>
 
+  <span class="n">freeu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">time_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
                <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
@@ -840,15 +867,31 @@ generax.nn.unet.TimeDependentUNet        </code>
                <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
                <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
                <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+               <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="o">*</span><span class="p">,</span>
-               <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">):</span>
+               <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+               <span class="n">freeu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="n">time_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">    - `dim`: The dimension of the features</span>
+<span class="sd">    - `dim_mults`: The dimension of the features at each downsampling</span>
+<span class="sd">    - `resnet_block_groups`: The number of resnet blocks per downsampling</span>
+<span class="sd">    - `attn_heads`: The number of attention heads per downsampling</span>
+<span class="sd">    - `attn_dim_head`: The dimension of the attention heads</span>
+<span class="sd">    - `freeu`: Whether to use freeu filtering</span>
+<span class="sd">    - `time_dependent`: Whether to use time conditioning</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">input_shape</span>
-    <span class="k">if</span> <span class="n">H</span><span class="o">//</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">dim_mults</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">H</span><span class="o">//</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Image size </span><span class="si">{</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">)</span><span class="si">}</span><span class="s2"> is too small for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">)</span><span class="si">}</span><span class="s2"> downsamples.&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span> <span class="o">=</span> <span class="n">dim_mults</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">freeu</span> <span class="o">=</span> <span class="n">freeu</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span> <span class="o">=</span> <span class="n">time_dependent</span>
 
     <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
     <span class="n">key_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
@@ -859,10 +902,22 @@ generax.nn.unet.TimeDependentUNet        </code>
                                   <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                                   <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span> <span class="o">=</span> <span class="n">TimeFeatures</span><span class="p">(</span><span class="n">embedding_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
-                                      <span class="n">out_features</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
-                                      <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
-    <span class="n">time_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span> <span class="o">=</span> <span class="n">TimeFeatures</span><span class="p">(</span><span class="n">embedding_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
+                                        <span class="n">out_features</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
+                                        <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
+      <span class="n">time_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span> <span class="o">=</span> <span class="kc">None</span>
+      <span class="n">time_shape</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">cond_shape</span> <span class="o">=</span> <span class="n">cond_shape</span>
+    <span class="k">if</span> <span class="n">cond_shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cond_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+      <span class="k">if</span> <span class="n">time_shape</span><span class="p">:</span>
+        <span class="n">time_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cond_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">time_shape</span> <span class="o">=</span> <span class="n">cond_shape</span>
 
     <span class="k">def</span> <span class="nf">make_resblock</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">):</span>
       <span class="k">return</span> <span class="n">ImageResBlock</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
@@ -881,7 +936,7 @@ generax.nn.unet.TimeDependentUNet        </code>
 
     <span class="c1"># Downsampling</span>
     <span class="n">down_blocks</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">*</span><span class="n">mult</span> <span class="k">for</span> <span class="n">mult</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span><span class="p">]</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">*</span><span class="n">mult</span> <span class="k">for</span> <span class="n">mult</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span><span class="p">]</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">)):</span>
@@ -894,6 +949,8 @@ generax.nn.unet.TimeDependentUNet        </code>
                         <span class="n">out_size</span><span class="o">=</span><span class="n">dim_out</span><span class="p">,</span>
                         <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
       <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">down</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">H</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+      <span class="k">assert</span> <span class="n">W</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
       <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">H</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">W</span><span class="o">//</span><span class="mi">2</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">down_blocks</span> <span class="o">=</span> <span class="n">down_blocks</span>
 
@@ -907,7 +964,6 @@ generax.nn.unet.TimeDependentUNet        </code>
     <span class="c1"># Upsampling</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">))</span>
     <span class="n">up_blocks</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">last_dim</span> <span class="o">=</span> <span class="n">dim_out</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])):</span>
       <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
@@ -931,16 +987,47 @@ generax.nn.unet.TimeDependentUNet        </code>
                                     <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                                     <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
 
-  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-               <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-               <span class="n">y</span><span class="p">:</span> <span class="n">Array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+  <span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
 
-    <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span>
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `x`: The data to initialize the parameters with.</span>
+<span class="sd">    - `y`: The conditioning information</span>
+<span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    A new layer with the parameters initialized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span>
+
+  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="p">:</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+      <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span>
 
     <span class="c1"># Time embedding</span>
-    <span class="n">time_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="p">:</span>
+      <span class="n">conditional_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">conditional_embedding</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">conditional_embedding</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">conditional_embedding</span> <span class="o">=</span> <span class="n">y</span>
 
     <span class="n">hs</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -952,11 +1039,11 @@ generax.nn.unet.TimeDependentUNet        </code>
     <span class="n">block_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">down_blocks</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">):</span>
       <span class="c1"># Resnet block</span>
-      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
       <span class="n">hs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
 
       <span class="c1"># Resnet block + attention block</span>
-      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
       <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
       <span class="n">hs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
 
@@ -976,13 +1063,27 @@ generax.nn.unet.TimeDependentUNet        </code>
       <span class="c1"># Upsample</span>
       <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
 
+      <span class="n">hs_</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">freeu</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Not tested yet&#39;</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+          <span class="n">h_mean</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[:,:,</span><span class="kc">None</span><span class="p">]</span>
+          <span class="n">h_max</span> <span class="o">=</span> <span class="n">h_mean</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+          <span class="n">h_min</span> <span class="o">=</span> <span class="n">h_mean</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+          <span class="n">h_mean</span> <span class="o">=</span> <span class="p">(</span><span class="n">h_mean</span> <span class="o">-</span> <span class="n">h_min</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">h_max</span> <span class="o">-</span> <span class="n">h_min</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+          <span class="n">b1</span> <span class="o">=</span> <span class="mf">1.5</span>
+          <span class="n">s1</span> <span class="o">=</span> <span class="mf">0.9</span>
+          <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">at</span><span class="p">[:,:</span><span class="mi">640</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">((</span><span class="n">b1</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">*</span> <span class="n">h_mean</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+          <span class="n">hs_</span> <span class="o">=</span> <span class="n">freeu_filter</span><span class="p">(</span><span class="n">hs_</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">s1</span><span class="p">)</span>
+
       <span class="c1"># Resnet block</span>
-      <span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hs</span><span class="o">.</span><span class="n">pop</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hs_</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
 
       <span class="c1"># Resnet block</span>
       <span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hs</span><span class="o">.</span><span class="n">pop</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
 
       <span class="c1"># Attention block</span>
       <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
@@ -990,10 +1091,9 @@ generax.nn.unet.TimeDependentUNet        </code>
     <span class="c1"># Final</span>
     <span class="n">h_in</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
     <span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">h_in</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_block</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_block</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">h</span>
 </code></pre></div>
@@ -1015,14 +1115,25 @@ generax.nn.unet.TimeDependentUNet        </code>
 
 
 
-<h5 id="generax.nn.unet.TimeDependentUNet.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span></code>
+<h5 id="generax.nn.unet.UNet.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">freeu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">time_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></code>
 
 
-<a href="#generax.nn.unet.TimeDependentUNet.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+<a href="#generax.nn.unet.UNet.__init__" class="headerlink" title="Permanent link">¤</a></h5>
 
     <div class="doc doc-contents ">
 
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>input_shape</code>: The input shape.  Output size is the same as shape.</li>
+<li><code>dim</code>: The dimension of the features</li>
+<li><code>dim_mults</code>: The dimension of the features at each downsampling</li>
+<li><code>resnet_block_groups</code>: The number of resnet blocks per downsampling</li>
+<li><code>attn_heads</code>: The number of attention heads per downsampling</li>
+<li><code>attn_dim_head</code>: The dimension of the attention heads</li>
+<li><code>freeu</code>: Whether to use freeu filtering</li>
+<li><code>time_dependent</code>: Whether to use time conditioning</li>
+</ul>
 
         <details class="quote">
           <summary>Source code in <code>generax/nn/unet.py</code></summary>
@@ -1033,15 +1144,31 @@ generax.nn.unet.TimeDependentUNet        </code>
              <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
              <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
              <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+             <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="o">*</span><span class="p">,</span>
-             <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">):</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+             <span class="n">freeu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="n">time_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">  - `dim`: The dimension of the features</span>
+<span class="sd">  - `dim_mults`: The dimension of the features at each downsampling</span>
+<span class="sd">  - `resnet_block_groups`: The number of resnet blocks per downsampling</span>
+<span class="sd">  - `attn_heads`: The number of attention heads per downsampling</span>
+<span class="sd">  - `attn_dim_head`: The dimension of the attention heads</span>
+<span class="sd">  - `freeu`: Whether to use freeu filtering</span>
+<span class="sd">  - `time_dependent`: Whether to use time conditioning</span>
+<span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">input_shape</span>
-  <span class="k">if</span> <span class="n">H</span><span class="o">//</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">dim_mults</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">H</span><span class="o">//</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Image size </span><span class="si">{</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">)</span><span class="si">}</span><span class="s2"> is too small for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">)</span><span class="si">}</span><span class="s2"> downsamples.&quot;</span><span class="p">)</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span> <span class="o">=</span> <span class="n">dim_mults</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">freeu</span> <span class="o">=</span> <span class="n">freeu</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span> <span class="o">=</span> <span class="n">time_dependent</span>
 
   <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
   <span class="n">key_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
@@ -1052,10 +1179,22 @@ generax.nn.unet.TimeDependentUNet        </code>
                                 <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                                 <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
 
-  <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span> <span class="o">=</span> <span class="n">TimeFeatures</span><span class="p">(</span><span class="n">embedding_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
-                                    <span class="n">out_features</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
-                                    <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
-  <span class="n">time_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,)</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span> <span class="o">=</span> <span class="n">TimeFeatures</span><span class="p">(</span><span class="n">embedding_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
+                                      <span class="n">out_features</span><span class="o">=</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
+                                      <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
+    <span class="n">time_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">time_shape</span> <span class="o">=</span> <span class="kc">None</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">cond_shape</span> <span class="o">=</span> <span class="n">cond_shape</span>
+  <span class="k">if</span> <span class="n">cond_shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cond_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">time_shape</span><span class="p">:</span>
+      <span class="n">time_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">time_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cond_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">time_shape</span> <span class="o">=</span> <span class="n">cond_shape</span>
 
   <span class="k">def</span> <span class="nf">make_resblock</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">ImageResBlock</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
@@ -1074,7 +1213,7 @@ generax.nn.unet.TimeDependentUNet        </code>
 
   <span class="c1"># Downsampling</span>
   <span class="n">down_blocks</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">*</span><span class="n">mult</span> <span class="k">for</span> <span class="n">mult</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span><span class="p">]</span>
+  <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">*</span><span class="n">mult</span> <span class="k">for</span> <span class="n">mult</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span><span class="p">]</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
   <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">))</span>
   <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">)):</span>
@@ -1087,6 +1226,8 @@ generax.nn.unet.TimeDependentUNet        </code>
                       <span class="n">out_size</span><span class="o">=</span><span class="n">dim_out</span><span class="p">,</span>
                       <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
     <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">down</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">H</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">W</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">H</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">W</span><span class="o">//</span><span class="mi">2</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">down_blocks</span> <span class="o">=</span> <span class="n">down_blocks</span>
 
@@ -1100,7 +1241,6 @@ generax.nn.unet.TimeDependentUNet        </code>
   <span class="c1"># Upsampling</span>
   <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">))</span>
   <span class="n">up_blocks</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="n">last_dim</span> <span class="o">=</span> <span class="n">dim_out</span>
   <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])):</span>
     <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
@@ -1135,11 +1275,11 @@ generax.nn.unet.TimeDependentUNet        </code>
 
 
 
-<h5 id="generax.nn.unet.TimeDependentUNet.__call__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+<h5 id="generax.nn.unet.UNet.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
 
 
-<a href="#generax.nn.unet.TimeDependentUNet.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+<a href="#generax.nn.unet.UNet.__call__" class="headerlink" title="Permanent link">¤</a></h5>
 
     <div class="doc doc-contents ">
 
@@ -1147,16 +1287,30 @@ generax.nn.unet.TimeDependentUNet        </code>
 
         <details class="quote">
           <summary>Source code in <code>generax/nn/unet.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-             <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-             <span class="n">y</span><span class="p">:</span> <span class="n">Array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+      <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">t</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">args</span>
+      <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+      <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
 
-  <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">()</span>
   <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span>
 
   <span class="c1"># Time embedding</span>
-  <span class="n">time_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="p">:</span>
+    <span class="n">conditional_embedding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_features</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="n">conditional_embedding</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">conditional_embedding</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">conditional_embedding</span> <span class="o">=</span> <span class="n">y</span>
 
   <span class="n">hs</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -1168,11 +1322,11 @@ generax.nn.unet.TimeDependentUNet        </code>
   <span class="n">block_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">down_blocks</span><span class="p">)</span>
   <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">):</span>
     <span class="c1"># Resnet block</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
     <span class="n">hs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
 
     <span class="c1"># Resnet block + attention block</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
     <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
     <span class="n">hs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
 
@@ -1192,13 +1346,27 @@ generax.nn.unet.TimeDependentUNet        </code>
     <span class="c1"># Upsample</span>
     <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
 
+    <span class="n">hs_</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">freeu</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Not tested yet&#39;</span>
+      <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">h_mean</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[:,:,</span><span class="kc">None</span><span class="p">]</span>
+        <span class="n">h_max</span> <span class="o">=</span> <span class="n">h_mean</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">h_min</span> <span class="o">=</span> <span class="n">h_mean</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">h_mean</span> <span class="o">=</span> <span class="p">(</span><span class="n">h_mean</span> <span class="o">-</span> <span class="n">h_min</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">h_max</span> <span class="o">-</span> <span class="n">h_min</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+        <span class="n">b1</span> <span class="o">=</span> <span class="mf">1.5</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="mf">0.9</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">at</span><span class="p">[:,:</span><span class="mi">640</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">((</span><span class="n">b1</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">*</span> <span class="n">h_mean</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">hs_</span> <span class="o">=</span> <span class="n">freeu_filter</span><span class="p">(</span><span class="n">hs_</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">s1</span><span class="p">)</span>
+
     <span class="c1"># Resnet block</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hs</span><span class="o">.</span><span class="n">pop</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hs_</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
 
     <span class="c1"># Resnet block</span>
     <span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">hs</span><span class="o">.</span><span class="n">pop</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
 
     <span class="c1"># Attention block</span>
     <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
@@ -1206,12 +1374,375 @@ generax.nn.unet.TimeDependentUNet        </code>
   <span class="c1"># Final</span>
   <span class="n">h_in</span> <span class="o">=</span> <span class="n">hs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
   <span class="n">h</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">h_in</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-  <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_block</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">time_emb</span><span class="p">)</span>
+  <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_block</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
+
   <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
 
-  <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">hs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-
   <span class="k">return</span> <span class="n">h</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.nn.unet.Encoder" class="doc doc-heading">
+        <code>
+generax.nn.unet.Encoder        </code>
+
+
+
+<a href="#generax.nn.unet.Encoder" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>Half of the Unet architecture to use as an encoder.  Input is an image and output is a vector</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/nn/unet.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Encoder</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Half of the Unet architecture to use as an encoder.  Input is an image and output is a vector</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">in_out</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">conv_in</span><span class="p">:</span> <span class="n">WeightNormConv</span>
+
+  <span class="n">down_blocks</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ImageResBlock</span><span class="p">,</span> <span class="n">AttentionBlock</span><span class="p">,</span> <span class="n">Downsample</span><span class="p">]]</span>
+  <span class="n">middle_blocks</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ImageResBlock</span><span class="p">,</span> <span class="n">AttentionBlock</span><span class="p">]]</span>
+  <span class="n">proj_out</span><span class="p">:</span> <span class="n">WeightNormConv</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+               <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+               <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+               <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+               <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+               <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+               <span class="n">out_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+               <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="o">*</span><span class="p">,</span>
+               <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">    - `dim`: The dimension of the features</span>
+<span class="sd">    - `dim_mults`: The dimension of the features at each downsampling</span>
+<span class="sd">    - `resnet_block_groups`: The number of resnet blocks per downsampling</span>
+<span class="sd">    - `attn_heads`: The number of attention heads per downsampling</span>
+<span class="sd">    - `attn_dim_head`: The dimension of the attention heads</span>
+<span class="sd">    - `out_size`: The dimension of the output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">input_shape</span>
+    <span class="k">if</span> <span class="n">H</span><span class="o">//</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+          <span class="sa">f</span><span class="s2">&quot;Image size </span><span class="si">{</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">)</span><span class="si">}</span><span class="s2"> is too small for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">)</span><span class="si">}</span><span class="s2"> downsamples.&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span> <span class="o">=</span> <span class="n">dim_mults</span>
+
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">key_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">conv_in</span> <span class="o">=</span> <span class="n">WeightNormConv</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                                  <span class="n">out_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
+                                  <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+                                  <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                  <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">make_resblock</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">ImageResBlock</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                           <span class="n">hidden_size</span><span class="o">=</span><span class="n">dim_out</span><span class="p">,</span>
+                           <span class="n">out_size</span><span class="o">=</span><span class="n">dim_out</span><span class="p">,</span>
+                           <span class="n">groups</span><span class="o">=</span><span class="n">resnet_block_groups</span><span class="p">,</span>
+                           <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">make_attention</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">AttentionBlock</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                            <span class="n">heads</span><span class="o">=</span><span class="n">attn_heads</span><span class="p">,</span>
+                            <span class="n">dim_head</span><span class="o">=</span><span class="n">attn_dim_head</span><span class="p">,</span>
+                            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                            <span class="n">use_linear_attention</span><span class="o">=</span><span class="n">linear</span><span class="p">)</span>
+
+    <span class="c1"># Downsampling</span>
+    <span class="n">down_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">*</span><span class="n">mult</span> <span class="k">for</span> <span class="n">mult</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">)):</span>
+      <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+      <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_resblock</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">),</span> <span class="n">dim_in</span><span class="p">))</span>
+      <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_resblock</span><span class="p">(</span><span class="n">k2</span><span class="p">,</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">),</span> <span class="n">dim_in</span><span class="p">))</span>
+      <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_attention</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">)))</span>
+
+      <span class="n">down</span> <span class="o">=</span> <span class="n">Downsample</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">),</span>
+                        <span class="n">out_size</span><span class="o">=</span><span class="n">dim_out</span><span class="p">,</span>
+                        <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+      <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">down</span><span class="p">)</span>
+      <span class="k">assert</span> <span class="n">H</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+      <span class="k">assert</span> <span class="n">W</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+      <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">H</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">W</span><span class="o">//</span><span class="mi">2</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">down_blocks</span> <span class="o">=</span> <span class="n">down_blocks</span>
+
+    <span class="c1"># Middle</span>
+    <span class="n">middle_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">middle_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_resblock</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span> <span class="n">dim_out</span><span class="p">))</span>
+    <span class="n">middle_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_attention</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span> <span class="n">linear</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+    <span class="n">middle_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_resblock</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span> <span class="n">dim_out</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">middle_blocks</span> <span class="o">=</span> <span class="n">middle_blocks</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span> <span class="o">=</span> <span class="n">WeightNormConv</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span>
+                                   <span class="n">out_size</span><span class="o">=</span><span class="n">out_size</span><span class="p">,</span>
+                                   <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">),</span>
+                                   <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                   <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `x`: The data to initialize the parameters with.</span>
+<span class="sd">    - `y`: The conditioning information</span>
+<span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    A new layer with the parameters initialized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span>
+
+  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span>
+
+    <span class="n">conditional_embedding</span> <span class="o">=</span> <span class="n">y</span>
+
+
+    <span class="c1"># Initial convolution</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_in</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Downsampling</span>
+    <span class="n">block_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">down_blocks</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">):</span>
+      <span class="c1"># Resnet block</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
+
+      <span class="c1"># Resnet block + attention block</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
+
+      <span class="c1"># Downsample</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
+
+    <span class="c1"># Middle</span>
+    <span class="n">res_block1</span><span class="p">,</span> <span class="n">attn_block</span><span class="p">,</span> <span class="n">res_block2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">middle_blocks</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">res_block1</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">attn_block</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">res_block2</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+    <span class="c1"># Final</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.nn.unet.Encoder.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">out_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span></code>
+
+
+<a href="#generax.nn.unet.Encoder.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>input_shape</code>: The input shape.  Output size is the same as shape.</li>
+<li><code>dim</code>: The dimension of the features</li>
+<li><code>dim_mults</code>: The dimension of the features at each downsampling</li>
+<li><code>resnet_block_groups</code>: The number of resnet blocks per downsampling</li>
+<li><code>attn_heads</code>: The number of attention heads per downsampling</li>
+<li><code>attn_dim_head</code>: The dimension of the attention heads</li>
+<li><code>out_size</code>: The dimension of the output</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/nn/unet.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+             <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+             <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+             <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+             <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+             <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+             <span class="n">out_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+             <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="o">*</span><span class="p">,</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">  - `dim`: The dimension of the features</span>
+<span class="sd">  - `dim_mults`: The dimension of the features at each downsampling</span>
+<span class="sd">  - `resnet_block_groups`: The number of resnet blocks per downsampling</span>
+<span class="sd">  - `attn_heads`: The number of attention heads per downsampling</span>
+<span class="sd">  - `attn_dim_head`: The dimension of the attention heads</span>
+<span class="sd">  - `out_size`: The dimension of the output</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">input_shape</span>
+  <span class="k">if</span> <span class="n">H</span><span class="o">//</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Image size </span><span class="si">{</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">)</span><span class="si">}</span><span class="s2"> is too small for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">)</span><span class="si">}</span><span class="s2"> downsamples.&quot;</span><span class="p">)</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span> <span class="o">=</span> <span class="n">dim_mults</span>
+
+  <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+  <span class="n">key_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">conv_in</span> <span class="o">=</span> <span class="n">WeightNormConv</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                                <span class="n">out_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">,</span>
+                                <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+                                <span class="n">padding</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
+
+  <span class="k">def</span> <span class="nf">make_resblock</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ImageResBlock</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                         <span class="n">hidden_size</span><span class="o">=</span><span class="n">dim_out</span><span class="p">,</span>
+                         <span class="n">out_size</span><span class="o">=</span><span class="n">dim_out</span><span class="p">,</span>
+                         <span class="n">groups</span><span class="o">=</span><span class="n">resnet_block_groups</span><span class="p">,</span>
+                         <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">make_attention</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">AttentionBlock</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                          <span class="n">heads</span><span class="o">=</span><span class="n">attn_heads</span><span class="p">,</span>
+                          <span class="n">dim_head</span><span class="o">=</span><span class="n">attn_dim_head</span><span class="p">,</span>
+                          <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                          <span class="n">use_linear_attention</span><span class="o">=</span><span class="n">linear</span><span class="p">)</span>
+
+  <span class="c1"># Downsampling</span>
+  <span class="n">down_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">*</span><span class="n">mult</span> <span class="k">for</span> <span class="n">mult</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span><span class="p">]</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+  <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">))</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">)):</span>
+    <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_resblock</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">),</span> <span class="n">dim_in</span><span class="p">))</span>
+    <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_resblock</span><span class="p">(</span><span class="n">k2</span><span class="p">,</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">),</span> <span class="n">dim_in</span><span class="p">))</span>
+    <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_attention</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">)))</span>
+
+    <span class="n">down</span> <span class="o">=</span> <span class="n">Downsample</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">),</span>
+                      <span class="n">out_size</span><span class="o">=</span><span class="n">dim_out</span><span class="p">,</span>
+                      <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">down_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">down</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">H</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">W</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span> <span class="o">=</span> <span class="n">H</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">W</span><span class="o">//</span><span class="mi">2</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">down_blocks</span> <span class="o">=</span> <span class="n">down_blocks</span>
+
+  <span class="c1"># Middle</span>
+  <span class="n">middle_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">middle_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_resblock</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span> <span class="n">dim_out</span><span class="p">))</span>
+  <span class="n">middle_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_attention</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span> <span class="n">linear</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+  <span class="n">middle_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_resblock</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span> <span class="n">dim_out</span><span class="p">))</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">middle_blocks</span> <span class="o">=</span> <span class="n">middle_blocks</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span> <span class="o">=</span> <span class="n">WeightNormConv</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">),</span>
+                                 <span class="n">out_size</span><span class="o">=</span><span class="n">out_size</span><span class="p">,</span>
+                                 <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">),</span>
+                                 <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                 <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.nn.unet.Encoder.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.nn.unet.Encoder.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Call self as a function.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/nn/unet.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span>
+
+  <span class="n">conditional_embedding</span> <span class="o">=</span> <span class="n">y</span>
+
+
+  <span class="c1"># Initial convolution</span>
+  <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv_in</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+  <span class="c1"># Downsampling</span>
+  <span class="n">block_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">down_blocks</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">):</span>
+    <span class="c1"># Resnet block</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
+
+    <span class="c1"># Resnet block + attention block</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">,</span> <span class="n">conditional_embedding</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
+
+    <span class="c1"># Downsample</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">block_iter</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
+
+  <span class="c1"># Middle</span>
+  <span class="n">res_block1</span><span class="p">,</span> <span class="n">attn_block</span><span class="p">,</span> <span class="n">res_block2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">middle_blocks</span>
+  <span class="n">h</span> <span class="o">=</span> <span class="n">res_block1</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+  <span class="n">h</span> <span class="o">=</span> <span class="n">attn_block</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+  <span class="n">h</span> <span class="o">=</span> <span class="n">res_block2</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+
+  <span class="c1"># Final</span>
+  <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 </code></pre></div>
         </details>
     </div>

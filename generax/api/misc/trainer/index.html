@@ -444,6 +444,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../flows/conv/" class="md-nav__link">
+        Convolution
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../flows/coupling/" class="md-nav__link">
         Coupling
       </a>
@@ -1081,11 +1095,17 @@ generax.trainer.Trainer        </code>
 <span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="n">checkpointer</span><span class="p">:</span> <span class="n">Checkpointer</span>
+  <span class="n">_aux_history</span><span class="p">:</span> <span class="nb">list</span>
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">checkpointer</span> <span class="o">=</span> <span class="n">Checkpointer</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_aux_history</span> <span class="o">=</span> <span class="p">[]</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">aux_history</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">xs</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_aux_history</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">train_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">objective</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
@@ -1120,7 +1140,8 @@ generax.trainer.Trainer        </code>
             <span class="n">double_batch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">checkpoint_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
             <span class="n">test_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-            <span class="n">retrain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">retrain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">just_load</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Train the model.  This will load the model if the most</span>
 <span class="sd">    recent checkpoint exists has completed training.</span>
 
@@ -1138,6 +1159,7 @@ generax.trainer.Trainer        </code>
 <span class="sd">    - `checkpoint_every`: How often to checkpoint the model</span>
 <span class="sd">    - `test_every`: How often to evaluate the model</span>
 <span class="sd">    - `retrain`: Whether to force retraining from scratch</span>
+<span class="sd">    - `just_load`: Whether to just load the most recent checkpoint and return</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">key0</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -1148,6 +1170,9 @@ generax.trainer.Trainer        </code>
     <span class="c1"># Load the most recent checkpoint</span>
     <span class="k">if</span> <span class="n">retrain</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
       <span class="n">train_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">train_state</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">just_load</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">train_state</span><span class="o">.</span><span class="n">model</span>
 
     <span class="c1"># Fill in the training step with the objective and optimizer</span>
     <span class="n">train_step</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_step</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
@@ -1191,10 +1216,11 @@ generax.trainer.Trainer        </code>
         <span class="n">params</span><span class="p">,</span> <span class="n">aux</span> <span class="o">=</span> <span class="n">scan_step</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="n">train_state</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">double_batch</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_aux_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aux</span><span class="p">)</span>
 
       <span class="c1"># Update the progress bar</span>
-      <span class="n">loss</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;objective&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-      <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+      <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">aux</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+      <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 
       <span class="c1"># Checkpoint the model</span>
       <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span><span class="o">%</span><span class="n">checkpoint_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
@@ -1251,6 +1277,7 @@ generax.trainer.Trainer        </code>
              <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 
   <span class="bp">self</span><span class="o">.</span><span class="n">checkpointer</span> <span class="o">=</span> <span class="n">Checkpointer</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">_aux_history</span> <span class="o">=</span> <span class="p">[]</span>
 </code></pre></div>
         </details>
     </div>
@@ -1309,7 +1336,7 @@ generax.trainer.Trainer        </code>
 
 
 <h5 id="generax.trainer.Trainer.train" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">objective</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">evaluate_model</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">:</span> <span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_iterator</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">double_batch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">checkpoint_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">test_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">retrain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">objective</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">evaluate_model</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">:</span> <span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">num_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_iterator</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">double_batch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">checkpoint_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">test_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">retrain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">just_load</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span></code>
 
 
 <a href="#generax.trainer.Trainer.train" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1332,6 +1359,7 @@ recent checkpoint exists has completed training.</p>
 <li><code>checkpoint_every</code>: How often to checkpoint the model</li>
 <li><code>test_every</code>: How often to evaluate the model</li>
 <li><code>retrain</code>: Whether to force retraining from scratch</li>
+<li><code>just_load</code>: Whether to just load the most recent checkpoint and return</li>
 </ul>
 
         <details class="quote">
@@ -1346,7 +1374,8 @@ recent checkpoint exists has completed training.</p>
           <span class="n">double_batch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
           <span class="n">checkpoint_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
           <span class="n">test_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
-          <span class="n">retrain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+          <span class="n">retrain</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+          <span class="n">just_load</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;Train the model.  This will load the model if the most</span>
 <span class="sd">  recent checkpoint exists has completed training.</span>
 
@@ -1364,6 +1393,7 @@ recent checkpoint exists has completed training.</p>
 <span class="sd">  - `checkpoint_every`: How often to checkpoint the model</span>
 <span class="sd">  - `test_every`: How often to evaluate the model</span>
 <span class="sd">  - `retrain`: Whether to force retraining from scratch</span>
+<span class="sd">  - `just_load`: Whether to just load the most recent checkpoint and return</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="n">key0</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
@@ -1374,6 +1404,9 @@ recent checkpoint exists has completed training.</p>
   <span class="c1"># Load the most recent checkpoint</span>
   <span class="k">if</span> <span class="n">retrain</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
     <span class="n">train_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">train_state</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">just_load</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">train_state</span><span class="o">.</span><span class="n">model</span>
 
   <span class="c1"># Fill in the training step with the objective and optimizer</span>
   <span class="n">train_step</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_step</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
@@ -1417,10 +1450,11 @@ recent checkpoint exists has completed training.</p>
       <span class="n">params</span><span class="p">,</span> <span class="n">aux</span> <span class="o">=</span> <span class="n">scan_step</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
       <span class="n">train_state</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
       <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">double_batch</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_aux_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aux</span><span class="p">)</span>
 
     <span class="c1"># Update the progress bar</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="n">aux</span><span class="p">[</span><span class="s1">&#39;objective&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">aux</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+    <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 
     <span class="c1"># Checkpoint the model</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i</span><span class="o">%</span><span class="n">checkpoint_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>

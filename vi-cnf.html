@@ -78,27 +78,147 @@
         <div class="span8 offset2 article-content">
             
             <h1>Motivation</h1>
-<p>Consider the task of minimizing the reverse KL divergence between a target distribution <span class="math">\(p\)</span> and a model distribution <span class="math">\(q\)</span> over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  If we have a probability path as the solution where <span class="math">\(q_t(z)\)</span> where <span class="math">\(q_0\)</span> is arbitrary and <span class="math">\(q_1 = p\)</span>, then we could be interested in seeing how the reverse KL divergence between <span class="math">\(q_t(z)\)</span> and <span class="math">\(p\)</span> changes as <span class="math">\(t\)</span> changes.</p>
-<p>Let <span class="math">\((q_t(z), V_t(z))\)</span> be a probability path between <span class="math">\(q_0\)</span> and <span class="math">\(q_1\)</span> where <span class="math">\(V_t(z)\in \mathfrak{X}(\mathcal{M})\)</span> is the vector field that generates the flow of <span class="math">\(q_t(z)\)</span> and let <span class="math">\(dz\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the time derivative of the reverse KL divergence is:
+<p>Suppose we want to be able to sample from some probability density function, <span class="math">\(p\)</span>, that we can evaluate.  We can do this by using a continuous normalizing flow (CNF) to transform a simple distribution, <span class="math">\(q_0\)</span>, into <span class="math">\(p\)</span>.  CNFs do this by flowing samples from <span class="math">\(q_0\)</span> along a vector field <span class="math">\(V_t\)</span> that is parameterized by a neural network to time <span class="math">\(t=1\)</span>.  The probability density function of the samples at time <span class="math">\(t\)</span> is denoted by <span class="math">\(q_t\)</span> and if the model is trained correctly then <span class="math">\(q_1 = p\)</span>.</p>
+<p>The current way of training CNFs is to minimize <span class="math">\(KL[q_1||p]\)</span> by maximizing the ELBO.  However, this can be expensive and lead to vector fields that are difficult to integrate numerically.  We will try to remedy this issue by first constructing a target probability path that starts at <span class="math">\(q_0\)</span> and ends at <span class="math">\(p\)</span> as:
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{d}{dt}\text{KL}\left[q_t(z_t)||p(z_t|x)\right] &amp;= \int \frac{d}{dt}q_t(z_t)\log \frac{q_t(z_t)}{p(z_t|x)}dz_t \\
-  &amp;= \int \left((\frac{d q_t(z_t)}{dt})\log \frac{q_t(z_t)}{p(z_t|x)} + q_t(z_t)\frac{d \log q_t(z_t)}{dt}\right)dz_t \\
-  &amp;= \int \left(-\text{Div}(q_t(z_t) V_t(z_t)) \log \frac{q_t(z_t)}{p(z_t|x)} + \underbrace{\frac{d q(z_t)}{dt}}_{\text{$0$ in expectation}}\right)dz_t \\
-  &amp;= \int \langle \text{grad } \log \frac{q_t(z_t)}{p(z_t|x)} , q_t(z_t) V_t(z_t)\rangle dz \\
-  &amp;= \int q_t(z_t)\left( \langle \text{grad } \log q_t(z_t) , V_t(z_t)\rangle  - \langle \text{grad } \log p(z_t|x), V_t(z_t)\rangle  \right)dz_t \\
-  &amp;= \int \langle \text{grad } q_t(z_t) , V_t(z_t)\rangle  dz_t - \int q_t(z_t)\langle \text{grad } \log p(z_t|x), V_t(z_t)\rangle  dz_t \\
-  &amp;= -\int q_t(z_t) \text{Div}(V_t(z_t)) dz_t - \int q_t(z_t)\langle \text{grad } \log p(z_t|x), V_t(z_t)\rangle  dz_t \\
-  &amp;= -\mathbb{E}_{q_t(z_t)}\left[\langle \text{grad } \log p(z_t|x), V_t(z_t) \rangle  + \text{Div}(V_t(z_t))\right]
+  p_\beta &amp;= \frac{1}{Z_\beta}q_0(x)^{1-\beta}p(x)^\beta
 \end{align}
 $$</div>
-<p>So the full KL divergence is
+<p>
+Then we will try to learn a CNF by minimizing the objective
 </p>
 <div class="math">$$
 \begin{align}
-  \text{KL}\left[q_1(z_1)||p(z_1|x)\right] &amp;= \text{KL}\left[q_0(z_0)||p(z_0|x)\right] + \int_0^1 \frac{d}{dt}\text{KL}\left[q_t(z_t)||p(z_t|x)\right]dt \\
-  &amp;= \text{KL}\left[q_0(z_0)||p(z_0|x)\right] - \int_0^1 \mathbb{E}_{q_t(z_t)}\left[\langle \text{grad } \log p(z_t|x), V_t(z_t) \rangle  + \text{Div}(V_t(z_t))\right]dt
+  \mathcal{L} = \int_{0}^1 \lambda(\beta)\text{KL}\left[q_{\beta}||p_{\beta}\right] d\beta
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(\lambda(\beta)\)</span> is a weighting function that we will choose later.  By doing so, the CNF will learn to transport samples from a fixed target distribution to the target distribution.  This should help the flow learn multimodal distributions better because the modes of the distribution are slowly formed as <span class="math">\(\beta\)</span> increases.</p>
+<h1>Objective derivation</h1>
+<p>Let's start by deriving the KL term.  We'll take an approach that lets us completely bypass the normalization constant.</p>
+<div class="math">$$
+\begin{align}
+  \text{KL}\left[q_{\beta}||p_{\beta}\right] &amp;= \text{KL}\left[q_0||p_{\beta}\right] + \int_{0}^\beta \frac{d}{dt}\text{KL}\left[q_t||p_\beta \right]dt \\
+\end{align}
+$$</div>
+<p>
+Next,
+</p>
+<div class="math">$$
+\begin{align}
+  \frac{d}{dt}\text{KL}\left[q_t||p_\beta\right] &amp;= \int \frac{d}{dt}q_t\log \frac{q_t}{p_\beta}dV \\
+  &amp;= \int \left((\frac{d q_t}{dt})\log \frac{q_t}{p_\beta} + q_t\frac{d \log q_t}{dt}\right)dV \\
+  &amp;= \int \left(-\text{Div}(q_t V_t) \log \frac{q_t}{p_\beta} + \underbrace{\frac{d q}{dt}}_{\text{$0$ in expectation}}\right)dV \\
+  &amp;= \int \langle \nabla \log \frac{q_t}{p_\beta} , q_t V_t\rangle dz \\
+  &amp;= \int q_t\left( \langle \nabla \log q_t , V_t\rangle  - \langle \nabla \log p_\beta, V_t\rangle  \right)dV \\
+  &amp;= \int \langle \nabla q_t , V_t\rangle  dV - \int q_t\langle \nabla \log p_\beta, V_t\rangle  dV \\
+  &amp;= -\int q_t \text{Div}(V_t) dV - \int q_t\langle \nabla \log p_\beta, V_t\rangle  dV \\
+  &amp;= -\mathbb{E}_{q_t}\left[\langle \nabla \log p_\beta, V_t \rangle  + \text{Div}(V_t)\right]
+\end{align}
+$$</div>
+<p>This means that we can get an unbiased estimate of the KL term without having to compute the normalization constant.  Instead, we only need access to the score function:
+</p>
+<div class="math">$$
+\begin{align}
+  \nabla \log p_\beta &amp;= (1-\beta)\nabla \log q_0 + \beta\nabla \log p
+\end{align}
+$$</div>
+<p>Putting everything together yields the objective:
+</p>
+<div class="math">$$
+\begin{align}
+  \mathcal{L} &amp;= \int_{0}^1 \text{KL}\left[q_{\beta}||p_{\beta}\right] d\beta \\
+  &amp;= \underbrace{\int_{0}^1 \text{KL}\left[q_0||p_{\beta}\right] d\beta}_{\text{C}} + \int_{0}^1 \int_{0}^\beta \frac{d}{dt}\text{KL}\left[q_t||p_\beta \right]dt d\beta \\
+  &amp;= \text{C} - \int_{0}^1 \int_{0}^\beta \mathbb{E}_{q_t}\left[\langle \nabla \log p_\beta, V_t \rangle  + \text{Div}(V_t)\right]dt d\beta \\
+  &amp;= \text{C} - \mathbb{E}_{q_0}\left[\int_{0}^1 \int_{0}^\beta \langle \nabla \log p_\beta, V_t \rangle  + \text{Div}(V_t)dt d\beta\right] \\
+  &amp;= \text{C} - \mathbb{E}_{q_0}[\int_{0}^1 \int_{0}^\beta (1-\beta)\langle \nabla \log q_0, V_t \rangle + \beta \langle \nabla \log p , V_t \rangle + \text{Div}(V_t)dt d\beta]
+\end{align}
+$$</div>
+<h2>Integrating out <span class="math">\(\beta\)</span></h2>
+<p>Next, we'll integrate out <span class="math">\(\beta\)</span> by using the identity:
+</p>
+<div class="math">$$
+\begin{align}
+  \int_0^1 \int_0^\beta h(\beta)f(t)dt d\beta &amp;= \int_0^1 \left[H(1) - H(t)\right]f(t) dt
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(\frac{dH(\beta)}{d\beta} = h(\beta)\)</span>.</p>
+<p>Proof:
+We can change the region of integration by letting <span class="math">\(s=1-t\)</span> and <span class="math">\(\gamma = 1-\beta\)</span> and then we have:
+</p>
+<div class="math">$$
+\begin{align}
+  \int_{\beta=0}^1 \int_{t=0}^\beta h(\beta)f(t)dt d\beta &amp;= \int_{s=0}^1 \int_{\gamma=s}^0 h(1-\gamma)f(1-s)d\gamma ds \\
+  &amp;= \int_{s=0}^1 f(1-s) \int_{\gamma=s}^0 h(1-\gamma)d\gamma ds \\
+  &amp;= \int_{s=0}^1 f(1-s) \left[H(1-s) - H(1)\right] ds \\
+  &amp;= \int_{t=0}^1 f(t) \left[H(1) - H(t)\right] ds
+\end{align}
+$$</div>
+<h3>Choosing <span class="math">\(\lambda(\beta)\)</span></h3>
+<p><span class="math">\(\lambda(\beta)\)</span> will be absorbed into <span class="math">\(h(\beta)\)</span> above.  In particular, <span class="math">\(h(\beta)\)</span> will take the form of either:
+</p>
+<div class="math">$$
+\begin{align}
+  h_1(\beta) &amp;= \lambda(\beta) \\
+  h_2(\beta) &amp;= \beta \lambda(\beta)
+\end{align}
+$$</div>
+<p>
+Therefore, we will need to be able to evaluate the anti-derivative of <span class="math">\(\lambda(\beta)\)</span> and <span class="math">\(\beta \lambda(\beta)\)</span>.  The anti-derivative of <span class="math">\(x\lambda(\beta)\)</span> can be evaluated using integration by parts:
+</p>
+<div class="math">$$
+\begin{align}
+  \int_a^b \beta\lambda(\beta) d\beta &amp;= (\beta \Lambda(\beta))\big|_a^b - \int_a^b \Lambda(\beta) d\beta
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(\Lambda(\beta)\)</span> is the anti-derivative of <span class="math">\(\lambda(\beta)\)</span>.  Therefore, we need to be able to evaluate 2 anti-derivatives of <span class="math">\(\lambda(\beta)\)</span> in order to have a closed form expression for the objective.</p>
+<p>The trivial choice of letting <span class="math">\(\lambda(\beta) = 1\)</span> gives us the expreessions:
+</p>
+<div class="math">$$
+\begin{align}
+  \int_{0}^1 \int_{0}^\beta C(t) dt d\beta &amp;= \int_0^1 (1-t)C(t)dt \\
+  \int_{0}^1 \int_{0}^\beta \beta B(t) dt d\beta &amp;= \int_0^1 \frac{1}{2}(1-t^2)B(t)dt \\
+  \int_{0}^1 \int_{0}^\beta (1-\beta)A(t) dt d\beta &amp;= \int_0^1 \frac{1}{2}(1-t)^2A(t)dt
+\end{align}
+$$</div>
+<p>
+With the choice of <span class="math">\(\lambda(\beta) = 1\)</span>, the objective becomes:
+</p>
+<div class="math">$$
+\begin{align}
+  \mathcal{L} &amp;= \text{C} - \mathbb{E}_{q_0}[\int_{0}^1 \frac{1}{2}(1-t)^2\langle \nabla \log q_0, V_t \rangle + \frac{1}{2}(1-t^2) \langle \nabla \log p , V_t \rangle + (1-t)\text{Div}(V_t)dt]
+\end{align}
+$$</div>
+<h3>Polynomial <span class="math">\(\lambda(\beta)\)</span></h3>
+<p>We can also choose <span class="math">\(\lambda(\beta)\)</span> to be a polynomial of degree <span class="math">\(n\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+  \lambda(\beta) &amp;= \sum_{i=0}^n a_i \beta^i
+\end{align}
+$$</div>
+<p>
+The anti-derivatives are then:
+</p>
+<div class="math">$$
+\begin{align}
+  H_1(\beta) = \int \lambda(\beta) d\beta &amp;= \sum_{i=0}^n \frac{a_i}{i+1}\beta^{i+1} \\
+  H_2(\beta) = \int \beta \lambda(\beta) d\beta &amp;= \sum_{i=0}^n \frac{a_i}{i+2}\beta^{i+2} \\
+  H_3(\beta) = \int (1 - \beta) \lambda(\beta) d\beta &amp;= \sum_{i=0}^n a_i\beta^{i+1}(\frac{1}{i+1} - \frac{1}{i+2}\beta)
+\end{align}
+$$</div>
+<p>
+And plugging this into <span class="math">\(H(1) - H(t)\)</span> gives us:
+</p>
+<div class="math">$$
+\begin{align}
+  H_1(1) - H_1(t) &amp;= \sum_{i=0}^n \frac{a_i}{i+1}(1 - t^{i+1}) \\
+  H_2(1) - H_2(t) &amp;= \sum_{i=0}^n \frac{a_i}{i+2}(1-t^{i+2}) \\
+  H_3(1) - H_3(t) &amp;= \sum_{i=0}^n \frac{a_i}{i+1}(1 - t^{i+1})(1 - \frac{i+1}{i+2}t)
 \end{align}
 $$</div>
 <h1>Comparison to ELBO maximization</h1>
