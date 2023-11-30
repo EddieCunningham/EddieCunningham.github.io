@@ -509,6 +509,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../flows/conv/" class="md-nav__link">
+        Convolution
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../flows/coupling/" class="md-nav__link">
         Coupling
       </a>
@@ -1584,7 +1598,6 @@ generax.distributions.flow_models.ContinuousNormalizingFlow            (<a class
                <span class="o">*</span><span class="p">,</span>
                <span class="n">controller_rtol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
                <span class="n">controller_atol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
-               <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                <span class="n">adjoint</span><span class="o">=</span><span class="s1">&#39;recursive_checkpoint&#39;</span><span class="p">,</span>
                <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1597,7 +1610,6 @@ generax.distributions.flow_models.ContinuousNormalizingFlow            (<a class
 <span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
 <span class="sd">    - `controller_rtol`: The relative tolerance for the controller.</span>
 <span class="sd">    - `controller_atol`: The absolute tolerance for the controller.</span>
-<span class="sd">    - `trace_estimate_likelihood`: Whether or not to use trace estimation for the likelihood.</span>
 <span class="sd">    - `adjoint`: The adjoint method to use.  See [this](https://docs.kidger.site/diffrax/api/adjoints/)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">transform</span> <span class="o">=</span> <span class="n">FFJORDTransform</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
@@ -1606,13 +1618,16 @@ generax.distributions.flow_models.ContinuousNormalizingFlow            (<a class
                                 <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
                                 <span class="n">controller_rtol</span><span class="o">=</span><span class="n">controller_rtol</span><span class="p">,</span>
                                 <span class="n">controller_atol</span><span class="o">=</span><span class="n">controller_atol</span><span class="p">,</span>
-                                <span class="n">trace_estimate_likelihood</span><span class="o">=</span><span class="n">trace_estimate_likelihood</span><span class="p">,</span>
                                 <span class="n">adjoint</span><span class="o">=</span><span class="n">adjoint</span><span class="p">,</span>
                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">prior</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">)</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
                      <span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span>
                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span> <span class="nf">neural_ode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">neural_ode</span>
 
   <span class="nd">@property</span>
   <span class="k">def</span> <span class="nf">vector_field</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1710,7 +1725,7 @@ an <code>eqx.Module</code> that with the signature <code>vector_field(t, x, y=y)
 
 
 <h5 id="generax.distributions.flow_models.ContinuousNormalizingFlow.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">net</span><span class="p">:</span> <span class="n">Module</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">controller_rtol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">controller_atol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-05</span><span class="p">,</span> <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">adjoint</span> <span class="o">=</span> <span class="s1">&#39;recursive_checkpoint&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">net</span><span class="p">:</span> <span class="n">Module</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">controller_rtol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">controller_atol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-05</span><span class="p">,</span> <span class="n">adjoint</span> <span class="o">=</span> <span class="s1">&#39;recursive_checkpoint&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.distributions.flow_models.ContinuousNormalizingFlow.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1726,7 +1741,6 @@ an <code>eqx.Module</code> that with the signature <code>vector_field(t, x, y=y)
 <li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
 <li><code>controller_rtol</code>: The relative tolerance for the controller.</li>
 <li><code>controller_atol</code>: The absolute tolerance for the controller.</li>
-<li><code>trace_estimate_likelihood</code>: Whether or not to use trace estimation for the likelihood.</li>
 <li><code>adjoint</code>: The adjoint method to use.  See <a href="https://docs.kidger.site/diffrax/api/adjoints/">this</a></li>
 </ul>
 
@@ -1739,7 +1753,6 @@ an <code>eqx.Module</code> that with the signature <code>vector_field(t, x, y=y)
              <span class="o">*</span><span class="p">,</span>
              <span class="n">controller_rtol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
              <span class="n">controller_atol</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
-             <span class="n">trace_estimate_likelihood</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
              <span class="n">adjoint</span><span class="o">=</span><span class="s1">&#39;recursive_checkpoint&#39;</span><span class="p">,</span>
              <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1752,7 +1765,6 @@ an <code>eqx.Module</code> that with the signature <code>vector_field(t, x, y=y)
 <span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
 <span class="sd">  - `controller_rtol`: The relative tolerance for the controller.</span>
 <span class="sd">  - `controller_atol`: The absolute tolerance for the controller.</span>
-<span class="sd">  - `trace_estimate_likelihood`: Whether or not to use trace estimation for the likelihood.</span>
 <span class="sd">  - `adjoint`: The adjoint method to use.  See [this](https://docs.kidger.site/diffrax/api/adjoints/)</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="n">transform</span> <span class="o">=</span> <span class="n">FFJORDTransform</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
@@ -1761,7 +1773,6 @@ an <code>eqx.Module</code> that with the signature <code>vector_field(t, x, y=y)
                               <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
                               <span class="n">controller_rtol</span><span class="o">=</span><span class="n">controller_rtol</span><span class="p">,</span>
                               <span class="n">controller_atol</span><span class="o">=</span><span class="n">controller_atol</span><span class="p">,</span>
-                              <span class="n">trace_estimate_likelihood</span><span class="o">=</span><span class="n">trace_estimate_likelihood</span><span class="p">,</span>
                               <span class="n">adjoint</span><span class="o">=</span><span class="n">adjoint</span><span class="p">,</span>
                               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
   <span class="n">prior</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">)</span>

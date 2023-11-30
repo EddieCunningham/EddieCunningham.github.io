@@ -8,6 +8,8 @@ from generax.trainer import Trainer
 import generax.util.misc as misc
 import matplotlib.pyplot as plt
 import equinox as eqx
+import generax as gx
+from generax.distributions.flow_models import ContinuousNormalizingFlow
 
 def get_dataset_iter():
   from sklearn.datasets import make_moons, make_swiss_roll
@@ -33,9 +35,9 @@ def get_dataset_iter():
 
 if __name__ == '__main__':
   from debug import *
+  from generax.distributions.flow_models import *
   from generax.distributions.base import *
   from generax.nn import *
-  import generax as gx
 
   train_ds = get_dataset_iter()
   data = next(train_ds)
@@ -44,21 +46,48 @@ if __name__ == '__main__':
   key = random.PRNGKey(0)
 
   # Construct the flow
-  flow = gx.NeuralSpline(input_shape=x.shape[1:],
-                  key=key,
-                  n_flow_layers=3,
-                  n_blocks=4,
-                  hidden_size=32,
-                  working_size=16,
-                  n_spline_knots=8)
+  net = gx.TimeDependentResNet(input_shape=x_shape,
+                            working_size=16,
+                            hidden_size=32,
+                            out_size=x_shape[-1],
+                            n_blocks=5,
+                            embedding_size=16,
+                            out_features=32,
+                            key=key)
+  flow = ContinuousNormalizingFlow(input_shape=x_shape,
+                                    net=net,
+                                    key=key,
+                                    controller_atol=1e-5,
+                                    controller_rtol=1e-5,
+                                    adjoint='seminorm')
 
   # Construct the loss function
   def loss(flow, data, key):
     x = data['x']
-    log_px = eqx.filter_vmap(flow.log_prob)(x)
-    objective = -log_px.mean()
+    keys = random.split(key, x.shape[0])
 
-    aux = dict(log_px=log_px)
+    def solve_ode(x, key):
+      return flow.neural_ode(x,
+                             inverse=False,
+                             log_likelihood=True,
+                             trace_estimate_likelihood=False,
+                             key=key)
+    solution = jax.vmap(solve_ode)(x, keys)
+
+    z = solution.ys
+    log_det = solution.log_det
+    log_pz = eqx.filter_vmap(flow.prior.log_prob)(z)
+    log_px = log_pz + log_det
+
+    total_vf_norm = solution.total_vf_norm
+    total_jac_frob_norm = solution.total_jac_frob_norm
+
+    objective = -log_px + 0.01*total_vf_norm + 0.01*total_jac_frob_norm
+    objective = objective.mean()
+
+    aux = dict(log_px=log_px,
+               total_vf_norm=total_vf_norm,
+               total_jac_frob_norm=total_jac_frob_norm)
     return objective, aux
 
   # Create the optimizer
@@ -76,17 +105,18 @@ if __name__ == '__main__':
   optimizer = optax.chain(*chain)
 
   # Create the trainer and optimize
-  trainer = Trainer(checkpoint_path='tmp/flow/spline')
+  trainer = Trainer(checkpoint_path='tmp/flow/cnf_ml')
   flow = trainer.train(model=flow,
                        objective=loss,
                        evaluate_model=lambda x: x,
                        optimizer=optimizer,
-                       num_steps=30000,
-                       double_batch=1000,
+                       num_steps=5000,
+                       double_batch=-1,
                        data_iterator=train_ds,
                        checkpoint_every=5000,
                        test_every=-1,
-                       retrain=True)
+                       retrain=True,
+                       just_load=False)
 
   # Pull samples from the model
   keys = random.split(key, 1000)
@@ -94,5 +124,6 @@ if __name__ == '__main__':
 
   fig, ax = plt.subplots(1, 1)
   ax.scatter(*samples.T)
-  plt.show()
+  plt.savefig('examples/cnf_ml_samples.png')
+  # plt.show()
   import pdb; pdb.set_trace()

@@ -444,6 +444,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../flows/conv/" class="md-nav__link">
+        Convolution
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../flows/coupling/" class="md-nav__link">
         Coupling
       </a>
@@ -932,13 +946,15 @@ https://arxiv.org/pdf/1602.07868.pdf</p>
 
   <span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                           <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">before_square_plus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
 
 <span class="sd">    **Arguments**:</span>
 
 <span class="sd">    - `x`: The data to initialize the parameters with.</span>
 <span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">    - `before_square_plus`: In case we want the activations after square plus to be gaussian</span>
 
 <span class="sd">    **Returns**:</span>
 <span class="sd">    A new layer with the parameters initialized.</span>
@@ -950,6 +966,10 @@ https://arxiv.org/pdf/1602.07868.pdf</p>
     <span class="n">x</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,bj-&gt;bi&#39;</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
     <span class="n">std</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-5</span>
+
+    <span class="k">if</span> <span class="n">before_square_plus</span><span class="p">:</span>
+      <span class="n">std</span> <span class="o">=</span> <span class="n">std</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">std</span>
+
     <span class="n">g</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">std</span>
 
     <span class="n">x</span> <span class="o">*=</span> <span class="n">g</span>
@@ -1027,7 +1047,7 @@ https://arxiv.org/pdf/1602.07868.pdf</p>
 
 
 <h5 id="generax.nn.layers.WeightNormDense.data_dependent_init" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span></code>
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">before_square_plus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span></code>
 
 
 <a href="#generax.nn.layers.WeightNormDense.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1039,6 +1059,7 @@ https://arxiv.org/pdf/1602.07868.pdf</p>
 <ul>
 <li><code>x</code>: The data to initialize the parameters with.</li>
 <li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+<li><code>before_square_plus</code>: In case we want the activations after square plus to be gaussian</li>
 </ul>
 <p><strong>Returns</strong>:
 A new layer with the parameters initialized.</p>
@@ -1047,13 +1068,15 @@ A new layer with the parameters initialized.</p>
           <summary>Source code in <code>generax/nn/layers.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                         <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">before_square_plus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
 
 <span class="sd">  **Arguments**:</span>
 
 <span class="sd">  - `x`: The data to initialize the parameters with.</span>
 <span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">  - `before_square_plus`: In case we want the activations after square plus to be gaussian</span>
 
 <span class="sd">  **Returns**:</span>
 <span class="sd">  A new layer with the parameters initialized.</span>
@@ -1065,6 +1088,10 @@ A new layer with the parameters initialized.</p>
   <span class="n">x</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,bj-&gt;bi&#39;</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
   <span class="n">std</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-5</span>
+
+  <span class="k">if</span> <span class="n">before_square_plus</span><span class="p">:</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">std</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">std</span>
+
   <span class="n">g</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">std</span>
 
   <span class="n">x</span> <span class="o">*=</span> <span class="n">g</span>
@@ -1183,13 +1210,15 @@ https://arxiv.org/pdf/1602.07868.pdf</p>
   <span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                           <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
                           <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">before_square_plus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
 
 <span class="sd">    **Arguments**:</span>
 
 <span class="sd">    - `x`: The data to initialize the parameters with.</span>
 <span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">    - `before_square_plus`: In case we want the activations after square plus to be gaussian</span>
 
 <span class="sd">    **Returns**:</span>
 <span class="sd">    A new layer with the parameters initialized.</span>
@@ -1201,6 +1230,10 @@ https://arxiv.org/pdf/1602.07868.pdf</p>
     <span class="n">x</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stride</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">)</span>
 
     <span class="n">std</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-5</span>
+
+    <span class="k">if</span> <span class="n">before_square_plus</span><span class="p">:</span>
+      <span class="n">std</span> <span class="o">=</span> <span class="n">std</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">std</span>
+
     <span class="n">g</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">std</span>
 
     <span class="n">x</span> <span class="o">*=</span> <span class="n">g</span>
@@ -1285,7 +1318,7 @@ https://arxiv.org/pdf/1602.07868.pdf</p>
 
 
 <h5 id="generax.nn.layers.WeightNormConv.data_dependent_init" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span></code>
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">before_square_plus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span></code>
 
 
 <a href="#generax.nn.layers.WeightNormConv.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1297,6 +1330,7 @@ https://arxiv.org/pdf/1602.07868.pdf</p>
 <ul>
 <li><code>x</code>: The data to initialize the parameters with.</li>
 <li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+<li><code>before_square_plus</code>: In case we want the activations after square plus to be gaussian</li>
 </ul>
 <p><strong>Returns</strong>:
 A new layer with the parameters initialized.</p>
@@ -1306,13 +1340,15 @@ A new layer with the parameters initialized.</p>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                         <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
                         <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">before_square_plus</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
 
 <span class="sd">  **Arguments**:</span>
 
 <span class="sd">  - `x`: The data to initialize the parameters with.</span>
 <span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">  - `before_square_plus`: In case we want the activations after square plus to be gaussian</span>
 
 <span class="sd">  **Returns**:</span>
 <span class="sd">  A new layer with the parameters initialized.</span>
@@ -1324,6 +1360,10 @@ A new layer with the parameters initialized.</p>
   <span class="n">x</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stride</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">)</span>
 
   <span class="n">std</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-5</span>
+
+  <span class="k">if</span> <span class="n">before_square_plus</span><span class="p">:</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">std</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">std</span>
+
   <span class="n">g</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">std</span>
 
   <span class="n">x</span> <span class="o">*=</span> <span class="n">g</span>

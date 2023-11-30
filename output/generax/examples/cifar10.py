@@ -16,7 +16,7 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 import matplotlib.pyplot as plt
 
-def get_dataset_iter():
+def get_dataset_iter(dtype=jnp.bfloat16):
 
   training_data = datasets.CIFAR10(
       root="data",
@@ -33,7 +33,7 @@ def get_dataset_iter():
     while True:
       for batch in train_dataloader:
         images, labels = batch
-        x = images.numpy().transpose(0, 2, 3, 1)
+        x = images.numpy().transpose(0, 2, 3, 1).astype(dtype)
         yield dict(x=x)
 
   train_ds = get_train_ds()
@@ -41,23 +41,25 @@ def get_dataset_iter():
 
 if __name__ == '__main__':
   from debug import *
-  from generax.nn.unet import TimeDependentUNet
+  from generax.nn.unet import UNet
   from generax.flows.affine import *
   from generax.distributions.flow_models import *
   from generax.distributions.base import *
   from generax.nn import *
   from generax.distributions.coupling import OTTCoupling
 
-  train_ds = get_dataset_iter()
+  dtype = jnp.float32
+
+  train_ds = get_dataset_iter(dtype=dtype)
   data = next(train_ds)
   x = data['x']
   x_shape = x.shape[1:]
   key = random.PRNGKey(0)
 
   # Construct the neural network that learn the score
-  net = TimeDependentUNet(input_shape=x_shape,
-                          dim=64,
-                          dim_mults=[1, 2, 2, 4],
+  net = UNet(input_shape=x_shape,
+                          dim=256,
+                          dim_mults=[1, 2, 4, 8],
                           resnet_block_groups=8,
                           attn_heads=4,
                           attn_dim_head=32,
@@ -67,6 +69,15 @@ if __name__ == '__main__':
                                    key=key,
                                    controller_atol=1e-5,
                                    controller_rtol=1e-5)
+
+  # Change the data type of the parameters
+  params, static = eqx.partition(flow, eqx.is_inexact_array)
+  params = jax.tree_util.tree_map(lambda x: x.astype(dtype), params)
+  flow = eqx.combine(params, static)
+
+  # Count the number of parameters in the flow
+  params, _ = eqx.partition(flow, eqx.is_inexact_array)
+  num_params = sum(jax.tree_map(lambda x: util.list_prod(x.shape), jax.tree_util.tree_leaves(params)))
 
   # Build the probability path that we'll use for learning.
   # The target probability path is the expectation of cond_ppath
@@ -82,11 +93,15 @@ if __name__ == '__main__':
     x1 = data['x']
     keys = random.split(k1, x1.shape[0])
     x0 = eqx.filter_vmap(cond_ppath.prior.sample)(keys)
-    t = random.uniform(k2, shape=(x1.shape[0],))
+    t = random.uniform(k2, shape=(x1.shape[0],), dtype=x1.dtype)
 
     # Resample from the coupling
-    coupling = OTTCoupling(x0, x1)
-    x0 = coupling.sample_x0_given_x1(k1)
+    x_shape = x1.shape
+    x0_flat, x1_flat = map(lambda x: x.reshape((x.shape[0], -1)), (x0, x1))
+    coupling = OTTCoupling(x0_flat, x1_flat)
+    x0_flat = coupling.sample_x0_given_x1(k1)
+    x0 = x0_flat.reshape(x_shape)
+    x0 = x0.astype(x1.dtype)
 
     # Compute f_t(x_0; x_1)
     def ft(t):
@@ -102,6 +117,8 @@ if __name__ == '__main__':
     aux = dict(objective=objective)
     return objective, aux
 
+  print(f'Number of parameters: {num_params}')
+
   # Create the optimizer
   import optax
   schedule = optax.warmup_cosine_decay_schedule(init_value=0.0,
@@ -112,31 +129,37 @@ if __name__ == '__main__':
                                     exponent=1.0)
   chain = []
   chain.append(optax.clip_by_global_norm(15.0))
-  chain.append(optax.adamw(1e-3))
+  chain.append(optax.adamw(3e-4))
   chain.append(optax.scale_by_schedule(schedule))
   optimizer = optax.chain(*chain)
 
   # Create the trainer and optimize
-  trainer = Trainer(checkpoint_path='tmp/flow/flow_matching')
+  trainer = Trainer(checkpoint_path='tmp/cifar10/')
   flow = trainer.train(model=flow,
                       objective=loss,
                       evaluate_model=lambda x: x,
                       optimizer=optimizer,
-                      num_steps=25000,
-                      double_batch=10,
+                      num_steps=int(1e6),
+                      double_batch=100,
                       data_iterator=train_ds,
                       checkpoint_every=5000,
                       test_every=-1,
-                      retrain=False)
+                      retrain=False,
+                      just_load=True)
 
   # Pull samples from the model
-  keys = random.split(key, 8)
+  keys = random.split(key, 64)
   samples = eqx.filter_vmap(flow.sample)(keys)
 
-  fig, axes = plt.subplots(1, 8)
-  for i, ax in enumerate(axes):
+  n_rows, n_cols = 8, 8
+  size = 4
+  fig, axes = plt.subplots(n_rows, n_cols, figsize=(size*n_cols, size*n_rows))
+  ax_iter = iter(axes.ravel())
+  for i in range(64):
+    ax = next(ax_iter)
     ax.imshow(samples[i])
+    ax.set_axis_off()
 
   # Save the plot
-  plt.savefig('tmp/flow/flow_matching/samples.png')
-  import pdb; pdb.set_trace()
+  plt.savefig('tmp/cifar10/samples.png')
+  # import pdb; pdb.set_trace()

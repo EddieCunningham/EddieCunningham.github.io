@@ -502,6 +502,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../flows/conv/" class="md-nav__link">
+        Convolution
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../flows/coupling/" class="md-nav__link">
         Coupling
       </a>
@@ -860,19 +874,19 @@ generax.distributions.base.ProbabilityDistribution        </code>
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="o">*</span><span class="p">,</span>
-               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
-<span class="sd">    - `input_shape`: The dimension of the space.  This can be either</span>
-<span class="sd">            an integer or a tuple of integers to represent images</span>
+<span class="sd">    - `input_shape`: The dimensions of the samples</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
 
   <span class="nd">@abstractmethod</span>
   <span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
 <span class="sd">    - `key`: The random number generator key.</span>
@@ -959,7 +973,7 @@ generax.distributions.base.ProbabilityDistribution        </code>
 
 
 <h5 id="generax.distributions.base.ProbabilityDistribution.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.distributions.base.ProbabilityDistribution.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -968,20 +982,18 @@ generax.distributions.base.ProbabilityDistribution        </code>
 
       <p><strong>Arguments</strong>:</p>
 <ul>
-<li><code>input_shape</code>: The dimension of the space.  This can be either
-        an integer or a tuple of integers to represent images</li>
+<li><code>input_shape</code>: The dimensions of the samples</li>
 </ul>
 
         <details class="quote">
           <summary>Source code in <code>generax/distributions/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="o">*</span><span class="p">,</span>
-             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
-<span class="sd">  - `input_shape`: The dimension of the space.  This can be either</span>
-<span class="sd">          an integer or a tuple of integers to represent images</span>
+<span class="sd">  - `input_shape`: The dimensions of the samples</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
@@ -998,7 +1010,7 @@ generax.distributions.base.ProbabilityDistribution        </code>
 
 
 <h5 id="generax.distributions.base.ProbabilityDistribution.sample_and_log_prob" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+<code class="highlight language-python"><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-abstractmethod"><code>abstractmethod</code></small>
@@ -1023,7 +1035,8 @@ A single sample from the model with its log probability.</p>
           <summary>Source code in <code>generax/distributions/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
 <span class="sd">  - `key`: The random number generator key.</span>
@@ -1252,12 +1265,11 @@ generax.distributions.base.ProbabilityPath            (<a class="autorefs autore
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="o">*</span><span class="p">,</span>
-               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
-<span class="sd">    - `input_shape`: The dimension of the space.  This can be either</span>
-<span class="sd">            an integer or a tuple of integers to represent images</span>
+<span class="sd">    - `input_shape`: The dimensions of the samples</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
@@ -1354,24 +1366,24 @@ generax.distributions.base.ProbabilityPath            (<a class="autorefs autore
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 
-    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">vector_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                     <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-                     <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-                     <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-<span class="w">      </span><span class="sd">&quot;&quot;&quot;The vector field that samples evolve on as t changes</span>
+  <span class="nd">@abstractmethod</span>
+  <span class="k">def</span> <span class="nf">vector_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                    <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                    <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The vector field that samples evolve on as t changes</span>
 
-<span class="sd">      **Arguments**:</span>
+<span class="sd">    **Arguments**:</span>
 
-<span class="sd">      - `t`: Time.</span>
-<span class="sd">      - `xt`: A point in the base space.</span>
-<span class="sd">      - `y`: The (optional) conditioning information.</span>
+<span class="sd">    - `t`: Time.</span>
+<span class="sd">    - `xt`: A point in the base space.</span>
+<span class="sd">    - `y`: The (optional) conditioning information.</span>
 
-<span class="sd">      **Returns**:</span>
-<span class="sd">      dxt/dt</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">pass</span>
+<span class="sd">    **Returns**:</span>
+<span class="sd">    dxt/dt</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
 </code></pre></div>
         </details>
 
@@ -1392,7 +1404,7 @@ generax.distributions.base.ProbabilityPath            (<a class="autorefs autore
 
 
 <h5 id="generax.distributions.base.ProbabilityPath.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.distributions.base.ProbabilityPath.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1401,20 +1413,18 @@ generax.distributions.base.ProbabilityPath            (<a class="autorefs autore
 
       <p><strong>Arguments</strong>:</p>
 <ul>
-<li><code>input_shape</code>: The dimension of the space.  This can be either
-        an integer or a tuple of integers to represent images</li>
+<li><code>input_shape</code>: The dimensions of the samples</li>
 </ul>
 
         <details class="quote">
           <summary>Source code in <code>generax/distributions/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="o">*</span><span class="p">,</span>
-             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
-<span class="sd">  - `input_shape`: The dimension of the space.  This can be either</span>
-<span class="sd">          an integer or a tuple of integers to represent images</span>
+<span class="sd">  - `input_shape`: The dimensions of the samples</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
@@ -1676,25 +1686,59 @@ The log likelihood of x under the model.</p>
 <span class="sd">  (xt, dxt/dt)</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="k">pass</span>
+</code></pre></div>
+        </details>
+    </div>
 
-  <span class="nd">@abstractmethod</span>
-  <span class="k">def</span> <span class="nf">vector_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                   <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-                   <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-                   <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The vector field that samples evolve on as t changes</span>
+  </div>
 
-<span class="sd">    **Arguments**:</span>
 
-<span class="sd">    - `t`: Time.</span>
-<span class="sd">    - `xt`: A point in the base space.</span>
-<span class="sd">    - `y`: The (optional) conditioning information.</span>
 
-<span class="sd">    **Returns**:</span>
-<span class="sd">    dxt/dt</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.ProbabilityPath.vector_field" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">vector_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#generax.distributions.base.ProbabilityPath.vector_field" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>The vector field that samples evolve on as t changes</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>t</code>: Time.</li>
+<li><code>xt</code>: A point in the base space.</li>
+<li><code>y</code>: The (optional) conditioning information.</li>
+</ul>
+<p><strong>Returns</strong>:
+dxt/dt</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">vector_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                  <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                  <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                  <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;The vector field that samples evolve on as t changes</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `t`: Time.</span>
+<span class="sd">  - `xt`: A point in the base space.</span>
+<span class="sd">  - `y`: The (optional) conditioning information.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  dxt/dt</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">pass</span>
 </code></pre></div>
         </details>
     </div>
@@ -1790,7 +1834,7 @@ generax.distributions.base.Gaussian            (<a class="autorefs autorefs-inte
 
 
 <h5 id="generax.distributions.base.Gaussian.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.distributions.base.Gaussian.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1799,20 +1843,18 @@ generax.distributions.base.Gaussian            (<a class="autorefs autorefs-inte
 
       <p><strong>Arguments</strong>:</p>
 <ul>
-<li><code>input_shape</code>: The dimension of the space.  This can be either
-        an integer or a tuple of integers to represent images</li>
+<li><code>input_shape</code>: The dimensions of the samples</li>
 </ul>
 
         <details class="quote">
           <summary>Source code in <code>generax/distributions/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="o">*</span><span class="p">,</span>
-             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
-<span class="sd">  - `input_shape`: The dimension of the space.  This can be either</span>
-<span class="sd">          an integer or a tuple of integers to represent images</span>
+<span class="sd">  - `input_shape`: The dimensions of the samples</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
