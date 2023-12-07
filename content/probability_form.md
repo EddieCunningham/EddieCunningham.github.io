@@ -2,7 +2,6 @@ Title: Probability measures using Riemannian densities
 Date: 2023-07-16
 Modified: 2023-07-16
 Category: Blog
-<!-- status: hidden -->
 Tags: riemannian geometry, differential geometry
 Slug: probability_measure
 Summary: A connection between generative models and Riemannian geometry.

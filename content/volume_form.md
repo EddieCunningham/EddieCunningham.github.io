@@ -2,7 +2,6 @@ Title: Volume form
 Date: 2023-07-16
 Modified: 2023-07-16
 Category: Blog
-<!-- status: hidden -->
 Tags: riemannian geometry, volume form, differential geometry
 Slug: volume-form
 Summary: An intro to the Riemannian volume form

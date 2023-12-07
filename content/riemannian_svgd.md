@@ -2,7 +2,6 @@ Title: Riemannian stein variational gradient descent
 Date: 2023-07-15
 Modified: 2023-07-15
 Category: Blog
-<!-- status: hidden -->
 Tags: stein discrepancy, kernels, stein variational gradient descent, rkhs
 Slug: stein-vi
 Summary: A tutorial on Stein variational gradient descent

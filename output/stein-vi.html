@@ -80,17 +80,17 @@
             <p>The Stein discrepancy measure is a way of measuring the distance between two probability distributions.  It is used in Stein variational gradient descent (SVGD) to construct a flow that minimizes the reverse KL divergence to a target distribution.  In this post, we'll go over the kernel Stein discrepancy as introduced by <a href="https://arxiv.org/pdf/1602.03253.pdf">Liu et al.</a> and the extensions in <a href="https://arxiv.org/pdf/1711.11216.pdf">Liu and Zhu</a>.</p>
 <h1>Motivation</h1>
 <p>Consider the task of minimizing the reverse KL divergence between a target distribution <span class="math">\(p\)</span> and a model distribution <span class="math">\(q\)</span> over a Riemannian manifold <span class="math">\((\mathcal{M},g)\)</span>.  If we have a probability path as the solution where <span class="math">\(q_t\)</span> where <span class="math">\(q_0\)</span> is arbitrary and <span class="math">\(q_1 = p\)</span>, then we could be interested in seeing how the reverse KL divergence between <span class="math">\(q_t\)</span> and <span class="math">\(p\)</span> changes as <span class="math">\(t\)</span> changes.</p>
-<p>Let <span class="math">\((q_t, V_t)\)</span> be a probability path between <span class="math">\(q_0\)</span> and <span class="math">\(q_1\)</span> where <span class="math">\(V_t\in \mathfrak{X}(\mathcal{M})\)</span> is the vector field that generates the flow of <span class="math">\(q_t\)</span> and let <span class="math">\(\omega_g\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the time derivative of the reverse KL divergence is:
+<p>Let <span class="math">\((q_t, V_t)\)</span> be a probability path between <span class="math">\(q_0\)</span> and <span class="math">\(q_1\)</span> where <span class="math">\(V_t\in \mathfrak{X}(\mathcal{M})\)</span> is the vector field that generates the flow of <span class="math">\(q_t\)</span> and let <span class="math">\(dV_g\)</span> be the volume form on <span class="math">\(\mathcal{M}\)</span>.  Then the time derivative of the reverse KL divergence is:
 </p>
 <div class="math">$$
 \begin{align}
-  \frac{d}{dt}\text{KL}\left[q_t||p\right] &amp;= \int \frac{d}{dt}q_t\log \frac{q_t}{p}\omega_g \\
-  &amp;= \int \left((\frac{d q_t}{dt})\log \frac{q_t}{p} + q_t\frac{d \log q}{dt}\right)\omega_g \\
-  &amp;= \int \left(-\text{Div}(q_t V_t) \log \frac{q_t}{p} + \underbrace{\frac{d q}{dt}}_{\text{$0$ in expectation}}\right)\omega_g \\
-  &amp;= \int \langle \text{grad } \log \frac{q_t}{p} , q_t V_t\rangle_g\omega_g \\
-  &amp;= \int q_t\left( \langle \text{grad } \log q_t , V_t\rangle_g - \langle \text{grad } \log p, V_t\rangle_g \right)\omega_g \\
-  &amp;= \int \langle \text{grad } q_t , V_t\rangle_g \omega_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g \omega_g \\
-  &amp;= -\int q_t \text{Div}(V_t) \omega_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g \omega_g \\
+  \frac{d}{dt}\text{KL}\left[q_t||p\right] &amp;= \int \frac{d}{dt}q_t\log \frac{q_t}{p}dV_g \\
+  &amp;= \int \left((\frac{d q_t}{dt})\log \frac{q_t}{p} + q_t\frac{d \log q}{dt}\right)dV_g \\
+  &amp;= \int \left(-\text{Div}(q_t V_t) \log \frac{q_t}{p} + \underbrace{\frac{d q}{dt}}_{\text{$0$ in expectation}}\right)dV_g \\
+  &amp;= \int \langle \text{grad } \log \frac{q_t}{p} , q_t V_t\rangle_gdV_g \\
+  &amp;= \int q_t\left( \langle \text{grad } \log q_t , V_t\rangle_g - \langle \text{grad } \log p, V_t\rangle_g \right)dV_g \\
+  &amp;= \int \langle \text{grad } q_t , V_t\rangle_g dV_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g dV_g \\
+  &amp;= -\int q_t \text{Div}(V_t) dV_g - \int q_t\langle \text{grad } \log p, V_t\rangle_g dV_g \\
   &amp;= -\mathbb{E}_{q_t}\left[\langle \text{grad } \log p, V_t \rangle_g + \text{Div}(V_t)\right]
 \end{align}
 $$</div>
@@ -127,7 +127,7 @@ $$</div>
 \end{align}
 $$</div>
 <p>
-where <span class="math">\(\mathcal{H}_k\)</span> is a reproducing kernel Hilbert space (RKHS) with kernel <span class="math">\(K\)</span>.  Check out my <a href="reproducing_kernel_hilbert_space.md">post on RKHS</a> for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that <span class="math">\(V_t = \text{grad } f_t\)</span>.  Also recall that <span class="math">\(\text{grad } f_t = \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K}\)</span> and <span class="math">\(\text{Div}(\text{grad } f_t) = \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}\)</span>.</p>
+where <span class="math">\(\mathcal{H}_k\)</span> is a reproducing kernel Hilbert space (RKHS) with kernel <span class="math">\(K\)</span>.  Check out my <a href="/reproducing-kernel-hilbert-space.html">post on RKHS</a> for a quick introduction to RKHS and derivations of the properties that we'll use here.  Say that <span class="math">\(V_t = \text{grad } f_t\)</span>.  Also recall that <span class="math">\(\text{grad } f_t = \langle f_t, \text{grad }  K_x \rangle_{\mathcal{H}_K}\)</span> and <span class="math">\(\text{Div}(\text{grad } f_t) = \langle f_t, \text{Div}(\text{grad }  K_x) \rangle_{\mathcal{H}_K}\)</span>.</p>
 <p>Then we can simplify the objective further by rewriting <span class="math">\(V_t\)</span> in terms of <span class="math">\(f_t\)</span>:
 </p>
 <div class="math">$$
@@ -233,12 +233,16 @@ $$</div>
             <h4>Tags</h4>
             <ul class="list-of-tags tags-in-article">
                 <li><a href="/tags.html#kernels-ref">kernels
+                    <span>2</span>
 </a></li>
                 <li><a href="/tags.html#rkhs-ref">rkhs
+                    <span>2</span>
 </a></li>
                 <li><a href="/tags.html#stein-discrepancy-ref">stein discrepancy
+                    <span>1</span>
 </a></li>
                 <li><a href="/tags.html#stein-variational-gradient-descent-ref">stein variational gradient descent
+                    <span>1</span>
 </a></li>
             </ul>
             

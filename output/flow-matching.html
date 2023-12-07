@@ -9,17 +9,17 @@
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary">
 
-<meta name="keywords" content=", Blog, " />
+<meta name="keywords" content="flows, matching, generative models, Blog, " />
 
 <meta property="og:title" content="Flow matching "/>
 <meta property="og:url" content="/flow-matching.html" />
-<meta property="og:description" content="Tags: flows, matching, generative models Slug: flow-matching Summary: A tutorial on flow matching Flow matching is probably the most important contribution to the field of normalizing flows in the last few years. It allows us to train continuous normalizing flows in a simulation free way while also avoiding the pitfalls …" />
+<meta property="og:description" content="A tutorial on flow matching" />
 <meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
 <meta property="og:article:published_time" content="2023-07-15T00:00:00-05:00" />
 <meta property="og:article:modified_time" content="2023-07-15T00:00:00-05:00" />
 <meta name="twitter:title" content="Flow matching ">
-<meta name="twitter:description" content="Tags: flows, matching, generative models Slug: flow-matching Summary: A tutorial on flow matching Flow matching is probably the most important contribution to the field of normalizing flows in the last few years. It allows us to train continuous normalizing flows in a simulation free way while also avoiding the pitfalls …">
+<meta name="twitter:description" content="A tutorial on flow matching">
 
         <title>Flow matching  · 
 </title>
@@ -77,11 +77,7 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <!-- status: hidden -->
-<p>Tags: flows, matching, generative models
-Slug: flow-matching
-Summary: A tutorial on flow matching</p>
-<p>Flow matching is probably the most important contribution to the field of normalizing flows in the last few years.  It allows us to train continuous normalizing flows in a simulation free way while also avoiding the pitfalls that comes with working with likelihoods.  In this tutorial, we'll go over what flow matching is and some of its practical properties.</p>
+            <p>Flow matching is probably the most important contribution to the field of normalizing flows in the last few years.  It allows us to train continuous normalizing flows in a simulation free way while also avoiding the pitfalls that comes with working with likelihoods.  In this tutorial, we'll go over what flow matching is and some of its practical properties.</p>
 <h1>Overview</h1>
 <p>Say that we are trying to learn a parametric approximation of an unknown probability distribution that we can sample from.  The first <a href="https://arxiv.org/pdf/2210.02747.pdf">flow matching paper</a> showed how we can <strong>construct</strong> a continuous normalizing flow that generates this target from any user specified prior.  Moreover, this flow that we can write down is something that we can use as a target to train a parametric model against.  This training algorithm does not suffer from the common pitfalls that maximum likelihood or score matching suffer from because it does not require us to compute likelihoods or score functions.  If you're not familiar with continuous normalizing flows, check out <a href="/continuous-normalizing-flows.html">my post</a> on them.</p>
 <h1>CNF construction</h1>
@@ -274,6 +270,18 @@ So the pseudo code to train a CNF using flow matching with the conditional optim
 
             <h4>Category</h4>
             <a class="category-link" href="/categories.html#blog-ref">Blog</a>
+            <h4>Tags</h4>
+            <ul class="list-of-tags tags-in-article">
+                <li><a href="/tags.html#flows-ref">flows
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#generative-models-ref">generative models
+                    <span>2</span>
+</a></li>
+                <li><a href="/tags.html#matching-ref">matching
+                    <span>2</span>
+</a></li>
+            </ul>
             
 
 

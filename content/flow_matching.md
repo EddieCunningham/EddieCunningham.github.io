@@ -2,7 +2,6 @@ Title: Flow matching
 Date: 2023-07-15
 Modified: 2023-07-15
 Category: Blog
-<!-- status: hidden -->
 Tags: flows, matching, generative models
 Slug: flow-matching
 Summary: A tutorial on flow matching

@@ -2,7 +2,6 @@ Title: The Dynamics of SDE based MCMC
 Date: 2023-07-16
 Modified: 2023-07-16
 Category: Blog
-<!-- status: hidden -->
 Tags: mcmc, differential equations
 Slug: mcmc_dynamics
 Summary: A look at the probability path of MCMC

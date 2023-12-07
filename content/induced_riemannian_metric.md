@@ -2,7 +2,6 @@ Title: Geometry on submanifolds
 Date: 2023-07-16
 Modified: 2023-07-16
 Category: Blog
-<!-- status: hidden -->
 Tags: riemannian metric
 Slug: submanifolds
 Summary: A look at how the Riemannian metric on a manifold can be used to define a Riemannian metric on a submanifold.
