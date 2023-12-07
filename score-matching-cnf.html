@@ -11,16 +11,16 @@
 
 <meta name="keywords" content=", Blog, " />
 
-<meta property="og:title" content="Score matching with CNFs "/>
+<meta property="og:title" content="Likelihood gradient dynamics "/>
 <meta property="og:url" content="/score-matching-cnf.html" />
-<meta property="og:description" content="Training CNFs with score matching" />
+<meta property="og:description" content="The dynamics of the score function" />
 <meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
 <meta property="og:article:published_time" content="2023-11-25T00:00:00-05:00" />
-<meta name="twitter:title" content="Score matching with CNFs ">
-<meta name="twitter:description" content="Training CNFs with score matching">
+<meta name="twitter:title" content="Likelihood gradient dynamics ">
+<meta name="twitter:description" content="The dynamics of the score function">
 
-        <title>Score matching with CNFs  · 
+        <title>Likelihood gradient dynamics  · 
 </title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
@@ -67,7 +67,7 @@
     <header class="page-header span10 offset2">
         <h1>
             <a href="/score-matching-cnf.html">
-                Score matching with CNFs
+                Likelihood gradient dynamics
             </a>
         </h1>
     </header>
@@ -76,36 +76,72 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <h1>Score function dynamics</h1>
-<p>First lets see how the gradient of any time-dependent function changes w.r.t. time.  Let <span class="math">\(f_t\)</span> be a time-dependent function.  Then
+            <h1>Motivation</h1>
+<p>From another post, we saw that the vector field
+</p>
+<div class="math">$$
+\begin{align}
+  V_t &amp;= A(\nabla \log p^* - \nabla \log p_t), \text{ where }A \in \mathbb{R}^{d\times d}
+\end{align}
+$$</div>
+<p>
+generates a flow whose probability path is the same as that of stochastic gradient MCMC.  So a sample <span class="math">\(x_t\)</span> that evolves under <span class="math">\(V_t\)</span> will slowly become more distributed like <span class="math">\(p^*\)</span>.  However in order to do this in practice, we need to know the score function <span class="math">\(\nabla \log p_t\)</span> at every time.  In this post we'll show how to keep track of the score function dynamics.</p>
+<h1>Gradient dynamics</h1>
+<p>First we need to know how the gradient function changes over time.  Recall that the gradient <span class="math">\(\nabla_{x_t}\)</span> depends on the time <span class="math">\(t\)</span>.  Let <span class="math">\(f_t\)</span> be a time-dependent function.  Then
 </p>
 <div class="math">$$
 \begin{align}
   \frac{d}{dt}\frac{\partial f_t}{\partial x_t^i} &amp;= \frac{d}{dt}\frac{\partial x_0^j}{\partial x_t^i}\frac{\partial f_t}{\partial x_0^j} \\
   &amp;= \left(\frac{d}{dt}\frac{\partial x_0^j}{\partial x_t^i}\right)\frac{\partial f_t}{\partial x_0^j} + \frac{\partial x_0^j}{\partial x_t^i}\left(\frac{d}{dt}\frac{\partial f_t}{\partial x_0^j}\right) \\
-  &amp;= \left( -\frac{\partial x_0^j}{\partial x_t^k} \frac{\partial u_t^k}{\partial x_t^i} \right)\frac{\partial f_t}{\partial x_0^j} + \frac{\partial x_0^j}{\partial x_t^i}\left(\frac{\partial}{\partial x_0^j}\frac{d f_t}{dt}\right) \\
-  &amp;= -\frac{\partial u_t^k}{\partial x_t^i}\frac{\partial f_t}{\partial x_t^k} + \frac{\partial}{\partial x_t^i}\frac{d f_t}{dt}
+  &amp;= \left( -\frac{\partial x_0^j}{\partial x_t^k} \frac{\partial V_t^k}{\partial x_t^i} \right)\frac{\partial f_t}{\partial x_0^j} + \frac{\partial x_0^j}{\partial x_t^i}\left(\frac{\partial}{\partial x_0^j}\frac{d f_t}{dt}\right) \\
+  &amp;= -\frac{\partial V_t^k}{\partial x_t^i}\frac{\partial f_t}{\partial x_t^k} + \frac{\partial}{\partial x_t^i}\frac{d f_t}{dt}
 \end{align}
 $$</div>
 <p>
-In operator form, we can write:
+In matrix form, we have
 </p>
 <div class="math">$$
-\frac{d}{dt}\frac{\partial}{\partial x_t^i} = -\frac{\partial u_t^k}{\partial x_t^i}\frac{\partial}{\partial x_t^k} + \frac{\partial}{\partial x_t^i}\frac{d}{dt}
+\frac{d}{dt}\nabla f_t = -\nabla V_t^T\nabla f_t + \nabla\frac{d}{dt} f_t
 $$</div>
-<p>So plugging in <span class="math">\(\log p_t\)</span> for <span class="math">\(f_t\)</span>, we have that
-</p>
+<h1>Likelihood dynamics</h1>
+<p>Next lets see how the dynamics of derivatives of the likelihood function.  Also we'll take a look at what these values using <span class="math">\(V_t\)</span> from above with <span class="math">\(A=I\)</span>.</p>
+<h3>Likelihood</h3>
 <div class="math">$$
 \begin{align}
-  \frac{d}{dt}\frac{\partial \log p_t}{\partial x_t^i} &amp;= -\frac{\partial u_t^k}{\partial x_t^i}\frac{\partial \log p_t}{\partial x_t^k} + \frac{\partial}{\partial x_t^i}\frac{d \log p_t}{dt} \\
-  &amp;= -\frac{\partial u_t^k}{\partial x_t^i}\frac{\partial \log p_t}{\partial x_t^k} - \frac{\partial}{\partial x_t^i}\frac{\partial u_t^k}{\partial x_t^k}
+\frac{d\log p_t}{dt} &amp;= -\text{Div}(V_t)
 \end{align}
 $$</div>
-<p>
-which in matrix notation is:
-</p>
+<h3>Score function</h3>
 <div class="math">$$
-\frac{d}{dt}\nabla \log p_t = -\nabla u_t^T\nabla \log p_t - \nabla \text{Tr}(\nabla u_t)
+\begin{align}
+\frac{d\nabla \log p_t}{dt} &amp;= -\nabla V_t^T\nabla \log p_t + \nabla \frac{d\log p_t}{dt}
+\end{align}
+$$</div>
+<h3>Hessian</h3>
+<div class="math">$$
+\begin{align}
+\frac{d\nabla^2 \log p_t}{dt} &amp;= -\nabla V_t^T\nabla^2 \log p_t + \nabla \frac{d\nabla \log p_t}{dt} \\
+&amp;= -\nabla V_t^T\nabla^2 \log p_t + \nabla (-\nabla V_t^T\nabla \log p_t + \nabla \frac{d\log p_t}{dt}) \\
+&amp;= -\nabla V_t^T\nabla^2 \log p_t - \nabla^2 V_t^T\nabla \log p_t - \nabla^2 \log p_t \nabla V_t + \nabla^2 \frac{d\log p_t}{dt} \\
+&amp;= -\nabla V_t^T\nabla^2 \log p_t - \nabla^2 \log p_t \nabla V_t - \nabla^2 V_t^T\nabla \log p_t + \nabla^2 \frac{d\log p_t}{dt} \\
+\end{align}
+$$</div>
+<h2>Plugging in values for <span class="math">\(V_t\)</span></h2>
+<div class="math">$$
+\begin{align}
+\frac{d\log p_t}{dt} &amp;= -\text{Div}(\nabla \log p^* - \nabla \log p_t)
+\end{align}
+$$</div>
+<div class="math">$$
+\begin{align}
+\frac{d\nabla \log p_t}{dt} &amp;= -(\nabla^2 \log p^* - \nabla^2 \log p_t)^T\nabla \log p_t + \nabla \frac{d\log p_t}{dt} \\
+&amp;= (\nabla^2 \log p_t - \nabla^2 \log p^*)^T\nabla \log p_t + \nabla \frac{d\log p_t}{dt}
+\end{align}
+$$</div>
+<div class="math">$$
+\begin{align}
+\frac{d\nabla^2 \log p_t}{dt} &amp;= -(\nabla^2 \log p^* - \nabla^2 \log p_t)^T\nabla^2 \log p_t - \nabla^2 \log p_t (\nabla^2 \log p^* - \nabla^2 \log p_t) - (\nabla^3 \log p^* - \nabla^3 \log p_t)^T\nabla \log p_t + \nabla^2 \frac{d\log p_t}{dt} \\
+\end{align}
 $$</div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
