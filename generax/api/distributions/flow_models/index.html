@@ -413,6 +413,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#generax.distributions.flow_models.RectangularFlow" class="md-nav__link">
+    RectangularFlow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#generax.distributions.flow_models.RealNVP" class="md-nav__link">
     RealNVP
   </a>
@@ -464,14 +471,14 @@
       
       
         <label class="md-nav__link" for="__nav_2_2">
-          BijectiveTransforms
+          Transformations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="BijectiveTransforms" data-md-level="2">
+      <nav class="md-nav" aria-label="Transformations" data-md-level="2">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
-          BijectiveTransforms
+          Transformations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -567,6 +574,20 @@
     <li class="md-nav__item">
       <a href="../../flows/compositions/" class="md-nav__link">
         Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../flows/reshape/" class="md-nav__link">
+        Reshape
       </a>
     </li>
   
@@ -1136,45 +1157,6 @@ A single sample from the model.  Use vmap to get more samples.</p>
 
 
 
-<h5 id="generax.distributions.flow_models.NormalizingFlow.score" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
-
-
-<a href="#generax.distributions.flow_models.NormalizingFlow.score" class="headerlink" title="Permanent link">¤</a></h5>
-
-    <div class="doc doc-contents ">
-
-      <p>Inherited from <a class="autorefs autorefs-internal" href="../distributions/#generax.distributions.base.ProbabilityDistribution.score"><code>generax.distributions.base.ProbabilityDistribution.score</code></a>.</p>
-
-        <details class="quote">
-          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-          <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
-
-<span class="sd">  - `x`: The point we want to compute grad logp(x) at.</span>
-<span class="sd">  - `y`: The (optional) conditioning information.</span>
-<span class="sd">  - `key`: The random number generator key.  Can be passed in the event</span>
-<span class="sd">           that we&#39;re getting a stochastic estimate of the log prob.</span>
-
-<span class="sd">  **Returns**:</span>
-<span class="sd">  The log likelihood of x under the model.</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="k">return</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prob</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
 <h5 id="generax.distributions.flow_models.NormalizingFlow.log_prob" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
 
@@ -1208,6 +1190,45 @@ The log likelihood of x under the model.</p>
   <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
   <span class="n">log_pz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">log_pz</span> <span class="o">+</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.flow_models.NormalizingFlow.score" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.flow_models.NormalizingFlow.score" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../distributions/#generax.distributions.base.ProbabilityDistribution.score"><code>generax.distributions.base.ProbabilityDistribution.score</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The point we want to compute grad logp(x) at.</span>
+<span class="sd">  - `y`: The (optional) conditioning information.</span>
+<span class="sd">  - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">           that we&#39;re getting a stochastic estimate of the log prob.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  The log likelihood of x under the model.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prob</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -1262,6 +1283,446 @@ A new flow with the parameters initialized.</p>
   <span class="c1"># Turn the new parameters into a new module</span>
   <span class="n">get_transform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">transform</span>
   <span class="k">return</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_transform</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">new_layer</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.distributions.flow_models.RectangularFlow" class="doc doc-heading">
+        <code>
+generax.distributions.flow_models.RectangularFlow            (<a class="autorefs autorefs-internal" title="generax.distributions.flow_models.NormalizingFlow" href="#generax.distributions.flow_models.NormalizingFlow">NormalizingFlow</a>)
+        </code>
+
+
+
+<a href="#generax.distributions.flow_models.RectangularFlow" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>A flow with an injective transformation, i.e. the base space has a lower
+dimensionality than the data space.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">RectangularFlow</span><span class="p">(</span><span class="n">NormalizingFlow</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;A flow with an injective transformation, i.e. the base space has a lower</span>
+<span class="sd">  dimensionality than the data space.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">transform</span><span class="p">:</span> <span class="n">InjectiveTransform</span>
+  <span class="n">output_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">transform</span><span class="p">:</span> <span class="n">InjectiveTransform</span><span class="p">,</span>
+                <span class="n">prior</span><span class="p">:</span> <span class="n">ProbabilityDistribution</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `transform`: A bijective transformation</span>
+<span class="sd">    - `prior`: The prior distribution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">InjectiveTransform</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">output_shape</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">output_shape</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                     <span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+              <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+              <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Project a point onto the image of the transformation.</span>
+
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `x`: The input to the transformation</span>
+<span class="sd">    - `y`: The conditioning information</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    z</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `key`: The random number generator key.</span>
+<span class="sd">    - `y`: The conditioning information</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    A single sample from the model.  Use vmap to get more samples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">z</span><span class="p">,</span> <span class="n">log_pz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">log_determiant</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_pz</span> <span class="o">+</span> <span class="n">log_det</span>
+
+  <span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `x`: The point we want to compute logp(x) at.</span>
+<span class="sd">    - `y`: The conditioning information</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    The log likelihood of x under the model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">log_pz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">log_determiant</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">log_pz</span> <span class="o">+</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.flow_models.RectangularFlow.sample" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.flow_models.RectangularFlow.sample" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>key</code>: The random number generator key.</li>
+</ul>
+<p><strong>Returns</strong>:
+Samples from the model</p>
+<p>Use eqx.filter_vmap to get more samples!  For example,
+<div class="highlight"><pre><span></span><code><span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_vmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">)(</span><span class="n">keys</span><span class="p">)</span>
+</code></pre></div></p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+           <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+           <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `key`: The random number generator key.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  Samples from the model</span>
+
+<span class="sd">  Use eqx.filter_vmap to get more samples!  For example,</span>
+<span class="sd">  ```python</span>
+<span class="sd">  keys = random.split(key, n_samples)</span>
+<span class="sd">  samples = eqx.filter_vmap(self.sample)(keys)</span>
+<span class="sd">  ```</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.flow_models.RectangularFlow.score" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.flow_models.RectangularFlow.score" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The point we want to compute grad logp(x) at.</li>
+<li><code>y</code>: The (optional) conditioning information.</li>
+<li><code>key</code>: The random number generator key.  Can be passed in the event
+         that we're getting a stochastic estimate of the log prob.</li>
+</ul>
+<p><strong>Returns</strong>:
+The log likelihood of x under the model.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The point we want to compute grad logp(x) at.</span>
+<span class="sd">  - `y`: The (optional) conditioning information.</span>
+<span class="sd">  - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">           that we&#39;re getting a stochastic estimate of the log prob.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  The log likelihood of x under the model.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prob</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.flow_models.RectangularFlow.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
+
+
+<a href="#generax.distributions.flow_models.RectangularFlow.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="#generax.distributions.flow_models.NormalizingFlow.data_dependent_init"><code>generax.distributions.flow_models.NormalizingFlow.data_dependent_init</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on a batch of data.</span>
+<span class="sd">  This is one of the few times that $x$ is expected to be batched.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The data to initialize the parameters with.</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  A new flow with the parameters initialized.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">new_layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="c1"># Turn the new parameters into a new module</span>
+  <span class="n">get_transform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">transform</span>
+  <span class="k">return</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_transform</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">new_layer</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.flow_models.RectangularFlow.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transform</span><span class="p">:</span> <span class="n">InjectiveTransform</span><span class="p">,</span> <span class="n">prior</span><span class="p">:</span> <span class="n">ProbabilityDistribution</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.distributions.flow_models.RectangularFlow.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>transform</code>: A bijective transformation</li>
+<li><code>prior</code>: The prior distribution</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">transform</span><span class="p">:</span> <span class="n">InjectiveTransform</span><span class="p">,</span>
+              <span class="n">prior</span><span class="p">:</span> <span class="n">ProbabilityDistribution</span><span class="p">,</span>
+              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `transform`: A bijective transformation</span>
+<span class="sd">  - `prior`: The prior distribution</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">InjectiveTransform</span><span class="p">)</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">output_shape</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">output_shape</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                   <span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.flow_models.RectangularFlow.project" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.flow_models.RectangularFlow.project" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Project a point onto the image of the transformation.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+z</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Project a point onto the image of the transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  z</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.flow_models.RectangularFlow.sample_and_log_prob" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.flow_models.RectangularFlow.sample_and_log_prob" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>key</code>: The random number generator key.</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+A single sample from the model.  Use vmap to get more samples.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `key`: The random number generator key.</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  A single sample from the model.  Use vmap to get more samples.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">z</span><span class="p">,</span> <span class="n">log_pz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+  <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="n">log_det</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">log_determiant</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_pz</span> <span class="o">+</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.flow_models.RectangularFlow.log_prob" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.flow_models.RectangularFlow.log_prob" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The point we want to compute logp(x) at.</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+The log likelihood of x under the model.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/flow_models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The point we want to compute logp(x) at.</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  The log likelihood of x under the model.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="n">log_pz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+  <span class="n">log_det</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">log_determiant</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">log_pz</span> <span class="o">+</span> <span class="n">log_det</span>
 </code></pre></div>
         </details>
     </div>

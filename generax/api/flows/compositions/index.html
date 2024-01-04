@@ -401,14 +401,14 @@
       
       
         <label class="md-nav__link" for="__nav_2_2">
-          BijectiveTransforms
+          Transformations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="BijectiveTransforms" data-md-level="2">
+      <nav class="md-nav" aria-label="Transformations" data-md-level="2">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
-          BijectiveTransforms
+          Transformations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -544,6 +544,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#generax.flows.models.NICETransform" class="md-nav__link">
+    NICETransform
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#generax.flows.models.RealNVPTransform" class="md-nav__link">
     RealNVPTransform
   </a>
@@ -557,10 +564,52 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#generax.flows.models.GeneralImageTransform" class="md-nav__link">
+    GeneralImageTransform
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generax.flows.models.NICEImageTransform" class="md-nav__link">
+    NICEImageTransform
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generax.flows.models.RealNVPImageTransform" class="md-nav__link">
+    RealNVPImageTransform
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generax.flows.models.NeuralSplineImageTransform" class="md-nav__link">
+    NeuralSplineImageTransform
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reshape/" class="md-nav__link">
+        Reshape
+      </a>
     </li>
   
 
@@ -834,7 +883,7 @@
 
 <h4 id="generax.flows.models.GeneralTransform" class="doc doc-heading">
         <code>
-generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-internal" title="generax.flows.base.Sequential" href="../base/#generax.flows.base.Sequential">Sequential</a>)
+generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-internal" title="generax.flows.base.Repeat" href="../base/#generax.flows.base.Repeat">Repeat</a>)
         </code>
 
 
@@ -847,7 +896,7 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/models.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralTransform</span><span class="p">(</span><span class="n">Sequential</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralTransform</span><span class="p">(</span><span class="n">Repeat</span><span class="p">):</span>
 
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">TransformType</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
@@ -858,22 +907,19 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
                <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
                <span class="n">filter_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
                <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">coupling_split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="n">create_net</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKeyArray</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="o">*</span><span class="p">,</span>
                <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-    <span class="c1"># Build a dummy transfom to get the input and output shapes</span>
-    <span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">net_input_shape</span> <span class="o">=</span> <span class="n">Coupling</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">TransformType</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
-                              <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-    <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">Coupling</span><span class="o">.</span><span class="n">get_net_output_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">init_transform</span><span class="p">(</span><span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">TransformType</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
+                           <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                           <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-      <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">net_input_shape</span>
-      <span class="k">assert</span> <span class="n">net_output_size</span><span class="o">%</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">W</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-      <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">net_output_size</span> <span class="o">//</span> <span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">W</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">create_net</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_net</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
       <span class="k">return</span> <span class="n">ResNet</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">net_input_shape</span><span class="p">,</span>
                     <span class="n">working_size</span><span class="o">=</span><span class="n">working_size</span><span class="p">,</span>
                     <span class="n">hidden_size</span><span class="o">=</span><span class="n">hidden_size</span><span class="p">,</span>
@@ -882,28 +928,29 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
                     <span class="n">filter_shape</span><span class="o">=</span><span class="n">filter_shape</span><span class="p">,</span>
                     <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
                     <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">create_net</span> <span class="o">=</span> <span class="n">create_net</span> <span class="k">if</span> <span class="n">create_net</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_create_net</span>
 
-    <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">n_flow_layers</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
-      <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span><span class="p">,</span> <span class="n">k4</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-      <span class="n">transform</span> <span class="o">=</span> <span class="n">TransformType</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
-                                <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
-                                <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
-      <span class="n">layer</span> <span class="o">=</span> <span class="n">Coupling</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span>
-                       <span class="n">create_net</span><span class="p">(</span><span class="n">k2</span><span class="p">),</span>
+    <span class="k">def</span> <span class="nf">make_single_flow_layer</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequential</span><span class="p">:</span>
+      <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+      <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">layer</span> <span class="o">=</span> <span class="n">Coupling</span><span class="p">(</span><span class="n">init_transform</span><span class="p">,</span>
+                       <span class="n">create_net</span><span class="p">,</span>
                        <span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                        <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
-                       <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">)</span>
+                       <span class="n">split_dim</span><span class="o">=</span><span class="n">coupling_split_dim</span><span class="p">,</span>
+                       <span class="n">reverse_conditioning</span><span class="o">=</span><span class="n">reverse_conditioning</span><span class="p">,</span>
+                       <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
       <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
       <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PLUAffine</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                               <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
-                              <span class="n">key</span><span class="o">=</span><span class="n">k3</span><span class="p">))</span>
+                              <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">))</span>
       <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ShiftScale</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                                <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
-                               <span class="n">key</span><span class="o">=</span><span class="n">k4</span><span class="p">))</span>
+                               <span class="n">key</span><span class="o">=</span><span class="n">k3</span><span class="p">))</span>
+      <span class="k">return</span> <span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">make_single_flow_layer</span><span class="p">,</span> <span class="n">n_flow_layers</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -924,7 +971,7 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
 
 
 <h5 id="generax.flows.models.GeneralTransform.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">TransformType</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">n_flow_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">working_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">filter_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">TransformType</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">n_flow_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">working_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">filter_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">coupling_split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">create_net</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKeyArray</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.flows.models.GeneralTransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -943,22 +990,19 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
              <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
              <span class="n">filter_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
              <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">coupling_split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="n">create_net</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">PRNGKeyArray</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="o">*</span><span class="p">,</span>
              <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-  <span class="c1"># Build a dummy transfom to get the input and output shapes</span>
-  <span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">net_input_shape</span> <span class="o">=</span> <span class="n">Coupling</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
-  <span class="n">transform</span> <span class="o">=</span> <span class="n">TransformType</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
-                            <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-  <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">Coupling</span><span class="o">.</span><span class="n">get_net_output_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">init_transform</span><span class="p">(</span><span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">TransformType</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
+                         <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                         <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
-  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-    <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">net_input_shape</span>
-    <span class="k">assert</span> <span class="n">net_output_size</span><span class="o">%</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">W</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-    <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">net_output_size</span> <span class="o">//</span> <span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">W</span><span class="p">)</span>
-
-  <span class="k">def</span> <span class="nf">create_net</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">_create_net</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">ResNet</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">net_input_shape</span><span class="p">,</span>
                   <span class="n">working_size</span><span class="o">=</span><span class="n">working_size</span><span class="p">,</span>
                   <span class="n">hidden_size</span><span class="o">=</span><span class="n">hidden_size</span><span class="p">,</span>
@@ -967,28 +1011,29 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
                   <span class="n">filter_shape</span><span class="o">=</span><span class="n">filter_shape</span><span class="p">,</span>
                   <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
                   <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+  <span class="n">create_net</span> <span class="o">=</span> <span class="n">create_net</span> <span class="k">if</span> <span class="n">create_net</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_create_net</span>
 
-  <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">n_flow_layers</span><span class="p">)</span>
-  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
-    <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span><span class="p">,</span> <span class="n">k4</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">TransformType</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
-                              <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
-                              <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
-    <span class="n">layer</span> <span class="o">=</span> <span class="n">Coupling</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span>
-                     <span class="n">create_net</span><span class="p">(</span><span class="n">k2</span><span class="p">),</span>
+  <span class="k">def</span> <span class="nf">make_single_flow_layer</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequential</span><span class="p">:</span>
+    <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">Coupling</span><span class="p">(</span><span class="n">init_transform</span><span class="p">,</span>
+                     <span class="n">create_net</span><span class="p">,</span>
                      <span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                      <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
-                     <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">)</span>
+                     <span class="n">split_dim</span><span class="o">=</span><span class="n">coupling_split_dim</span><span class="p">,</span>
+                     <span class="n">reverse_conditioning</span><span class="o">=</span><span class="n">reverse_conditioning</span><span class="p">,</span>
+                     <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
     <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
     <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PLUAffine</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                             <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
-                            <span class="n">key</span><span class="o">=</span><span class="n">k3</span><span class="p">))</span>
+                            <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">))</span>
     <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ShiftScale</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                              <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
-                             <span class="n">key</span><span class="o">=</span><span class="n">k4</span><span class="p">))</span>
+                             <span class="n">key</span><span class="o">=</span><span class="n">k3</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">make_single_flow_layer</span><span class="p">,</span> <span class="n">n_flow_layers</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -1055,7 +1100,7 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
 
     <div class="doc doc-contents ">
 
-      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.Sequential.data_dependent_init"><code>generax.flows.base.Sequential.data_dependent_init</code></a>.</p>
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.Repeat.data_dependent_init"><code>generax.flows.base.Repeat.data_dependent_init</code></a>.</p>
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/models.py</code></summary>
@@ -1063,33 +1108,25 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
                         <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
                         <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                         <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+  <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_sequential</span><span class="p">()</span>
 
-<span class="sd">  **Arguments**:</span>
+  <span class="c1"># Apply the data dependent initalization</span>
+  <span class="n">out_seq_layers</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
-<span class="sd">  - `x`: The data to initialize the parameters with.</span>
-<span class="sd">  - `y`: The conditioning information</span>
-<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+  <span class="c1"># Turn the sequential layers into a repeat layer</span>
+  <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_seq_layers</span><span class="p">):</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+    <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
-<span class="sd">  **Returns**:</span>
-<span class="sd">  A new layer with the parameters initialized.</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on batched data&#39;</span>
+  <span class="c1"># Combine the parameters back into a single layer</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">all_params</span><span class="p">)</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+  <span class="n">layers</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
 
-  <span class="c1"># We need to initialize each of the layers</span>
-  <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">)</span>
-
-  <span class="n">new_layers</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">keys</span><span class="p">)):</span>
-    <span class="n">new_layer</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-    <span class="n">new_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_layer</span><span class="p">)</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_vmap</span><span class="p">(</span><span class="n">new_layer</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
-  <span class="n">new_layers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">new_layers</span><span class="p">)</span>
-
-  <span class="c1"># Turn the new parameters into a new module</span>
   <span class="n">get_layers</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">layers</span>
-  <span class="n">updated_layer</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">new_layers</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">updated_layer</span>
+  <span class="n">updated_module</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_module</span>
 </code></pre></div>
         </details>
     </div>
@@ -1110,14 +1147,14 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
 
     <div class="doc doc-contents ">
 
-      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.Sequential.__call__"><code>generax.flows.base.Sequential.__call__</code></a>.</p>
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.Repeat.__call__"><code>generax.flows.base.Repeat.__call__</code></a>.</p>
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/models.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
              <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
@@ -1128,12 +1165,250 @@ generax.flows.models.GeneralTransform            (<a class="autorefs autorefs-in
 <span class="sd">  **Returns**:</span>
 <span class="sd">  (z, log_det)</span>
 <span class="sd">  &quot;&quot;&quot;</span>
-  <span class="n">delta_logpx</span> <span class="o">=</span> <span class="mf">0.0</span>
-  <span class="n">layers</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span> <span class="k">if</span> <span class="n">inverse</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span>
-  <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">delta_logpx</span> <span class="o">+=</span> <span class="n">log_det</span>
-  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">delta_logpx</span>
+  <span class="n">dynamic</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">scan_body</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_body</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dynamic</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.flows.models.NICETransform" class="doc doc-heading">
+        <code>
+generax.flows.models.NICETransform            (<a class="autorefs autorefs-internal" title="generax.flows.models.GeneralTransform" href="#generax.flows.models.GeneralTransform">GeneralTransform</a>)
+        </code>
+
+
+
+<a href="#generax.flows.models.NICETransform" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>NICETransform(<em>args, </em>*kwargs)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">NICETransform</span><span class="p">(</span><span class="n">GeneralTransform</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">Shift</span><span class="p">,</span>
+                     <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NICETransform.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.models.NICETransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">Shift</span><span class="p">,</span>
+                   <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NICETransform.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.NICETransform.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Apply the inverse transformation.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NICETransform.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
+
+
+<a href="#generax.flows.models.NICETransform.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize the parameters of the layer based on the data.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The data to initialize the parameters with.</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+A new layer with the parameters initialized.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+  <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_sequential</span><span class="p">()</span>
+
+  <span class="c1"># Apply the data dependent initalization</span>
+  <span class="n">out_seq_layers</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="c1"># Turn the sequential layers into a repeat layer</span>
+  <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_seq_layers</span><span class="p">):</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+    <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+  <span class="c1"># Combine the parameters back into a single layer</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">all_params</span><span class="p">)</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+  <span class="n">layers</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+
+  <span class="n">get_layers</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">layers</span>
+  <span class="n">updated_module</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_module</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NICETransform.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.NICETransform.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>inverse</code>: Whether to inverse the transformation</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">dynamic</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">scan_body</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_body</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dynamic</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </code></pre></div>
         </details>
     </div>
@@ -1296,33 +1571,25 @@ A new layer with the parameters initialized.</p>
                         <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
                         <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                         <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+  <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_sequential</span><span class="p">()</span>
 
-<span class="sd">  **Arguments**:</span>
+  <span class="c1"># Apply the data dependent initalization</span>
+  <span class="n">out_seq_layers</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
-<span class="sd">  - `x`: The data to initialize the parameters with.</span>
-<span class="sd">  - `y`: The conditioning information</span>
-<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+  <span class="c1"># Turn the sequential layers into a repeat layer</span>
+  <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_seq_layers</span><span class="p">):</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+    <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
-<span class="sd">  **Returns**:</span>
-<span class="sd">  A new layer with the parameters initialized.</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on batched data&#39;</span>
+  <span class="c1"># Combine the parameters back into a single layer</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">all_params</span><span class="p">)</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+  <span class="n">layers</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
 
-  <span class="c1"># We need to initialize each of the layers</span>
-  <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">)</span>
-
-  <span class="n">new_layers</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">keys</span><span class="p">)):</span>
-    <span class="n">new_layer</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-    <span class="n">new_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_layer</span><span class="p">)</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_vmap</span><span class="p">(</span><span class="n">new_layer</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
-  <span class="n">new_layers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">new_layers</span><span class="p">)</span>
-
-  <span class="c1"># Turn the new parameters into a new module</span>
   <span class="n">get_layers</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">layers</span>
-  <span class="n">updated_layer</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">new_layers</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">updated_layer</span>
+  <span class="n">updated_module</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_module</span>
 </code></pre></div>
         </details>
     </div>
@@ -1357,7 +1624,7 @@ A new layer with the parameters initialized.</p>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
              <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
@@ -1368,12 +1635,15 @@ A new layer with the parameters initialized.</p>
 <span class="sd">  **Returns**:</span>
 <span class="sd">  (z, log_det)</span>
 <span class="sd">  &quot;&quot;&quot;</span>
-  <span class="n">delta_logpx</span> <span class="o">=</span> <span class="mf">0.0</span>
-  <span class="n">layers</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span> <span class="k">if</span> <span class="n">inverse</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span>
-  <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">delta_logpx</span> <span class="o">+=</span> <span class="n">log_det</span>
-  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">delta_logpx</span>
+  <span class="n">dynamic</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">scan_body</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_body</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dynamic</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </code></pre></div>
         </details>
     </div>
@@ -1438,6 +1708,36 @@ generax.flows.models.NeuralSplineTransform            (<a class="autorefs autore
 
 
 
+<h5 id="generax.flows.models.NeuralSplineTransform.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_spline_knots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.models.NeuralSplineTransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+             <span class="n">n_spline_knots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">RationalQuadraticSpline</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="n">n_spline_knots</span><span class="p">),</span>
+                   <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h5 id="generax.flows.models.NeuralSplineTransform.inverse" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
 
@@ -1484,36 +1784,6 @@ generax.flows.models.NeuralSplineTransform            (<a class="autorefs autore
 
 
 
-<h5 id="generax.flows.models.NeuralSplineTransform.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_spline_knots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
-
-
-<a href="#generax.flows.models.NeuralSplineTransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
-
-    <div class="doc doc-contents ">
-
-
-        <details class="quote">
-          <summary>Source code in <code>generax/flows/models.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-             <span class="n">n_spline_knots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
-             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">RationalQuadraticSpline</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="n">n_spline_knots</span><span class="p">),</span>
-                   <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
 <h5 id="generax.flows.models.NeuralSplineTransform.data_dependent_init" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
 
@@ -1538,33 +1808,25 @@ A new layer with the parameters initialized.</p>
                         <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
                         <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                         <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+  <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_sequential</span><span class="p">()</span>
 
-<span class="sd">  **Arguments**:</span>
+  <span class="c1"># Apply the data dependent initalization</span>
+  <span class="n">out_seq_layers</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
-<span class="sd">  - `x`: The data to initialize the parameters with.</span>
-<span class="sd">  - `y`: The conditioning information</span>
-<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+  <span class="c1"># Turn the sequential layers into a repeat layer</span>
+  <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_seq_layers</span><span class="p">):</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+    <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
-<span class="sd">  **Returns**:</span>
-<span class="sd">  A new layer with the parameters initialized.</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on batched data&#39;</span>
+  <span class="c1"># Combine the parameters back into a single layer</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">all_params</span><span class="p">)</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+  <span class="n">layers</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
 
-  <span class="c1"># We need to initialize each of the layers</span>
-  <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_layers</span><span class="p">)</span>
-
-  <span class="n">new_layers</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">keys</span><span class="p">)):</span>
-    <span class="n">new_layer</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
-    <span class="n">new_layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_layer</span><span class="p">)</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_vmap</span><span class="p">(</span><span class="n">new_layer</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
-  <span class="n">new_layers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">new_layers</span><span class="p">)</span>
-
-  <span class="c1"># Turn the new parameters into a new module</span>
   <span class="n">get_layers</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">layers</span>
-  <span class="n">updated_layer</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">new_layers</span><span class="p">)</span>
-  <span class="k">return</span> <span class="n">updated_layer</span>
+  <span class="n">updated_module</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_module</span>
 </code></pre></div>
         </details>
     </div>
@@ -1599,7 +1861,7 @@ A new layer with the parameters initialized.</p>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
              <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
@@ -1610,12 +1872,1055 @@ A new layer with the parameters initialized.</p>
 <span class="sd">  **Returns**:</span>
 <span class="sd">  (z, log_det)</span>
 <span class="sd">  &quot;&quot;&quot;</span>
-  <span class="n">delta_logpx</span> <span class="o">=</span> <span class="mf">0.0</span>
-  <span class="n">layers</span> <span class="o">=</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span> <span class="k">if</span> <span class="n">inverse</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span>
-  <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">delta_logpx</span> <span class="o">+=</span> <span class="n">log_det</span>
-  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">delta_logpx</span>
+  <span class="n">dynamic</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">scan_body</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_body</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dynamic</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.flows.models.GeneralImageTransform" class="doc doc-heading">
+        <code>
+generax.flows.models.GeneralImageTransform            (<a class="autorefs autorefs-internal" title="generax.flows.base.Repeat" href="../base/#generax.flows.base.Repeat">Repeat</a>)
+        </code>
+
+
+
+<a href="#generax.flows.models.GeneralImageTransform" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>GeneralImageTransform(<em>args, </em>*kwargs)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralImageTransform</span><span class="p">(</span><span class="n">Repeat</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">TransformType</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+               <span class="n">n_flow_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+               <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">unet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="n">coupling_split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="o">*</span><span class="p">,</span>
+               <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">init_transform</span><span class="p">(</span><span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">TransformType</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
+                           <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                           <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">unet</span><span class="p">:</span>
+      <span class="k">def</span> <span class="nf">create_net</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">net_input_shape</span>
+        <span class="k">return</span> <span class="n">UNet</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">net_input_shape</span><span class="p">,</span>
+                      <span class="n">dim</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                      <span class="n">out_channels</span><span class="o">=</span><span class="n">net_output_size</span><span class="o">//</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">W</span><span class="p">),</span>
+                      <span class="n">dim_mults</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim_mults&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+                      <span class="n">resnet_block_groups</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;resnet_block_groups&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                      <span class="n">attn_heads</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;attn_heads&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                      <span class="n">attn_dim_head</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;attn_dim_head&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                      <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                      <span class="n">time_dependent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">def</span> <span class="nf">create_net</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">net_input_shape</span><span class="p">,</span>
+                      <span class="n">dim</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                      <span class="n">dim_mults</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim_mults&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+                      <span class="n">resnet_block_groups</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;resnet_block_groups&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                      <span class="n">attn_heads</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;attn_heads&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                      <span class="n">attn_dim_head</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;attn_dim_head&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                      <span class="n">out_size</span><span class="o">=</span><span class="n">net_output_size</span><span class="p">,</span>
+                      <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                      <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">make_single_flow_layer</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequential</span><span class="p">:</span>
+      <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+      <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">layer</span> <span class="o">=</span> <span class="n">Coupling</span><span class="p">(</span><span class="n">init_transform</span><span class="p">,</span>
+                       <span class="n">create_net</span><span class="p">,</span>
+                       <span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                       <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                       <span class="n">split_dim</span><span class="o">=</span><span class="n">coupling_split_dim</span><span class="p">,</span>
+                       <span class="n">reverse_conditioning</span><span class="o">=</span><span class="n">reverse_conditioning</span><span class="p">,</span>
+                       <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
+      <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+      <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OneByOneConv</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                                 <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">))</span>
+      <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ShiftScale</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                               <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                               <span class="n">key</span><span class="o">=</span><span class="n">k3</span><span class="p">))</span>
+      <span class="k">return</span> <span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">make_single_flow_layer</span><span class="p">,</span> <span class="n">n_flow_layers</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.GeneralImageTransform.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">TransformType</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">n_flow_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">unet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">coupling_split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.models.GeneralImageTransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">TransformType</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+             <span class="n">n_flow_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+             <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">unet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+             <span class="n">coupling_split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">*</span><span class="p">,</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+  <span class="k">def</span> <span class="nf">init_transform</span><span class="p">(</span><span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">TransformType</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
+                         <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                         <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">unet</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">create_net</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+      <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">net_input_shape</span>
+      <span class="k">return</span> <span class="n">UNet</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">net_input_shape</span><span class="p">,</span>
+                    <span class="n">dim</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">out_channels</span><span class="o">=</span><span class="n">net_output_size</span><span class="o">//</span><span class="p">(</span><span class="n">H</span><span class="o">*</span><span class="n">W</span><span class="p">),</span>
+                    <span class="n">dim_mults</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim_mults&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+                    <span class="n">resnet_block_groups</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;resnet_block_groups&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                    <span class="n">attn_heads</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;attn_heads&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                    <span class="n">attn_dim_head</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;attn_dim_head&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                    <span class="n">time_dependent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">create_net</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">net_input_shape</span><span class="p">,</span>
+                    <span class="n">dim</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">dim_mults</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;dim_mults&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+                    <span class="n">resnet_block_groups</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;resnet_block_groups&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+                    <span class="n">attn_heads</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;attn_heads&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                    <span class="n">attn_dim_head</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;attn_dim_head&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span>
+                    <span class="n">out_size</span><span class="o">=</span><span class="n">net_output_size</span><span class="p">,</span>
+                    <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                    <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">make_single_flow_layer</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequential</span><span class="p">:</span>
+    <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">k3</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">Coupling</span><span class="p">(</span><span class="n">init_transform</span><span class="p">,</span>
+                     <span class="n">create_net</span><span class="p">,</span>
+                     <span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                     <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                     <span class="n">split_dim</span><span class="o">=</span><span class="n">coupling_split_dim</span><span class="p">,</span>
+                     <span class="n">reverse_conditioning</span><span class="o">=</span><span class="n">reverse_conditioning</span><span class="p">,</span>
+                     <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
+    <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+    <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OneByOneConv</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                               <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">))</span>
+    <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ShiftScale</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                             <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                             <span class="n">key</span><span class="o">=</span><span class="n">k3</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layers</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">make_single_flow_layer</span><span class="p">,</span> <span class="n">n_flow_layers</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.GeneralImageTransform.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.GeneralImageTransform.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Apply the inverse transformation.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.GeneralImageTransform.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
+
+
+<a href="#generax.flows.models.GeneralImageTransform.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.Repeat.data_dependent_init"><code>generax.flows.base.Repeat.data_dependent_init</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+  <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_sequential</span><span class="p">()</span>
+
+  <span class="c1"># Apply the data dependent initalization</span>
+  <span class="n">out_seq_layers</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="c1"># Turn the sequential layers into a repeat layer</span>
+  <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_seq_layers</span><span class="p">):</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+    <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+  <span class="c1"># Combine the parameters back into a single layer</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">all_params</span><span class="p">)</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+  <span class="n">layers</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+
+  <span class="n">get_layers</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">layers</span>
+  <span class="n">updated_module</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_module</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.GeneralImageTransform.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.GeneralImageTransform.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.Repeat.__call__"><code>generax.flows.base.Repeat.__call__</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">dynamic</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">scan_body</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_body</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dynamic</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.flows.models.NICEImageTransform" class="doc doc-heading">
+        <code>
+generax.flows.models.NICEImageTransform            (<a class="autorefs autorefs-internal" title="generax.flows.models.GeneralImageTransform" href="#generax.flows.models.GeneralImageTransform">GeneralImageTransform</a>)
+        </code>
+
+
+
+<a href="#generax.flows.models.NICEImageTransform" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>NICEImageTransform(<em>args, </em>*kwargs)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">NICEImageTransform</span><span class="p">(</span><span class="n">GeneralImageTransform</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">Shift</span><span class="p">,</span>
+                     <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NICEImageTransform.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.NICEImageTransform.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Apply the inverse transformation.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NICEImageTransform.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.models.NICEImageTransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">Shift</span><span class="p">,</span>
+                   <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NICEImageTransform.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
+
+
+<a href="#generax.flows.models.NICEImageTransform.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize the parameters of the layer based on the data.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The data to initialize the parameters with.</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+A new layer with the parameters initialized.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+  <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_sequential</span><span class="p">()</span>
+
+  <span class="c1"># Apply the data dependent initalization</span>
+  <span class="n">out_seq_layers</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="c1"># Turn the sequential layers into a repeat layer</span>
+  <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_seq_layers</span><span class="p">):</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+    <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+  <span class="c1"># Combine the parameters back into a single layer</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">all_params</span><span class="p">)</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+  <span class="n">layers</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+
+  <span class="n">get_layers</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">layers</span>
+  <span class="n">updated_module</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_module</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NICEImageTransform.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.NICEImageTransform.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>inverse</code>: Whether to inverse the transformation</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">dynamic</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">scan_body</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_body</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dynamic</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.flows.models.RealNVPImageTransform" class="doc doc-heading">
+        <code>
+generax.flows.models.RealNVPImageTransform            (<a class="autorefs autorefs-internal" title="generax.flows.models.GeneralImageTransform" href="#generax.flows.models.GeneralImageTransform">GeneralImageTransform</a>)
+        </code>
+
+
+
+<a href="#generax.flows.models.RealNVPImageTransform" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>RealNVPImageTransform(<em>args, </em>*kwargs)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">RealNVPImageTransform</span><span class="p">(</span><span class="n">GeneralImageTransform</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">ShiftScale</span><span class="p">,</span>
+                     <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.RealNVPImageTransform.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.RealNVPImageTransform.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Apply the inverse transformation.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.RealNVPImageTransform.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.models.RealNVPImageTransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">ShiftScale</span><span class="p">,</span>
+                   <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.RealNVPImageTransform.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
+
+
+<a href="#generax.flows.models.RealNVPImageTransform.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize the parameters of the layer based on the data.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The data to initialize the parameters with.</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+A new layer with the parameters initialized.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+  <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_sequential</span><span class="p">()</span>
+
+  <span class="c1"># Apply the data dependent initalization</span>
+  <span class="n">out_seq_layers</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="c1"># Turn the sequential layers into a repeat layer</span>
+  <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_seq_layers</span><span class="p">):</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+    <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+  <span class="c1"># Combine the parameters back into a single layer</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">all_params</span><span class="p">)</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+  <span class="n">layers</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+
+  <span class="n">get_layers</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">layers</span>
+  <span class="n">updated_module</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_module</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.RealNVPImageTransform.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.RealNVPImageTransform.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>inverse</code>: Whether to inverse the transformation</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">dynamic</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">scan_body</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_body</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dynamic</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.flows.models.NeuralSplineImageTransform" class="doc doc-heading">
+        <code>
+generax.flows.models.NeuralSplineImageTransform            (<a class="autorefs autorefs-internal" title="generax.flows.models.GeneralImageTransform" href="#generax.flows.models.GeneralImageTransform">GeneralImageTransform</a>)
+        </code>
+
+
+
+<a href="#generax.flows.models.NeuralSplineImageTransform" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>NeuralSplineImageTransform(<em>args, </em>*kwargs)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">NeuralSplineImageTransform</span><span class="p">(</span><span class="n">GeneralImageTransform</span><span class="p">):</span>
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+               <span class="n">n_spline_knots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">RationalQuadraticSpline</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="n">n_spline_knots</span><span class="p">),</span>
+                     <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NeuralSplineImageTransform.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.NeuralSplineImageTransform.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Apply the inverse transformation.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NeuralSplineImageTransform.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_spline_knots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.models.NeuralSplineImageTransform.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+             <span class="n">n_spline_knots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">TransformType</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">RationalQuadraticSpline</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="n">n_spline_knots</span><span class="p">),</span>
+                   <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NeuralSplineImageTransform.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
+
+
+<a href="#generax.flows.models.NeuralSplineImageTransform.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize the parameters of the layer based on the data.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The data to initialize the parameters with.</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+A new layer with the parameters initialized.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+  <span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_sequential</span><span class="p">()</span>
+
+  <span class="c1"># Apply the data dependent initalization</span>
+  <span class="n">out_seq_layers</span> <span class="o">=</span> <span class="n">seq</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="c1"># Turn the sequential layers into a repeat layer</span>
+  <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_seq_layers</span><span class="p">):</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+    <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+  <span class="c1"># Combine the parameters back into a single layer</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="o">*</span><span class="n">all_params</span><span class="p">)</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+  <span class="n">layers</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+
+  <span class="n">get_layers</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">layers</span>
+  <span class="n">updated_module</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_layers</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_module</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.models.NeuralSplineImageTransform.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.models.NeuralSplineImageTransform.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>inverse</code>: Whether to inverse the transformation</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/models.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">dynamic</span><span class="p">,</span> <span class="n">static</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">scan_body</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">static</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">scan_body</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dynamic</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_dets</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </code></pre></div>
         </details>
     </div>
@@ -1666,13 +2971,13 @@ A new layer with the parameters initialized.</p>
       
       
         
-        <a href="../../nn/layers/" class="md-footer__link md-footer__link--next" aria-label="Next: Neural network layers" rel="next">
+        <a href="../reshape/" class="md-footer__link md-footer__link--next" aria-label="Next: Reshape" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Neural network layers
+              Reshape
             </div>
           </div>
           <div class="md-footer__button md-icon">

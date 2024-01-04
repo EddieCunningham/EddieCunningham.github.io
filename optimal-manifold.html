@@ -11,16 +11,16 @@
 
 <meta name="keywords" content=", Blog, " />
 
-<meta property="og:title" content="Likelihood gradient dynamics "/>
-<meta property="og:url" content="/score-matching-cnf.html" />
-<meta property="og:description" content="The dynamics of the score function" />
+<meta property="og:title" content="Optimal manifold "/>
+<meta property="og:url" content="/optimal-manifold.html" />
+<meta property="og:description" content="Optimal manifolds and VAEs" />
 <meta property="og:site_name" content="" />
 <meta property="og:article:author" content="Eddie Cunningham" />
-<meta property="og:article:published_time" content="2023-11-25T00:00:00-05:00" />
-<meta name="twitter:title" content="Likelihood gradient dynamics ">
-<meta name="twitter:description" content="The dynamics of the score function">
+<meta property="og:article:published_time" content="2023-12-08T00:00:00-05:00" />
+<meta name="twitter:title" content="Optimal manifold ">
+<meta name="twitter:description" content="Optimal manifolds and VAEs">
 
-        <title>Likelihood gradient dynamics  · 
+        <title>Optimal manifold  · 
 </title>
         <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/theme/css/elegant.prod.css" media="screen">
@@ -66,8 +66,8 @@
 <div class="row-fluid">
     <header class="page-header span10 offset2">
         <h1>
-            <a href="/score-matching-cnf.html">
-                Likelihood gradient dynamics
+            <a href="/optimal-manifold.html">
+                Optimal manifold
             </a>
         </h1>
     </header>
@@ -76,29 +76,83 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <h1>Motivation</h1>
-<p>From another post, we saw that the vector field
-</p>
+            <p>In this post we'll be looking at a notion of optimality for manifolds from <a href="https://proceedings.neurips.cc/paper_files/paper/2003/file/bc7f621451b4f5df308a8e098112185d-Paper.pdf">Chigirev and Bialek</a>.</p>
+<h1>Problem setting</h1>
+<p>Suppose that we have data <span class="math">\(x\)</span> that follows the distribution <span class="math">\(p(x)\)</span> and we want to find an encoding of the data <span class="math">\(z\)</span> that is lower dimensional than <span class="math">\(x\)</span> but still captures the important information in <span class="math">\(x\)</span>.  We will want to find an encoding distribution, <span class="math">\(q(z|x)\)</span> and a function <span class="math">\(f(z)\)</span> that maps the encoding to the data such that <span class="math">\(f(z)\)</span> (measured by distortion) while keeping a fixed capacity needed to transmit the encoding (measured by mutual information).</p>
+<h2>Distortion</h2>
+<p>There will be some loss invovled in this process which we will measure with the concept of distortion.  Suppose that we have a function that measures how similar two points are, <span class="math">\(d(x,f(z))\)</span>.  Then the distortion is defined as:</p>
 <div class="math">$$
 \begin{align}
-  V_t &amp;= A(\nabla \log p^* - \nabla \log p_t), \text{ where }A \in \mathbb{R}^{d\times d}
+  D = \mathbb{E}_{p(x)q(z|x)}\left[d(x,f(z))\right]
 \end{align}
 $$</div>
 <p>
-generates a flow whose probability path is the same as that of stochastic gradient MCMC.  So a sample <span class="math">\(x_t\)</span> that evolves under <span class="math">\(V_t\)</span> will slowly become more distributed like <span class="math">\(p^*\)</span>.  However in order to do this in practice, we need to know the score function <span class="math">\(\nabla \log p_t\)</span> at every time.  In this post we'll show how to keep track of the score function dynamics.</p>
-<h1>Jacobian dynamics</h1>
+In order for the math to work out nicely, we can choose <span class="math">\(d=\frac{1}{2}\|x-f(z)\|^2\)</span>.</p>
+<h2>Mutual information</h2>
+<p>We also want to ensure that the encoding is efficient, i.e. the mutual information between the encoding and the data is maximized.  This is defined as:</p>
 <div class="math">$$
 \begin{align}
-    \frac{dJ(t)}{dt} = \lim_{\epsilon \to 0}\frac{J(t+\epsilon) - J(t)}{\epsilon}
+  I = \mathbb{E}_{p(x)q(z|x)}\left[\log \frac{q(z|x)}{q(z)}\right]
 \end{align}
 $$</div>
 <p>
-Also,
+where <span class="math">\(q(z) = \int p(x)q(z|x)dx\)</span> is the marginal under the model.</p>
+<h2>Optimal manifold</h2>
+<p>We want to find the optimal <span class="math">\(f\)</span> so that the distortion is minimized while the mutual information is fixed.  <a href="https://proceedings.neurips.cc/paper_files/paper/2003/file/bc7f621451b4f5df308a8e098112185d-Paper.pdf">Chigirev and Bialek</a> pose this as the solution of the optimization problem
 </p>
 <div class="math">$$
 \begin{align}
-    J(t+\epsilon) &amp;= \frac{dx(t+\epsilon)}{dx(0)} \\
-                  &amp;= \frac{dx(t+\epsilon)}{dx(t)}\underbrace{\frac{dx(t)}{dx(0)}}_{J(t)}
+  F(f,q) = D(f,q) + \lambda I(q)
+\end{align}
+$$</div>
+<p>
+We can solve this problem without using functional calculus by parametrizing <span class="math">\(f\)</span> and <span class="math">\(q\)</span> with the parameters <span class="math">\(\theta\)</span> and <span class="math">\(\phi\)</span> respecitvely and then set gradients to 0:
+</p>
+<div class="math">$$
+\begin{align}
+  F(\theta,\phi) = D(\theta,\phi) + \lambda I(\phi)
+\end{align}
+$$</div>
+<h3>Optimal decoder function</h3>
+<p>Lets derive the gradients of <span class="math">\(F\)</span> with respect to <span class="math">\(\theta\)</span> first.</p>
+<div class="math">$$
+\begin{align}
+  \nabla_\theta F(\theta,\phi) &amp;= \nabla_\theta D(\theta,\phi) \\
+  &amp;= \nabla_\theta \mathbb{E}_{p(x)q(z|x)}\left[\frac{1}{2}\|x-f_\theta(z)\|^2\right] \\
+  &amp;= \mathbb{E}_{p(x)q(z|x)}\left[\nabla_\theta \frac{1}{2}\|x-f_\theta(z)\|^2\right] \\
+  &amp;= \mathbb{E}_{p(x)q(z|x)}\left[(x-f_\theta(z))\nabla_\theta f_\theta(z)\right] \\
+  &amp;= \mathbb{E}_{q(z)p(x|z)}\left[(x-f_\theta(z))\nabla_\theta f_\theta(z)\right] \\
+  &amp;= \mathbb{E}_{q(z)}\left[(\mathbb{E}_{p(x|z)}[x]-f_\theta(z))\nabla_\theta f_\theta(z)\right]
+\end{align}
+$$</div>
+<p>
+Therefore, in order to get a gradient of <span class="math">\(0\)</span>, we would need
+</p>
+<div class="math">$$
+\begin{align}
+  f_\theta(z) = \mathbb{E}_{p(x|z)}[x]
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(p(x|z) = \frac{p(x)q(z|x)}{q(z)}\)</span> is the conditional under the model.</p>
+<h3>Optimal encoder distribution</h3>
+<p>Next, lets look at the gradient with respect to <span class="math">\(\phi\)</span>:
+</p>
+<div class="math">$$
+\begin{align}
+\nabla_\phi F(\theta,\phi) &amp;= \nabla_\phi D(\theta,\phi) + \lambda I(\phi) \\
+&amp;= \nabla_\phi \mathbb{E}_{p(x)q_\phi(z|x)}\left[\frac{1}{2}\|x-f(z)\|^2 + \lambda \log \frac{q_\phi(z|x)}{q_\phi(z)}\right] \\
+&amp;= \mathbb{E}_{p(x)q_\phi(z|x)}\left[\nabla_\phi \log q_\phi(z|x)(\frac{1}{2}\|x-f(z)\|^2 + \lambda \log \frac{q_\phi(z|x)}{q_\phi(z)})\right] + \lambda \underbrace{\mathbb{E}_{p(x)q_\phi(z|x)}\left[\nabla_\phi \log \frac{q_\phi(z|x)}{q_\phi(z)}\right]}_{0}
+\end{align}
+$$</div>
+<p>
+The last part of the equation is 0 because
+</p>
+<div class="math">$$
+\begin{align}
+\mathbb{E}_{p(x)q_\phi(z|x)}[\nabla_\phi \log q_\phi(z|x)] &amp;= \mathbb{E}_{p(x)}\int \nabla_\phi q_\phi(z|x)dz \\
+&amp;= \mathbb{E}_{p(x)}\nabla_\phi 1 \\
+&amp;= 0
 \end{align}
 $$</div>
 <p>
@@ -106,95 +160,45 @@ and
 </p>
 <div class="math">$$
 \begin{align}
-    \frac{dx(t+\epsilon)}{dx(t)} &amp;= \frac{d}{dx(t)}(x(t) + \int_{\epsilon}^{t+\epsilon}u_\tau(x(\tau))d\tau) \\
-    &amp;= \frac{d}{dx(t)}(x(t) + \epsilon u_t(x(t)) + O(\epsilon^2)) \\
-    &amp;= I + \epsilon \underbrace{\frac{du_t(x(t))}{dx(t)}}_{\Phi(t)} + O(\epsilon^2) \\
-    &amp;= I + \epsilon \Phi(t) + O(\epsilon^2)
+\mathbb{E}_{p(x)q_\phi(z|x)}[\nabla_\phi \log q_\phi(z)] &amp;= \mathbb{E}_{q_\phi(z)}[\nabla_\phi \log q_\phi(z)] \\
+&amp;= \nabla_\phi 1 \\
+&amp;= 0
 \end{align}
 $$</div>
 <p>
-so we can continue:
+So in order to get a gradient of <span class="math">\(0\)</span>, we would need
 </p>
 <div class="math">$$
 \begin{align}
-    \frac{dJ(t)}{dt} &amp;= \lim_{\epsilon \to 0}\frac{J(t+\epsilon) - J(t)}{\epsilon} \\
-    &amp;= \lim_{\epsilon \to 0}\frac{(I + \epsilon \Phi(t) + O(\epsilon^2))J(t) - J(t)}{\epsilon} \\
-    &amp;= \Phi(t) J(t)
+  \log q_\phi(z|x) = -\frac{1}{2\lambda}\|x - f(z)\|^2 + \log q_\phi(z) - \log Z(x)
 \end{align}
 $$</div>
 <p>
-So our final result is:
+where <span class="math">\(\log Z(x)\)</span> is a normalization constant (any constant that doesn't depend on <span class="math">\(z\)</span> will have an expectation of <span class="math">\(0\)</span> and can be added without changing the gradient).  Note that <span class="math">\(-\frac{1}{2\lambda}\|x - f(z)\|^2 = \log N(x|f(z),\lambda I) + \text{const}\)</span>.  This implies that the similarity function <span class="math">\(d(x,f(z))\)</span> can be interpreted as the negative log likelihood of <span class="math">\(x\)</span>.  This means that the distribution <span class="math">\(p(x|z)\)</span> that appears in the expression for <span class="math">\(f\)</span> is <span class="math">\(N(x|f(z),\lambda I)\)</span>.</p>
+<p>So in summary, we have that the optimal <span class="math">\(f\)</span> and <span class="math">\(q\)</span> are given by
 </p>
 <div class="math">$$
 \begin{align}
-    \frac{dJ(t)}{dt} = \Phi(t) J(t)
+  f(z) &amp;= \mathbb{E}_{N(x|f(z),\lambda I)}[x] \\
+  q(z|x) &amp;= \frac{N(x|f(z),\lambda I)q(z)}{Z(x)}
 \end{align}
 $$</div>
 <p>
-We can also look at the inverse matrix, <span class="math">\(G(t) = J(t)^{-1}\)</span>:
+A way to interpret this is that the generating process for the data is <span class="math">\(z\sim q(z)\)</span> and then <span class="math">\(x\sim N(x|f(z),\lambda I)\)</span>.</p>
+<h3>General distance function</h3>
+<p>We can keep the interpretation that the optimal encoding distribution is a posterior distribution by identifying the similarity function <span class="math">\(d(x,f(z))\)</span> as the negative log likelihood of a data generating process, <span class="math">\(-\log p_\lambda(x|f(z))\)</span>.  The optimal <span class="math">\(q(z|x)\)</span> is still the posterior:
 </p>
 <div class="math">$$
 \begin{align}
-    \frac{dG(t)}{dt} &amp;= \frac{d}{dt}J(t)^{-1} \\
-    &amp;= -J(t)^{-1}\frac{dJ(t)}{dt}J(t)^{-1} \\
-    &amp;= -G(t)\Phi(t)
-\end{align}
-$$</div>
-<h1>Gradient dynamics</h1>
-<p>First we need to know how the gradient function changes over time.  Recall that the gradient <span class="math">\(\nabla_{x_t}\)</span> depends on the time <span class="math">\(t\)</span>.  Let <span class="math">\(f_t\)</span> be a time-dependent function.  Then
-</p>
-<div class="math">$$
-\begin{align}
-  \frac{d}{dt}\frac{\partial f_t}{\partial x_t^i} &amp;= \frac{d}{dt}\frac{\partial x_0^j}{\partial x_t^i}\frac{\partial f_t}{\partial x_0^j} \\
-  &amp;= \left(\frac{d}{dt}\frac{\partial x_0^j}{\partial x_t^i}\right)\frac{\partial f_t}{\partial x_0^j} + \frac{\partial x_0^j}{\partial x_t^i}\left(\frac{d}{dt}\frac{\partial f_t}{\partial x_0^j}\right) \\
-  &amp;= \left( -\frac{\partial x_0^j}{\partial x_t^k} \frac{\partial V_t^k}{\partial x_t^i} \right)\frac{\partial f_t}{\partial x_0^j} + \frac{\partial x_0^j}{\partial x_t^i}\left(\frac{\partial}{\partial x_0^j}\frac{d f_t}{dt}\right) \\
-  &amp;= -\frac{\partial V_t^k}{\partial x_t^i}\frac{\partial f_t}{\partial x_t^k} + \frac{\partial}{\partial x_t^i}\frac{d f_t}{dt}
+  q(z|x) &amp;= \frac{p_\lambda(x|z)q(z)}{Z(x)}
 \end{align}
 $$</div>
 <p>
-In matrix form, we have
+However, the optimal manifold might not be something we can solve for analytically.  <span class="math">\(f(z)\)</span> will be a function that satisfies
 </p>
 <div class="math">$$
-\frac{d}{dt}\nabla f_t = -\nabla V_t^T\nabla f_t + \nabla\frac{d}{dt} f_t
-$$</div>
-<h1>Likelihood dynamics</h1>
-<p>Next lets see how the dynamics of derivatives of the likelihood function.  Also we'll take a look at what these values using <span class="math">\(V_t\)</span> from above with <span class="math">\(A=I\)</span>.</p>
-<h3>Likelihood</h3>
-<div class="math">$$
 \begin{align}
-\frac{d\log p_t}{dt} &amp;= -\text{Div}(V_t)
-\end{align}
-$$</div>
-<h3>Score function</h3>
-<div class="math">$$
-\begin{align}
-\frac{d\nabla \log p_t}{dt} &amp;= -\nabla V_t^T\nabla \log p_t + \nabla \frac{d\log p_t}{dt}
-\end{align}
-$$</div>
-<h3>Hessian</h3>
-<div class="math">$$
-\begin{align}
-\frac{d\nabla^2 \log p_t}{dt} &amp;= -\nabla V_t^T\nabla^2 \log p_t + \nabla \frac{d\nabla \log p_t}{dt} \\
-&amp;= -\nabla V_t^T\nabla^2 \log p_t + \nabla (-\nabla V_t^T\nabla \log p_t + \nabla \frac{d\log p_t}{dt}) \\
-&amp;= -\nabla V_t^T\nabla^2 \log p_t - \nabla^2 V_t^T\nabla \log p_t - \nabla^2 \log p_t \nabla V_t + \nabla^2 \frac{d\log p_t}{dt} \\
-&amp;= -\nabla V_t^T\nabla^2 \log p_t - \nabla^2 \log p_t \nabla V_t - \nabla^2 V_t^T\nabla \log p_t + \nabla^2 \frac{d\log p_t}{dt} \\
-\end{align}
-$$</div>
-<h2>Plugging in values for <span class="math">\(V_t\)</span></h2>
-<div class="math">$$
-\begin{align}
-\frac{d\log p_t}{dt} &amp;= -\text{Div}(\nabla \log p^* - \nabla \log p_t)
-\end{align}
-$$</div>
-<div class="math">$$
-\begin{align}
-\frac{d\nabla \log p_t}{dt} &amp;= -(\nabla^2 \log p^* - \nabla^2 \log p_t)^T\nabla \log p_t + \nabla \frac{d\log p_t}{dt} \\
-&amp;= (\nabla^2 \log p_t - \nabla^2 \log p^*)^T\nabla \log p_t + \nabla \frac{d\log p_t}{dt}
-\end{align}
-$$</div>
-<div class="math">$$
-\begin{align}
-\frac{d\nabla^2 \log p_t}{dt} &amp;= -(\nabla^2 \log p^* - \nabla^2 \log p_t)^T\nabla^2 \log p_t - \nabla^2 \log p_t (\nabla^2 \log p^* - \nabla^2 \log p_t) - (\nabla^3 \log p^* - \nabla^3 \log p_t)^T\nabla \log p_t + \nabla^2 \frac{d\log p_t}{dt} \\
+  0 &amp;= \mathbb{E}_{p(x)q(z|x)}\left[\nabla_\theta \log p_\lambda(x|f(z))\right]
 \end{align}
 $$</div>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
@@ -276,7 +280,7 @@ $$</div>
         </div>
         <section id="article-sidebar" class="span2">
             <h4>Published</h4>
-            <time itemprop="dateCreated" datetime="2023-11-25T00:00:00-05:00">Nov 25, 2023</time>
+            <time itemprop="dateCreated" datetime="2023-12-08T00:00:00-05:00">Dec 8, 2023</time>
             <h4>Category</h4>
             <a class="category-link" href="/categories.html#blog-ref">Blog</a>
             

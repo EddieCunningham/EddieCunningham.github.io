@@ -385,6 +385,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#generax.distributions.base.BoltzmannDistribution" class="md-nav__link">
+    BoltzmannDistribution
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generax.distributions.base.ProductDistribution" class="md-nav__link">
+    ProductDistribution
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generax.distributions.base.EmpiricalDistribution" class="md-nav__link">
+    EmpiricalDistribution
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#generax.distributions.base.ProbabilityPath" class="md-nav__link">
     ProbabilityPath
   </a>
@@ -457,14 +478,14 @@
       
       
         <label class="md-nav__link" for="__nav_2_2">
-          BijectiveTransforms
+          Transformations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="BijectiveTransforms" data-md-level="2">
+      <nav class="md-nav" aria-label="Transformations" data-md-level="2">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
-          BijectiveTransforms
+          Transformations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -560,6 +581,20 @@
     <li class="md-nav__item">
       <a href="../../flows/compositions/" class="md-nav__link">
         Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../flows/reshape/" class="md-nav__link">
+        Reshape
       </a>
     </li>
   
@@ -852,6 +887,7 @@ generax.distributions.base.ProbabilityDistribution        </code>
 <li><code>sample_and_log_prob(key) -&gt; (x,log_px)</code>: Sample from the distribution and compute the log probability.</li>
 <li><code>sample(key) -&gt; x</code>: Pull a single sample from the model</li>
 <li><code>log_prob(x) -&gt; log_px</code>: Compute the log probability of a point under the model</li>
+<li><code>score(x) -&gt; dlog_px/dx</code>: Compute the gradient of the log probability of a point under the model</li>
 </ul>
 
         <details class="quote">
@@ -868,6 +904,7 @@ generax.distributions.base.ProbabilityDistribution        </code>
 <span class="sd">  - `sample_and_log_prob(key) -&gt; (x,log_px)`: Sample from the distribution and compute the log probability.</span>
 <span class="sd">  - `sample(key) -&gt; x`: Pull a single sample from the model</span>
 <span class="sd">  - `log_prob(x) -&gt; log_px`: Compute the log probability of a point under the model</span>
+<span class="sd">  - `score(x) -&gt; dlog_px/dx`: Compute the gradient of the log probability of a point under the model</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="n">input_shape</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -953,6 +990,12 @@ generax.distributions.base.ProbabilityDistribution        </code>
 <span class="sd">    The log likelihood of x under the model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prob</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+    <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -1200,6 +1243,871 @@ The log likelihood of x under the model.</p>
 <span class="sd">  The log likelihood of x under the model.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="k">return</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prob</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.distributions.base.BoltzmannDistribution" class="doc doc-heading">
+        <code>
+generax.distributions.base.BoltzmannDistribution            (<a class="autorefs autorefs-internal" title="generax.distributions.base.ProbabilityDistribution" href="#generax.distributions.base.ProbabilityDistribution">ProbabilityDistribution</a>)
+        </code>
+
+
+
+<a href="#generax.distributions.base.BoltzmannDistribution" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>An unnormalized probability density function.  p(x) = 1/Z*exp(-E(x))</p>
+<p><strong>Atributes</strong>:</p>
+<ul>
+<li><code>input_shape</code>: The shape of samples.</li>
+</ul>
+<p><strong>Methods</strong>:</p>
+<ul>
+<li><code>energy(x) -&gt; E</code>: Compute the energy of a point under the model</li>
+<li><code>score(x) -&gt; grad log_px = -grad E</code>: Compute the gradient of the log probability of a point under the model</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">BoltzmannDistribution</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;An unnormalized probability density function.  p(x) = 1/Z*exp(-E(x))</span>
+
+<span class="sd">  **Atributes**:</span>
+
+<span class="sd">  - `input_shape`: The shape of samples.</span>
+
+<span class="sd">  **Methods**:</span>
+
+<span class="sd">  - `energy(x) -&gt; E`: Compute the energy of a point under the model</span>
+<span class="sd">  - `score(x) -&gt; grad log_px = -grad E`: Compute the gradient of the log probability of a point under the model</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t sample from a Boltzmann distribution&quot;</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t compute log prob of a Boltzmann distribution&quot;</span><span class="p">)</span>
+
+  <span class="nd">@abstractmethod</span>
+  <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `x`: The point we want to compute E(x) at.</span>
+<span class="sd">    - `y`: The (optional) conditioning information.</span>
+<span class="sd">    - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">             that we&#39;re getting a stochastic estimate of the energy.</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    The energy of x under the model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+  <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `x`: The point we want to compute grad logp(x) at.</span>
+<span class="sd">    - `y`: The (optional) conditioning information.</span>
+<span class="sd">    - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">             that we&#39;re getting a stochastic estimate of the log prob.</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    The log likelihood of x under the model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">eqx</span><span class="o">.</span><span class="n">filter_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.BoltzmannDistribution.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.distributions.base.BoltzmannDistribution.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>input_shape</code>: The dimensions of the samples</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="o">*</span><span class="p">,</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `input_shape`: The dimensions of the samples</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.BoltzmannDistribution.energy" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#generax.distributions.base.BoltzmannDistribution.energy" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The point we want to compute E(x) at.</li>
+<li><code>y</code>: The (optional) conditioning information.</li>
+<li><code>key</code>: The random number generator key.  Can be passed in the event
+         that we're getting a stochastic estimate of the energy.</li>
+</ul>
+<p><strong>Returns</strong>:
+The energy of x under the model.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+           <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+           <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The point we want to compute E(x) at.</span>
+<span class="sd">  - `y`: The (optional) conditioning information.</span>
+<span class="sd">  - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">           that we&#39;re getting a stochastic estimate of the energy.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  The energy of x under the model.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">pass</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.BoltzmannDistribution.score" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.base.BoltzmannDistribution.score" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The point we want to compute grad logp(x) at.</li>
+<li><code>y</code>: The (optional) conditioning information.</li>
+<li><code>key</code>: The random number generator key.  Can be passed in the event
+         that we're getting a stochastic estimate of the log prob.</li>
+</ul>
+<p><strong>Returns</strong>:
+The log likelihood of x under the model.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The point we want to compute grad logp(x) at.</span>
+<span class="sd">  - `y`: The (optional) conditioning information.</span>
+<span class="sd">  - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">           that we&#39;re getting a stochastic estimate of the log prob.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  The log likelihood of x under the model.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="o">-</span><span class="n">eqx</span><span class="o">.</span><span class="n">filter_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.distributions.base.ProductDistribution" class="doc doc-heading">
+        <code>
+generax.distributions.base.ProductDistribution            (<a class="autorefs autorefs-internal" title="generax.distributions.base.ProbabilityDistribution" href="#generax.distributions.base.ProbabilityDistribution">ProbabilityDistribution</a>)
+        </code>
+
+
+
+<a href="#generax.distributions.base.ProductDistribution" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>A product of probability distributions</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ProductDistribution</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;A product of probability distributions</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">dists</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ProbabilityDistribution</span><span class="p">]</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">distributions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ProbabilityDistribution</span><span class="p">],</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `distributions`: The distributions to take the product of.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">dists</span> <span class="o">=</span> <span class="n">distributions</span>
+
+    <span class="c1"># Check that the input shapes are all the same on all but the</span>
+    <span class="c1"># first axis and construct the total input shape</span>
+    <span class="n">input_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">input_shape</span><span class="p">)</span>
+    <span class="n">input_shape_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+      <span class="k">assert</span> <span class="n">dist</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">input_shape_end</span>
+      <span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dist</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">input_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `key`: The random number generator key.</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    A single sample from the model with its log probability.</span>
+
+<span class="sd">    Use eqx.filter_vmap to get more samples!  For example,</span>
+<span class="sd">    ```python</span>
+<span class="sd">    keys = random.split(key, n_samples)</span>
+<span class="sd">    x, log_px = eqx.filter_vmap(self.sample_and_log_prob)(keys)</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Sample from each of our distributions</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">))</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">log_px</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+      <span class="n">x</span><span class="p">,</span> <span class="n">_log_px</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+      <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+      <span class="n">log_px</span> <span class="o">+=</span> <span class="n">_log_px</span>
+
+    <span class="c1"># Concatenate the samples along the first axis</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_px</span>
+
+  <span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `x`: The point we want to compute logp(x) at.</span>
+<span class="sd">    - `y`: The (optional) conditioning information.</span>
+<span class="sd">    - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">             that we&#39;re getting a stochastic estimate of the log prob.</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    The log likelihood of x under the model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span>
+
+    <span class="c1"># Figure out how to split the input</span>
+    <span class="n">split_indices</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">]))</span>
+    <span class="n">splits</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">split_indices</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">split_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+    <span class="c1"># Compute the log prob of each sample</span>
+    <span class="n">log_px</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">splits</span><span class="p">):</span>
+      <span class="n">_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+      <span class="n">log_px</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">_x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">log_px</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.ProductDistribution.sample" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.base.ProductDistribution.sample" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="#generax.distributions.base.ProbabilityDistribution.sample"><code>generax.distributions.base.ProbabilityDistribution.sample</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+           <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+           <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `key`: The random number generator key.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  Samples from the model</span>
+
+<span class="sd">  Use eqx.filter_vmap to get more samples!  For example,</span>
+<span class="sd">  ```python</span>
+<span class="sd">  keys = random.split(key, n_samples)</span>
+<span class="sd">  samples = eqx.filter_vmap(self.sample)(keys)</span>
+<span class="sd">  ```</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.ProductDistribution.score" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.base.ProductDistribution.score" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="#generax.distributions.base.ProbabilityDistribution.score"><code>generax.distributions.base.ProbabilityDistribution.score</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+          <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The point we want to compute grad logp(x) at.</span>
+<span class="sd">  - `y`: The (optional) conditioning information.</span>
+<span class="sd">  - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">           that we&#39;re getting a stochastic estimate of the log prob.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  The log likelihood of x under the model.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_prob</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.ProductDistribution.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">distributions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ProbabilityDistribution</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.distributions.base.ProductDistribution.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>distributions</code>: The distributions to take the product of.</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="o">*</span><span class="n">distributions</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ProbabilityDistribution</span><span class="p">],</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `distributions`: The distributions to take the product of.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">dists</span> <span class="o">=</span> <span class="n">distributions</span>
+
+  <span class="c1"># Check that the input shapes are all the same on all but the</span>
+  <span class="c1"># first axis and construct the total input shape</span>
+  <span class="n">input_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">input_shape</span><span class="p">)</span>
+  <span class="n">input_shape_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+  <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+    <span class="k">assert</span> <span class="n">dist</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">input_shape_end</span>
+    <span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dist</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="n">input_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.ProductDistribution.sample_and_log_prob" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.base.ProductDistribution.sample_and_log_prob" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Implements <a class="autorefs autorefs-internal" href="#generax.distributions.base.ProbabilityDistribution.sample_and_log_prob"><code>generax.distributions.base.ProbabilityDistribution.sample_and_log_prob</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `key`: The random number generator key.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  A single sample from the model with its log probability.</span>
+
+<span class="sd">  Use eqx.filter_vmap to get more samples!  For example,</span>
+<span class="sd">  ```python</span>
+<span class="sd">  keys = random.split(key, n_samples)</span>
+<span class="sd">  x, log_px = eqx.filter_vmap(self.sample_and_log_prob)(keys)</span>
+<span class="sd">  ```</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c1"># Sample from each of our distributions</span>
+  <span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">))</span>
+  <span class="n">xs</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">log_px</span> <span class="o">=</span> <span class="mf">0.0</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">_log_px</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sample_and_log_prob</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">log_px</span> <span class="o">+=</span> <span class="n">_log_px</span>
+
+  <span class="c1"># Concatenate the samples along the first axis</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">log_px</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.ProductDistribution.log_prob" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.base.ProductDistribution.log_prob" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Implements <a class="autorefs autorefs-internal" href="#generax.distributions.base.ProbabilityDistribution.log_prob"><code>generax.distributions.base.ProbabilityDistribution.log_prob</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PRNGKeyArray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The point we want to compute logp(x) at.</span>
+<span class="sd">  - `y`: The (optional) conditioning information.</span>
+<span class="sd">  - `key`: The random number generator key.  Can be passed in the event</span>
+<span class="sd">           that we&#39;re getting a stochastic estimate of the log prob.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  The log likelihood of x under the model.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span>
+
+  <span class="c1"># Figure out how to split the input</span>
+  <span class="n">split_indices</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">]))</span>
+  <span class="n">splits</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">split_indices</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">split_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+  <span class="c1"># Compute the log prob of each sample</span>
+  <span class="n">log_px</span> <span class="o">=</span> <span class="mf">0.0</span>
+  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">splits</span><span class="p">):</span>
+    <span class="n">_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+    <span class="n">log_px</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">_x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">log_px</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.distributions.base.EmpiricalDistribution" class="doc doc-heading">
+        <code>
+generax.distributions.base.EmpiricalDistribution            (<a class="autorefs autorefs-internal" title="generax.distributions.base.ProbabilityDistribution" href="#generax.distributions.base.ProbabilityDistribution">ProbabilityDistribution</a>)
+        </code>
+
+
+
+<a href="#generax.distributions.base.EmpiricalDistribution" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>An empirical distribution.  This can be used as a wrapper around data</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">EmpiricalDistribution</span><span class="p">(</span><span class="n">ProbabilityDistribution</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;An empirical distribution.  This can be used as a wrapper around data</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">data</span><span class="p">:</span> <span class="n">Array</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">data</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `input_shape`: The dimensions of the samples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="n">input_shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t compute&quot;</span>
+
+  <span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Can&#39;t compute&quot;</span>
+
+  <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `key`: The random number generator key.</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    Samples from the model</span>
+
+<span class="sd">    Use eqx.filter_vmap to get more samples!  For example,</span>
+<span class="sd">    ```python</span>
+<span class="sd">    keys = random.split(key, n_samples)</span>
+<span class="sd">    samples = eqx.filter_vmap(self.sample)(keys)</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))[</span><span class="mi">0</span><span class="p">]</span>
+
+  <span class="k">def</span> <span class="nf">train_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An iterator over the training data.  This is compatible with the</span>
+<span class="sd">    Trainer class in this package.  Use like:</span>
+<span class="sd">    ```python</span>
+<span class="sd">    train_iter = empirical_dist.train_iterator(key, batch_size=128)</span>
+<span class="sd">    data_batch = next(train_iter)</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `key`: The random number generator key.</span>
+<span class="sd">    - `batch_size`: The batch size.</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    An iterator over the training data that yields a dictionary</span>
+<span class="sd">    with the key `x` and the value the training data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">total_choices</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+      <span class="n">key</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+      <span class="n">idx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">key</span><span class="p">,</span>
+                          <span class="n">total_choices</span><span class="p">,</span>
+                          <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,),</span>
+                          <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+      <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.EmpiricalDistribution.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.distributions.base.EmpiricalDistribution.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>input_shape</code>: The dimensions of the samples</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">data</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `input_shape`: The dimensions of the samples</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+  <span class="n">input_shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.EmpiricalDistribution.sample" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.distributions.base.EmpiricalDistribution.sample" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>key</code>: The random number generator key.</li>
+</ul>
+<p><strong>Returns</strong>:
+Samples from the model</p>
+<p>Use eqx.filter_vmap to get more samples!  For example,
+<div class="highlight"><pre><span></span><code><span class="n">keys</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">filter_vmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">)(</span><span class="n">keys</span><span class="p">)</span>
+</code></pre></div></p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+           <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+           <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `key`: The random number generator key.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  Samples from the model</span>
+
+<span class="sd">  Use eqx.filter_vmap to get more samples!  For example,</span>
+<span class="sd">  ```python</span>
+<span class="sd">  keys = random.split(key, n_samples)</span>
+<span class="sd">  samples = eqx.filter_vmap(self.sample)(keys)</span>
+<span class="sd">  ```</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.distributions.base.EmpiricalDistribution.train_iterator" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">train_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
+
+
+<a href="#generax.distributions.base.EmpiricalDistribution.train_iterator" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>An iterator over the training data.  This is compatible with the
+Trainer class in this package.  Use like:
+<div class="highlight"><pre><span></span><code><span class="n">train_iter</span> <span class="o">=</span> <span class="n">empirical_dist</span><span class="o">.</span><span class="n">train_iterator</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+<span class="n">data_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">train_iter</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>key</code>: The random number generator key.</li>
+<li><code>batch_size</code>: The batch size.</li>
+</ul>
+<p><strong>Returns</strong>:
+An iterator over the training data that yields a dictionary
+with the key <code>x</code> and the value the training data.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/distributions/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">train_iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                   <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;An iterator over the training data.  This is compatible with the</span>
+<span class="sd">  Trainer class in this package.  Use like:</span>
+<span class="sd">  ```python</span>
+<span class="sd">  train_iter = empirical_dist.train_iterator(key, batch_size=128)</span>
+<span class="sd">  data_batch = next(train_iter)</span>
+<span class="sd">  ```</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `key`: The random number generator key.</span>
+<span class="sd">  - `batch_size`: The batch size.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  An iterator over the training data that yields a dictionary</span>
+<span class="sd">  with the key `x` and the value the training data.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">total_choices</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+  <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="n">key</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">key</span><span class="p">,</span>
+                        <span class="n">total_choices</span><span class="p">,</span>
+                        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,),</span>
+                        <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="nb">dict</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
 </code></pre></div>
         </details>
     </div>
@@ -1792,7 +2700,8 @@ generax.distributions.base.Gaussian            (<a class="autorefs autorefs-inte
     <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">)</span>
 
   <span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
 <span class="sd">    - `x`: The point we want to compute logp(x) at.</span>
@@ -1800,10 +2709,12 @@ generax.distributions.base.Gaussian            (<a class="autorefs autorefs-inte
 <span class="sd">    **Returns**:</span>
 <span class="sd">    The log likelihood of x under the model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span>
     <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
   <span class="k">def</span> <span class="nf">sample_and_log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
 <span class="sd">    - `key`: The random number generator key.</span>
@@ -1911,7 +2822,7 @@ A single sample from the model.  Use eqx.filter_vmap to get more samples.</p>
 
 
 <h5 id="generax.distributions.base.Gaussian.log_prob" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+<code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
 
 
 <a href="#generax.distributions.base.Gaussian.log_prob" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1928,7 +2839,8 @@ The log likelihood of x under the model.</p>
         <details class="quote">
           <summary>Source code in <code>generax/distributions/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
 
 <span class="sd">  - `x`: The point we want to compute logp(x) at.</span>
@@ -1936,6 +2848,7 @@ The log likelihood of x under the model.</p>
 <span class="sd">  **Returns**:</span>
 <span class="sd">  The log likelihood of x under the model.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span>
   <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </code></pre></div>
         </details>
