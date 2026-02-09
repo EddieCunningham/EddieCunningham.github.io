@@ -196,7 +196,7 @@ $$
 \begin{align}
   \text{Vol}(D) &= \int_D dV_g \\
   &= \pm \int_{\phi(D)}(\phi^{-1})^*dV_g \\
-  &= \pm \int_{\phi(D)}\underbrace{\omega_{(\phi^{-1})^*g}}_{\omega_{\bar{g}}} \\
+  &= \pm \int_{\phi(D)}\underbrace{dV_{(\phi^{-1})^*g}}_{dV_{\bar{g}}} \\
   &= \pm \int_{\phi(D)}\det(\bar{g}_{ij})^\frac{1}{2} dx^1 \wedge \dots \wedge dx^n \\
   &= \pm \int_{\phi(D)}\det(\bar{g}_{ij})^\frac{1}{2} dx^1 \dots dx^n
 \end{align}

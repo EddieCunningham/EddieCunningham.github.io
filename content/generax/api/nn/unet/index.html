@@ -399,14 +399,14 @@
       
       
         <label class="md-nav__link" for="__nav_2_2">
-          BijectiveTransforms
+          Transformations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="BijectiveTransforms" data-md-level="2">
+      <nav class="md-nav" aria-label="Transformations" data-md-level="2">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
-          BijectiveTransforms
+          Transformations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -502,6 +502,20 @@
     <li class="md-nav__item">
       <a href="../../flows/compositions/" class="md-nav__link">
         Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../flows/reshape/" class="md-nav__link">
+        Reshape
       </a>
     </li>
   
@@ -845,6 +859,7 @@ generax.nn.unet.UNet        </code>
 
   <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="n">in_out</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
   <span class="n">conv_in</span><span class="p">:</span> <span class="n">WeightNormConv</span>
@@ -863,6 +878,7 @@ generax.nn.unet.UNet        </code>
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
                <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+               <span class="n">out_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
                <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
                <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
@@ -876,6 +892,7 @@ generax.nn.unet.UNet        </code>
 
 <span class="sd">    - `input_shape`: The input shape.  Output size is the same as shape.</span>
 <span class="sd">    - `dim`: The dimension of the features</span>
+<span class="sd">    - `out_channels`: The number of output channels.  If None, then the same as the input.</span>
 <span class="sd">    - `dim_mults`: The dimension of the features at each downsampling</span>
 <span class="sd">    - `resnet_block_groups`: The number of resnet blocks per downsampling</span>
 <span class="sd">    - `attn_heads`: The number of attention heads per downsampling</span>
@@ -889,6 +906,7 @@ generax.nn.unet.UNet        </code>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Image size </span><span class="si">{</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">)</span><span class="si">}</span><span class="s2"> is too small for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">)</span><span class="si">}</span><span class="s2"> downsamples.&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span> <span class="o">=</span> <span class="n">C</span> <span class="k">if</span> <span class="n">out_channels</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">out_channels</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span> <span class="o">=</span> <span class="n">dim_mults</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">freeu</span> <span class="o">=</span> <span class="n">freeu</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span> <span class="o">=</span> <span class="n">time_dependent</span>
@@ -983,9 +1001,9 @@ generax.nn.unet.UNet        </code>
     <span class="c1"># Final</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">final_block</span> <span class="o">=</span> <span class="n">make_resblock</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span> <span class="o">+</span> <span class="n">dim_in</span><span class="p">),</span> <span class="n">dim_in</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span> <span class="o">=</span> <span class="n">WeightNormConv</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">),</span>
-                                    <span class="n">out_size</span><span class="o">=</span><span class="n">C</span><span class="p">,</span>
-                                    <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                                    <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
+                                   <span class="n">out_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span>
+                                   <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                   <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
 
   <span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                           <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
@@ -1004,7 +1022,7 @@ generax.nn.unet.UNet        </code>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="bp">self</span>
 
-  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="p">:</span>
       <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
         <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>
@@ -1116,7 +1134,7 @@ generax.nn.unet.UNet        </code>
 
 
 <h5 id="generax.nn.unet.UNet.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">freeu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">time_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">attn_dim_head</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="n">freeu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">time_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></code>
 
 
 <a href="#generax.nn.unet.UNet.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1127,6 +1145,7 @@ generax.nn.unet.UNet        </code>
 <ul>
 <li><code>input_shape</code>: The input shape.  Output size is the same as shape.</li>
 <li><code>dim</code>: The dimension of the features</li>
+<li><code>out_channels</code>: The number of output channels.  If None, then the same as the input.</li>
 <li><code>dim_mults</code>: The dimension of the features at each downsampling</li>
 <li><code>resnet_block_groups</code>: The number of resnet blocks per downsampling</li>
 <li><code>attn_heads</code>: The number of attention heads per downsampling</li>
@@ -1140,6 +1159,7 @@ generax.nn.unet.UNet        </code>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
              <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
              <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+             <span class="n">out_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
              <span class="n">dim_mults</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
              <span class="n">resnet_block_groups</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
              <span class="n">attn_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
@@ -1153,6 +1173,7 @@ generax.nn.unet.UNet        </code>
 
 <span class="sd">  - `input_shape`: The input shape.  Output size is the same as shape.</span>
 <span class="sd">  - `dim`: The dimension of the features</span>
+<span class="sd">  - `out_channels`: The number of output channels.  If None, then the same as the input.</span>
 <span class="sd">  - `dim_mults`: The dimension of the features at each downsampling</span>
 <span class="sd">  - `resnet_block_groups`: The number of resnet blocks per downsampling</span>
 <span class="sd">  - `attn_heads`: The number of attention heads per downsampling</span>
@@ -1166,6 +1187,7 @@ generax.nn.unet.UNet        </code>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Image size </span><span class="si">{</span><span class="p">(</span><span class="n">H</span><span class="p">,</span><span class="w"> </span><span class="n">W</span><span class="p">)</span><span class="si">}</span><span class="s2"> is too small for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dim_mults</span><span class="p">)</span><span class="si">}</span><span class="s2"> downsamples.&quot;</span><span class="p">)</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span> <span class="o">=</span> <span class="n">C</span> <span class="k">if</span> <span class="n">out_channels</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">out_channels</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">dim_mults</span> <span class="o">=</span> <span class="n">dim_mults</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">freeu</span> <span class="o">=</span> <span class="n">freeu</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span> <span class="o">=</span> <span class="n">time_dependent</span>
@@ -1260,9 +1282,9 @@ generax.nn.unet.UNet        </code>
   <span class="c1"># Final</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">final_block</span> <span class="o">=</span> <span class="n">make_resblock</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">),</span> <span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span> <span class="o">+</span> <span class="n">dim_in</span><span class="p">),</span> <span class="n">dim_in</span><span class="p">)</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">proj_out</span> <span class="o">=</span> <span class="n">WeightNormConv</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">dim_in</span><span class="p">),</span>
-                                  <span class="n">out_size</span><span class="o">=</span><span class="n">C</span><span class="p">,</span>
-                                  <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                                  <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
+                                 <span class="n">out_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span>
+                                 <span class="n">filter_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                                 <span class="n">key</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">key_iter</span><span class="p">))</span>
 </code></pre></div>
         </details>
     </div>
@@ -1276,7 +1298,7 @@ generax.nn.unet.UNet        </code>
 
 
 <h5 id="generax.nn.unet.UNet.__call__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
 
 
 <a href="#generax.nn.unet.UNet.__call__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1287,7 +1309,7 @@ generax.nn.unet.UNet        </code>
 
         <details class="quote">
           <summary>Source code in <code>generax/nn/unet.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
   <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_dependent</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
       <span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>

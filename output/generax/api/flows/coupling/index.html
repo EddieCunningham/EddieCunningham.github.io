@@ -401,14 +401,14 @@
       
       
         <label class="md-nav__link" for="__nav_2_2">
-          BijectiveTransforms
+          Transformations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="BijectiveTransforms" data-md-level="2">
+      <nav class="md-nav" aria-label="Transformations" data-md-level="2">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
-          BijectiveTransforms
+          Transformations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -508,6 +508,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#generax.flows.coupling.TimeDependentCoupling" class="md-nav__link">
+    TimeDependentCoupling
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -553,6 +560,20 @@
     <li class="md-nav__item">
       <a href="../compositions/" class="md-nav__link">
         Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reshape/" class="md-nav__link">
+        Reshape
       </a>
     </li>
   
@@ -869,6 +890,17 @@ generax.flows.coupling.RavelParameters        </code>
     <span class="c1"># Keep track of the split points for each paramter in the flattened array</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">size</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapes_and_sizes</span><span class="p">]))</span>
 
+  <span class="k">def</span> <span class="nf">flatten_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+    <span class="c1"># Split the parameters into dynamic and static</span>
+    <span class="n">params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">eqx</span><span class="o">.</span><span class="n">is_array</span><span class="p">)</span>
+
+    <span class="c1"># Flatten the parameters so that we can extract its sizes</span>
+    <span class="n">leaves</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_flatten</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># Flatten the parameters</span>
+    <span class="n">flat_params</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">leaf</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="n">leaves</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">flat_params</span>
+
   <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_params</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
     <span class="n">flat_params</span> <span class="o">=</span> <span class="n">flat_params</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="c1"># Flatten the parameters completely</span>
     <span class="n">leaves</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1009,13 +1041,31 @@ generax.flows.coupling.Coupling            (<a class="autorefs autorefs-internal
 
       <p>Parametrize a flow over half of the inputs using the other half.
 The conditioning network will be fixed</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Intended usage:</span>
-<span class="n">layer</span> <span class="o">=</span> <span class="n">Coupling</span><span class="p">(</span><span class="n">BijectiveTransform</span><span class="p">,</span>
-                 <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Example of intended usage:</span>
+
+<span class="k">def</span> <span class="nf">initialize_scale</span><span class="p">(</span><span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">ShiftScale</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">transform_input_shape</span><span class="p">,</span>
+                    <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">initialize_network</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">ResNet</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">net_input_shape</span><span class="p">,</span>
+                <span class="n">out_size</span><span class="o">=</span><span class="n">net_output_size</span><span class="p">,</span>
+                <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="n">layer</span> <span class="o">=</span> <span class="n">Coupling</span><span class="p">(</span><span class="n">transform_init</span><span class="o">=</span><span class="n">initialize_scale</span><span class="p">,</span>
+                 <span class="n">net_init</span><span class="o">=</span><span class="n">initialize_network</span><span class="p">,</span>
+                 <span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                 <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                 <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                 <span class="n">reverse_conditioning</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">split_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
 <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">layer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Attributes</strong>:
-- <code>transform</code>: The bijective transformation to use.
+- <code>params_to_transform</code>: A module that turns an array of parameters into an eqx.Module.
 - <code>scale</code>: A scalar that we'll use to start with small parameter values
 - <code>net</code>: The neural network to use.</p>
 
@@ -1026,14 +1076,32 @@ The conditioning network will be fixed</p>
 <span class="sd">  The conditioning network will be fixed</span>
 
 <span class="sd">  ```python</span>
-<span class="sd">  # Intended usage:</span>
-<span class="sd">  layer = Coupling(BijectiveTransform,</span>
-<span class="sd">                   eqx.Module)</span>
+<span class="sd">  # Example of intended usage:</span>
+
+<span class="sd">  def initialize_scale(transform_input_shape, key):</span>
+<span class="sd">    return ShiftScale(input_shape=transform_input_shape,</span>
+<span class="sd">                      key=key,</span>
+<span class="sd">                      **kwargs)</span>
+
+<span class="sd">  def initialize_network(net_input_shape, net_output_size, key):</span>
+<span class="sd">    return ResNet(input_shape=net_input_shape,</span>
+<span class="sd">                  out_size=net_output_size,</span>
+<span class="sd">                  key=key,</span>
+<span class="sd">                  **kwargs)</span>
+
+<span class="sd">  layer = Coupling(transform_init=initialize_scale,</span>
+<span class="sd">                   net_init=initialize_network,</span>
+<span class="sd">                   input_shape=input_shape,</span>
+<span class="sd">                   cond_shape=cond_shape,</span>
+<span class="sd">                   key=key,</span>
+<span class="sd">                   reverse_conditioning=True,</span>
+<span class="sd">                   split_dim=1)</span>
+
 <span class="sd">  z, log_det = layer(x, y)</span>
 <span class="sd">  ```</span>
 
 <span class="sd">  **Attributes**:</span>
-<span class="sd">  - `transform`: The bijective transformation to use.</span>
+<span class="sd">  - `params_to_transform`: A module that turns an array of parameters into an eqx.Module.</span>
 <span class="sd">  - `scale`: A scalar that we&#39;ll use to start with small parameter values</span>
 <span class="sd">  - `net`: The neural network to use.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
@@ -1042,11 +1110,16 @@ The conditioning network will be fixed</p>
   <span class="n">scale</span><span class="p">:</span> <span class="n">Array</span>
   <span class="n">params_to_transform</span><span class="p">:</span> <span class="n">RavelParameters</span>
 
+  <span class="n">split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
   <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-               <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">,</span>
-               <span class="n">net</span><span class="p">:</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+               <span class="n">transform_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span><span class="n">BijectiveTransform</span><span class="p">],</span>
+               <span class="n">net_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">],</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
                <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
                <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                <span class="o">*</span><span class="p">,</span>
                <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1056,15 +1129,25 @@ The conditioning network will be fixed</p>
 <span class="sd">    - `net`: The neural network to generate the transform parameters.</span>
 <span class="sd">    - `input_shape`: The shape of the input</span>
 <span class="sd">    - `cond_shape`: The shape of the conditioning information</span>
+<span class="sd">    - `split_dim`: The number of dimension to split the last axis on.  If `None`, defaults to `dim//2`.</span>
+<span class="sd">    - `reverse_conditioning`: If `True`, condition on the first part of the input instead of the second part.</span>
 <span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                      <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="c1"># Check the input shapes of the transform and network</span>
-    <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">transform</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">==</span> <span class="n">x1_shape</span>
+    <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span> <span class="o">=</span> <span class="n">split_dim</span> <span class="k">if</span> <span class="n">split_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span> <span class="o">=</span> <span class="n">reverse_conditioning</span>
+
+    <span class="c1"># Get the shapes of the input to the transform and the network</span>
+    <span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">net_input_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">transform_init</span><span class="p">(</span><span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
+
+    <span class="n">net_output_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_net_output_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">net_init</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">net</span>
 
@@ -1100,20 +1183,27 @@ The conditioning network will be fixed</p>
 
   <span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Split the input into two halves.&quot;&quot;&quot;</span>
-    <span class="n">split_dim</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
-    <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">split_dim</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">split_dim</span><span class="p">:]</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x1</span>
     <span class="k">return</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span>
 
-  <span class="nd">@classmethod</span>
-  <span class="k">def</span> <span class="nf">get_split_shapes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-    <span class="n">split_dim</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
-    <span class="n">x1_dim</span><span class="p">,</span> <span class="n">x2_dim</span> <span class="o">=</span> <span class="n">split_dim</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">split_dim</span>
+  <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">x2</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine the two halves of the input.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x2</span><span class="p">,</span> <span class="n">x1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">get_split_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+    <span class="n">x1_dim</span><span class="p">,</span> <span class="n">x2_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span>
     <span class="n">x1_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">x1_dim</span><span class="p">,)</span>
     <span class="n">x2_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">x2_dim</span><span class="p">,)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">x2_shape</span><span class="p">,</span> <span class="n">x1_shape</span>
     <span class="k">return</span> <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span>
 
-  <span class="nd">@classmethod</span>
-  <span class="k">def</span> <span class="nf">get_net_output_shapes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+  <span class="k">def</span> <span class="nf">get_net_output_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
                             <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1125,33 +1215,12 @@ The conditioning network will be fixed</p>
 <span class="sd">    - `net_output_size`: The size of the output of the neural network.  This is a single integer</span>
 <span class="sd">                         because the network is expected to produce a single vector.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+    <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">x1_shape</span> <span class="o">!=</span> <span class="n">transform</span><span class="o">.</span><span class="n">input_shape</span><span class="p">:</span>
-      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s1"> needs to have an input shape equal to </span><span class="si">{</span><span class="n">x1_shape</span><span class="si">}</span><span class="s1">.  Use Coupling.get_input_shapes to get this shape.&#39;</span><span class="p">)</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s1"> needs to have an input shape equal to </span><span class="si">{</span><span class="n">x1_shape</span><span class="si">}</span><span class="s1">.  Use `get_input_shapes` to get this shape.&#39;</span><span class="p">)</span>
     <span class="n">params_to_transform</span> <span class="o">=</span> <span class="n">RavelParameters</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
     <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">params_to_transform</span><span class="o">.</span><span class="n">flat_params_size</span>
     <span class="k">return</span> <span class="n">net_output_size</span>
-
-
-  <span class="nd">@classmethod</span>
-  <span class="k">def</span> <span class="nf">get_net_input_and_output_shapes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                                      <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-                                      <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    **Arguments**:</span>
-<span class="sd">    - `input_shape`: The shape of the input</span>
-<span class="sd">    - `transform`: The bijective transformation to use.</span>
-
-<span class="sd">    **Returns**:</span>
-<span class="sd">    - `net_input_shape`: The shape of the input to the neural network.  This is a tuple of ints</span>
-<span class="sd">    - `net_output_size`: The size of the output of the neural network.  This is a single integer</span>
-<span class="sd">                         because the network is expected to produce a single vector.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
-    <span class="n">net_input_shape</span> <span class="o">=</span> <span class="n">x2_shape</span>
-    <span class="n">params_to_transform</span> <span class="o">=</span> <span class="n">RavelParameters</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
-    <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">params_to_transform</span><span class="o">.</span><span class="n">flat_params_size</span>
-    <span class="k">return</span> <span class="n">x1_shape</span><span class="p">,</span> <span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span>
 
   <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
@@ -1179,7 +1248,7 @@ The conditioning network will be fixed</p>
     <span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params_to_transform</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
     <span class="n">z1</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="n">z</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">z1</span><span class="p">,</span> <span class="n">x2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">z1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
 </code></pre></div>
         </details>
@@ -1201,7 +1270,7 @@ The conditioning network will be fixed</p>
 
 
 <h5 id="generax.flows.coupling.Coupling.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">,</span> <span class="n">net</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transform_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">BijectiveTransform</span><span class="p">],</span> <span class="n">net_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">equinox</span><span class="o">.</span><span class="n">_module</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.flows.coupling.Coupling.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1214,16 +1283,20 @@ The conditioning network will be fixed</p>
 <li><code>net</code>: The neural network to generate the transform parameters.</li>
 <li><code>input_shape</code>: The shape of the input</li>
 <li><code>cond_shape</code>: The shape of the conditioning information</li>
+<li><code>split_dim</code>: The number of dimension to split the last axis on.  If <code>None</code>, defaults to <code>dim//2</code>.</li>
+<li><code>reverse_conditioning</code>: If <code>True</code>, condition on the first part of the input instead of the second part.</li>
 <li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
 </ul>
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/coupling.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-             <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">,</span>
-             <span class="n">net</span><span class="p">:</span> <span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+             <span class="n">transform_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span><span class="n">BijectiveTransform</span><span class="p">],</span>
+             <span class="n">net_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">],</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
              <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
              <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
              <span class="o">*</span><span class="p">,</span>
              <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1233,15 +1306,25 @@ The conditioning network will be fixed</p>
 <span class="sd">  - `net`: The neural network to generate the transform parameters.</span>
 <span class="sd">  - `input_shape`: The shape of the input</span>
 <span class="sd">  - `cond_shape`: The shape of the conditioning information</span>
+<span class="sd">  - `split_dim`: The number of dimension to split the last axis on.  If `None`, defaults to `dim//2`.</span>
+<span class="sd">  - `reverse_conditioning`: If `True`, condition on the first part of the input instead of the second part.</span>
 <span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
 <span class="sd">  &quot;&quot;&quot;</span>
   <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
                    <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-  <span class="c1"># Check the input shapes of the transform and network</span>
-  <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
-  <span class="k">assert</span> <span class="n">transform</span><span class="o">.</span><span class="n">input_shape</span> <span class="o">==</span> <span class="n">x1_shape</span>
+  <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span> <span class="o">=</span> <span class="n">split_dim</span> <span class="k">if</span> <span class="n">split_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span> <span class="o">=</span> <span class="n">reverse_conditioning</span>
+
+  <span class="c1"># Get the shapes of the input to the transform and the network</span>
+  <span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">net_input_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+  <span class="n">transform</span> <span class="o">=</span> <span class="n">transform_init</span><span class="p">(</span><span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
+
+  <span class="n">net_output_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_net_output_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+  <span class="n">net</span> <span class="o">=</span> <span class="n">net_init</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">)</span>
 
   <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">net</span>
 
@@ -1370,8 +1453,9 @@ A new layer with the parameters initialized.</p>
           <summary>Source code in <code>generax/flows/coupling.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;Split the input into two halves.&quot;&quot;&quot;</span>
-  <span class="n">split_dim</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
-  <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="n">split_dim</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">split_dim</span><span class="p">:]</span>
+  <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">:]</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x1</span>
   <span class="k">return</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span>
 </code></pre></div>
         </details>
@@ -1386,11 +1470,8 @@ A new layer with the parameters initialized.</p>
 
 
 <h5 id="generax.flows.coupling.Coupling.get_split_shapes" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+<code class="highlight language-python"><span class="n">get_split_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
-  </span>
 
 <a href="#generax.flows.coupling.Coupling.get_split_shapes" class="headerlink" title="Permanent link">¤</a></h5>
 
@@ -1399,12 +1480,13 @@ A new layer with the parameters initialized.</p>
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/coupling.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">get_split_shapes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
-  <span class="n">split_dim</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
-  <span class="n">x1_dim</span><span class="p">,</span> <span class="n">x2_dim</span> <span class="o">=</span> <span class="n">split_dim</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">split_dim</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_split_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+  <span class="n">x1_dim</span><span class="p">,</span> <span class="n">x2_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span>
   <span class="n">x1_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">x1_dim</span><span class="p">,)</span>
   <span class="n">x2_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">x2_dim</span><span class="p">,)</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x2_shape</span><span class="p">,</span> <span class="n">x1_shape</span>
   <span class="k">return</span> <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span>
 </code></pre></div>
         </details>
@@ -1419,11 +1501,8 @@ A new layer with the parameters initialized.</p>
 
 
 <h5 id="generax.flows.coupling.Coupling.get_net_output_shapes" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_net_output_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span></code>
+<code class="highlight language-python"><span class="n">get_net_output_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span></code>
 
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
-  </span>
 
 <a href="#generax.flows.coupling.Coupling.get_net_output_shapes" class="headerlink" title="Permanent link">¤</a></h5>
 
@@ -1438,8 +1517,7 @@ A new layer with the parameters initialized.</p>
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/coupling.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">get_net_output_shapes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_net_output_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                           <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
                           <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1451,64 +1529,12 @@ A new layer with the parameters initialized.</p>
 <span class="sd">  - `net_output_size`: The size of the output of the neural network.  This is a single integer</span>
 <span class="sd">                       because the network is expected to produce a single vector.</span>
 <span class="sd">  &quot;&quot;&quot;</span>
-  <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+  <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
   <span class="k">if</span> <span class="n">x1_shape</span> <span class="o">!=</span> <span class="n">transform</span><span class="o">.</span><span class="n">input_shape</span><span class="p">:</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s1"> needs to have an input shape equal to </span><span class="si">{</span><span class="n">x1_shape</span><span class="si">}</span><span class="s1">.  Use Coupling.get_input_shapes to get this shape.&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s1"> needs to have an input shape equal to </span><span class="si">{</span><span class="n">x1_shape</span><span class="si">}</span><span class="s1">.  Use `get_input_shapes` to get this shape.&#39;</span><span class="p">)</span>
   <span class="n">params_to_transform</span> <span class="o">=</span> <span class="n">RavelParameters</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
   <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">params_to_transform</span><span class="o">.</span><span class="n">flat_params_size</span>
   <span class="k">return</span> <span class="n">net_output_size</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
-<h5 id="generax.flows.coupling.Coupling.get_net_input_and_output_shapes" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">get_net_input_and_output_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
-  </span>
-
-<a href="#generax.flows.coupling.Coupling.get_net_input_and_output_shapes" class="headerlink" title="Permanent link">¤</a></h5>
-
-    <div class="doc doc-contents ">
-
-      <p><strong>Arguments</strong>:
-- <code>input_shape</code>: The shape of the input
-- <code>transform</code>: The bijective transformation to use.</p>
-<p><strong>Returns</strong>:
-- <code>net_input_shape</code>: The shape of the input to the neural network.  This is a tuple of ints
-- <code>net_output_size</code>: The size of the output of the neural network.  This is a single integer
-                     because the network is expected to produce a single vector.</p>
-
-        <details class="quote">
-          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="nd">@classmethod</span>
-<span class="k">def</span> <span class="nf">get_net_input_and_output_shapes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                                    <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
-                                    <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">  **Arguments**:</span>
-<span class="sd">  - `input_shape`: The shape of the input</span>
-<span class="sd">  - `transform`: The bijective transformation to use.</span>
-
-<span class="sd">  **Returns**:</span>
-<span class="sd">  - `net_input_shape`: The shape of the input to the neural network.  This is a tuple of ints</span>
-<span class="sd">  - `net_output_size`: The size of the output of the neural network.  This is a single integer</span>
-<span class="sd">                       because the network is expected to produce a single vector.</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
-  <span class="n">net_input_shape</span> <span class="o">=</span> <span class="n">x2_shape</span>
-  <span class="n">params_to_transform</span> <span class="o">=</span> <span class="n">RavelParameters</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
-  <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">params_to_transform</span><span class="o">.</span><span class="n">flat_params_size</span>
-  <span class="k">return</span> <span class="n">x1_shape</span><span class="p">,</span> <span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span>
 </code></pre></div>
         </details>
     </div>
@@ -1559,8 +1585,499 @@ A new layer with the parameters initialized.</p>
   <span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params_to_transform</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
   <span class="n">z1</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-  <span class="n">z</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">z1</span><span class="p">,</span> <span class="n">x2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+  <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">z1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.flows.coupling.TimeDependentCoupling" class="doc doc-heading">
+        <code>
+generax.flows.coupling.TimeDependentCoupling            (<a class="autorefs autorefs-internal" title="generax.flows.coupling.Coupling" href="#generax.flows.coupling.Coupling">Coupling</a>, <a class="autorefs autorefs-internal" title="generax.flows.base.TimeDependentBijectiveTransform" href="../base/#generax.flows.base.TimeDependentBijectiveTransform">TimeDependentBijectiveTransform</a>)
+        </code>
+
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>Time dependent coupling transform.  At t=0, this will pass parameters of 0s
+to the transform.
+```</p>
+<p><strong>Attributes</strong>:
+- <code>params_to_transform</code>: A module that turns an array of parameters into an eqx.Module.
+- <code>scale</code>: A scalar that we'll use to start with small parameter values
+- <code>net</code>: The neural network to use.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TimeDependentCoupling</span><span class="p">(</span><span class="n">Coupling</span><span class="p">,</span> <span class="n">TimeDependentBijectiveTransform</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Time dependent coupling transform.  At t=0, this will pass parameters of 0s</span>
+<span class="sd">  to the transform.</span>
+<span class="sd">  ```</span>
+
+<span class="sd">  **Attributes**:</span>
+<span class="sd">  - `params_to_transform`: A module that turns an array of parameters into an eqx.Module.</span>
+<span class="sd">  - `scale`: A scalar that we&#39;ll use to start with small parameter values</span>
+<span class="sd">  - `net`: The neural network to use.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `t`: The time to initialize the parameters with.</span>
+<span class="sd">    - `x`: The data to initialize the parameters with.</span>
+<span class="sd">    - `y`: The conditioning information</span>
+<span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    A new layer with the parameters initialized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on batched data&#39;</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="c1"># Turn the new parameters into a new module</span>
+    <span class="k">def</span> <span class="nf">get_net</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span> <span class="k">return</span> <span class="n">tree</span><span class="o">.</span><span class="n">net</span>
+    <span class="n">updated_layer</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_net</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">updated_layer</span>
+
+  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `xt`: The input to the transformation.  If inverse=True, then should be x0</span>
+<span class="sd">    - `y`: The conditioning information</span>
+<span class="sd">    - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    (x0, log_det)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">xt</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+
+    <span class="c1"># Split the input into two halves</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">xt</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">params</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="o">*</span><span class="n">t</span>
+    <span class="k">assert</span> <span class="n">params</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params_to_transform</span><span class="o">.</span><span class="n">flat_params_size</span>
+
+    <span class="c1"># Apply the transformation to x1 given x2</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params_to_transform</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">z1</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">z1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.coupling.TimeDependentCoupling.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transform_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">BijectiveTransform</span><span class="p">],</span> <span class="n">net_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">equinox</span><span class="o">.</span><span class="n">_module</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>transform</code>: The bijective transformation to use.</li>
+<li><code>net</code>: The neural network to generate the transform parameters.</li>
+<li><code>input_shape</code>: The shape of the input</li>
+<li><code>cond_shape</code>: The shape of the conditioning information</li>
+<li><code>split_dim</code>: The number of dimension to split the last axis on.  If <code>None</code>, defaults to <code>dim//2</code>.</li>
+<li><code>reverse_conditioning</code>: If <code>True</code>, condition on the first part of the input instead of the second part.</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">transform_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span><span class="n">BijectiveTransform</span><span class="p">],</span>
+             <span class="n">net_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">],</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">],</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+             <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">split_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">reverse_conditioning</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">*</span><span class="p">,</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `transform`: The bijective transformation to use.</span>
+<span class="sd">  - `net`: The neural network to generate the transform parameters.</span>
+<span class="sd">  - `input_shape`: The shape of the input</span>
+<span class="sd">  - `cond_shape`: The shape of the conditioning information</span>
+<span class="sd">  - `split_dim`: The number of dimension to split the last axis on.  If `None`, defaults to `dim//2`.</span>
+<span class="sd">  - `reverse_conditioning`: If `True`, condition on the first part of the input instead of the second part.</span>
+<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                   <span class="n">cond_shape</span><span class="o">=</span><span class="n">cond_shape</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span> <span class="o">=</span> <span class="n">split_dim</span> <span class="k">if</span> <span class="n">split_dim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span> <span class="o">=</span> <span class="n">reverse_conditioning</span>
+
+  <span class="c1"># Get the shapes of the input to the transform and the network</span>
+  <span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">net_input_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+  <span class="n">transform</span> <span class="o">=</span> <span class="n">transform_init</span><span class="p">(</span><span class="n">transform_input_shape</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k1</span><span class="p">)</span>
+
+  <span class="n">net_output_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_net_output_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
+  <span class="n">net</span> <span class="o">=</span> <span class="n">net_init</span><span class="p">(</span><span class="n">net_input_shape</span><span class="p">,</span> <span class="n">net_output_size</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">k2</span><span class="p">)</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">net</span>
+
+  <span class="c1"># Use this to turn an eqx module into an array and vice-versa</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">params_to_transform</span> <span class="o">=</span> <span class="n">RavelParameters</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
+
+  <span class="c1"># Also initialize the parameters to be close to 0</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,))</span><span class="o">*</span><span class="mf">0.01</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.coupling.TimeDependentCoupling.split" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling.split" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="#generax.flows.coupling.Coupling.split"><code>generax.flows.coupling.Coupling.split</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">split</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="n">Array</span><span class="p">]:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Split the input into two halves.&quot;&quot;&quot;</span>
+  <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">:]</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x1</span>
+  <span class="k">return</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.coupling.TimeDependentCoupling.get_split_shapes" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_split_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></code>
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling.get_split_shapes" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="#generax.flows.coupling.Coupling.get_split_shapes"><code>generax.flows.coupling.Coupling.get_split_shapes</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_split_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+  <span class="n">x1_dim</span><span class="p">,</span> <span class="n">x2_dim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_dim</span>
+  <span class="n">x1_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">x1_dim</span><span class="p">,)</span>
+  <span class="n">x2_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">x2_dim</span><span class="p">,)</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse_conditioning</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x2_shape</span><span class="p">,</span> <span class="n">x1_shape</span>
+  <span class="k">return</span> <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.coupling.TimeDependentCoupling.get_net_output_shapes" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_net_output_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span></code>
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling.get_net_output_shapes" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="#generax.flows.coupling.Coupling.get_net_output_shapes"><code>generax.flows.coupling.Coupling.get_net_output_shapes</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_net_output_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                          <span class="n">transform</span><span class="p">:</span> <span class="n">BijectiveTransform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  **Arguments**:</span>
+<span class="sd">  - `input_shape`: The shape of the input</span>
+<span class="sd">  - `transform`: The bijective transformation to use.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  - `net_output_size`: The size of the output of the neural network.  This is a single integer</span>
+<span class="sd">                       because the network is expected to produce a single vector.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">x1_shape</span><span class="p">,</span> <span class="n">x2_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_shapes</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">x1_shape</span> <span class="o">!=</span> <span class="n">transform</span><span class="o">.</span><span class="n">input_shape</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s1"> needs to have an input shape equal to </span><span class="si">{</span><span class="n">x1_shape</span><span class="si">}</span><span class="s1">.  Use `get_input_shapes` to get this shape.&#39;</span><span class="p">)</span>
+  <span class="n">params_to_transform</span> <span class="o">=</span> <span class="n">RavelParameters</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
+  <span class="n">net_output_size</span> <span class="o">=</span> <span class="n">params_to_transform</span><span class="o">.</span><span class="n">flat_params_size</span>
+  <span class="k">return</span> <span class="n">net_output_size</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.coupling.TimeDependentCoupling.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize the parameters of the layer based on the data.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>t</code>: The time to initialize the parameters with.</li>
+<li><code>x</code>: The data to initialize the parameters with.</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+A new layer with the parameters initialized.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `t`: The time to initialize the parameters with.</span>
+<span class="sd">  - `x`: The data to initialize the parameters with.</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  A new layer with the parameters initialized.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on batched data&#39;</span>
+  <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">data_dependent_init</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+  <span class="c1"># Turn the new parameters into a new module</span>
+  <span class="k">def</span> <span class="nf">get_net</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span> <span class="k">return</span> <span class="n">tree</span><span class="o">.</span><span class="n">net</span>
+  <span class="n">updated_layer</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_net</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">updated_layer</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.coupling.TimeDependentCoupling.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Implements <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.TimeDependentBijectiveTransform.__call__"><code>generax.flows.base.TimeDependentBijectiveTransform.__call__</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `xt`: The input to the transformation.  If inverse=True, then should be x0</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (x0, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="n">xt</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+
+  <span class="c1"># Split the input into two halves</span>
+  <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">xt</span><span class="p">)</span>
+  <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="n">params</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="o">*</span><span class="n">t</span>
+  <span class="k">assert</span> <span class="n">params</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">params_to_transform</span><span class="o">.</span><span class="n">flat_params_size</span>
+
+  <span class="c1"># Apply the transformation to x1 given x2</span>
+  <span class="n">transform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params_to_transform</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+  <span class="n">z1</span><span class="p">,</span> <span class="n">log_det</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="n">inverse</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">z1</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.coupling.TimeDependentCoupling.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.TimeDependentBijectiveTransform.inverse"><code>generax.flows.base.TimeDependentBijectiveTransform.inverse</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">x0</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (xt, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.coupling.TimeDependentCoupling.vector_field" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">vector_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.coupling.TimeDependentCoupling.vector_field" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.TimeDependentBijectiveTransform.vector_field"><code>generax.flows.base.TimeDependentBijectiveTransform.vector_field</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/coupling.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">vector_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">t</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                 <span class="n">xt</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                 <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;The vector field that samples evolve on as t changes</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `t`: Time.</span>
+<span class="sd">  - `xt`: A point in the data space.</span>
+<span class="sd">  - `y`: The conditioning information.</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  `return vt`</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">x0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_base_space</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">xt</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">ft</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_data_space</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">jvp</span><span class="p">(</span><span class="n">ft</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="p">,),</span> <span class="p">(</span><span class="n">jnp</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">t</span><span class="p">),))[</span><span class="mi">1</span><span class="p">]</span>
 </code></pre></div>
         </details>
     </div>

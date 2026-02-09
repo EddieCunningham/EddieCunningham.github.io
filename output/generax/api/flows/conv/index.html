@@ -401,14 +401,14 @@
       
       
         <label class="md-nav__link" for="__nav_2_2">
-          BijectiveTransforms
+          Transformations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="BijectiveTransforms" data-md-level="2">
+      <nav class="md-nav" aria-label="Transformations" data-md-level="2">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
-          BijectiveTransforms
+          Transformations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -502,6 +502,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#generax.flows.conv.HaarWavelet" class="md-nav__link">
+    HaarWavelet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#generax.flows.pac_flow.EmergingConv" class="md-nav__link">
     EmergingConv
   </a>
@@ -574,6 +581,20 @@
     <li class="md-nav__item">
       <a href="../compositions/" class="md-nav__link">
         Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reshape/" class="md-nav__link">
+        Reshape
       </a>
     </li>
   
@@ -1289,7 +1310,7 @@ https://arxiv.org/pdf/2104.07167.pdf</p>
       <span class="n">z_fft</span> <span class="o">=</span> <span class="n">y_fft</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;abij,abj-&gt;abi&quot;</span><span class="p">,</span> <span class="n">A_fft</span><span class="p">,</span> <span class="n">y_fft</span><span class="p">)</span>
       <span class="n">z</span> <span class="o">=</span> <span class="n">ifft_channel_vmap</span><span class="p">(</span><span class="n">z_fft</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
 
-    <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
 </code></pre></div>
         </details>
@@ -1512,7 +1533,7 @@ https://arxiv.org/pdf/2104.07167.pdf</p>
     <span class="n">z_fft</span> <span class="o">=</span> <span class="n">y_fft</span> <span class="o">+</span> <span class="n">jnp</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;abij,abj-&gt;abi&quot;</span><span class="p">,</span> <span class="n">A_fft</span><span class="p">,</span> <span class="n">y_fft</span><span class="p">)</span>
     <span class="n">z</span> <span class="o">=</span> <span class="n">ifft_channel_vmap</span><span class="p">(</span><span class="n">z_fft</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
 
-  <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
+  <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
 </code></pre></div>
         </details>
@@ -1604,7 +1625,6 @@ never be that big.  Costs O(C^3).  Used in GLOW https://arxiv.org/pdf/1807.03039
       <span class="n">z</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">w_inv</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,:,:],</span> <span class="n">x</span><span class="p">)</span>
 
     <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">slogdet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">H</span><span class="o">*</span><span class="n">W</span>
-    <span class="n">log_det</span> <span class="o">*=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
       <span class="n">log_det</span> <span class="o">=</span> <span class="o">-</span><span class="n">log_det</span>
@@ -1800,7 +1820,6 @@ never be that big.  Costs O(C^3).  Used in GLOW https://arxiv.org/pdf/1807.03039
     <span class="n">z</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">w_inv</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,:,:],</span> <span class="n">x</span><span class="p">)</span>
 
   <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">slogdet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">H</span><span class="o">*</span><span class="n">W</span>
-  <span class="n">log_det</span> <span class="o">*=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">1</span><span class="p">])</span>
 
   <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
     <span class="n">log_det</span> <span class="o">=</span> <span class="o">-</span><span class="n">log_det</span>
@@ -1828,9 +1847,345 @@ never be that big.  Costs O(C^3).  Used in GLOW https://arxiv.org/pdf/1807.03039
 
 
 
+<h4 id="generax.flows.conv.HaarWavelet" class="doc doc-heading">
+        <code>
+generax.flows.conv.HaarWavelet            (<a class="autorefs autorefs-internal" title="generax.flows.base.BijectiveTransform" href="../base/#generax.flows.base.BijectiveTransform">BijectiveTransform</a>)
+        </code>
+
+
+
+<a href="#generax.flows.conv.HaarWavelet" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>Wavelet flow https://arxiv.org/pdf/2010.13821.pdf</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/conv.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">HaarWavelet</span><span class="p">(</span><span class="n">BijectiveTransform</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Wavelet flow https://arxiv.org/pdf/2010.13821.pdf&quot;&quot;&quot;</span>
+
+  <span class="n">W</span><span class="p">:</span> <span class="n">Array</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">output_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">input_shape</span>
+    <span class="k">if</span> <span class="n">H</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Height must be even&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">W</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Width must be even&#39;</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">output_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">H</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">W</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">C</span><span class="p">)</span>
+
+    <span class="c1"># Construct the filter</span>
+    <span class="n">p</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">],</span>
+                   <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">]],</span>
+                  <span class="p">[[</span><span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span>
+                   <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">]],</span>
+                  <span class="p">[[</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">],</span>
+                   <span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">]],</span>
+                  <span class="p">[[</span><span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span>
+                   <span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">]]])</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="c1"># (H, W, O)</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="p">[:,:,</span><span class="kc">None</span><span class="p">,:]</span> <span class="c1"># (H, W, I, O).  We&#39;ll be applying this channelwise</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">W</span>
+
+  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `x`: The input to the transformation</span>
+<span class="sd">    - `y`: The conditioning information</span>
+<span class="sd">    - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    `(z, log_det)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">haar_conv</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;(H, W) -&gt; (H/2, W/2, 4))&quot;&quot;&quot;</span>
+      <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">[:,:,</span><span class="kc">None</span><span class="p">],</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+      <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+      <span class="n">z</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">haar_conv</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+
+      <span class="c1"># Rescale the lowpass to have same mean</span>
+      <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">at</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+      <span class="n">z</span> <span class="o">=</span> <span class="n">einops</span><span class="o">.</span><span class="n">rearrange</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="s1">&#39;H W D C -&gt; H W (C D)&#39;</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="n">einops</span><span class="o">.</span><span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;H W (C D) -&gt; H W C D&#39;</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+      <span class="c1"># Rescale</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">at</span><span class="p">[:,:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+
+      <span class="n">h</span> <span class="o">=</span> <span class="n">einops</span><span class="o">.</span><span class="n">rearrange</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="s1">&#39;H W C (M N) -&gt; (H M) (W N) C&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+      <span class="n">h</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">haar_conv</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
+      <span class="n">z</span> <span class="o">=</span> <span class="n">einops</span><span class="o">.</span><span class="n">rearrange</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="s1">&#39;H W (M N) C -&gt; (H M) (W N) C&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">total_dim</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">list_prod</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">total_dim</span><span class="o">/</span><span class="mi">4</span>
+
+    <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
+      <span class="n">log_det</span> <span class="o">=</span> <span class="o">-</span><span class="n">log_det</span>
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.conv.HaarWavelet.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.conv.HaarWavelet.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.BijectiveTransform.data_dependent_init"><code>generax.flows.base.BijectiveTransform.data_dependent_init</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/conv.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The data to initialize the parameters with.</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  A new layer with the parameters initialized.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.conv.HaarWavelet.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.conv.HaarWavelet.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.BijectiveTransform.inverse"><code>generax.flows.base.BijectiveTransform.inverse</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/conv.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.conv.HaarWavelet.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.conv.HaarWavelet.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>input_shape</code>: The input shape.  Output size is the same as shape.</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/conv.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">input_shape</span>
+  <span class="k">if</span> <span class="n">H</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Height must be even&#39;</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">W</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Width must be even&#39;</span><span class="p">)</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">output_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">H</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">W</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">C</span><span class="p">)</span>
+
+  <span class="c1"># Construct the filter</span>
+  <span class="n">p</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span>
+  <span class="n">W</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[[</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">],</span>
+                 <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span>
+                 <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="p">],</span>
+                 <span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span>
+                 <span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">]]])</span>
+  <span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="c1"># (H, W, O)</span>
+  <span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="p">[:,:,</span><span class="kc">None</span><span class="p">,:]</span> <span class="c1"># (H, W, I, O).  We&#39;ll be applying this channelwise</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">W</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.conv.HaarWavelet.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.conv.HaarWavelet.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>inverse</code>: Whether to inverse the transformation</li>
+</ul>
+<p><strong>Returns</strong>:
+<code>(z, log_det)</code></p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/conv.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  `(z, log_det)`</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">haar_conv</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;(H, W) -&gt; (H/2, W/2, 4))&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">util</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">[:,:,</span><span class="kc">None</span><span class="p">],</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="n">H</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">haar_conv</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Rescale the lowpass to have same mean</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">at</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="n">einops</span><span class="o">.</span><span class="n">rearrange</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="s1">&#39;H W D C -&gt; H W (C D)&#39;</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">einops</span><span class="o">.</span><span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;H W (C D) -&gt; H W C D&#39;</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="c1"># Rescale</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">at</span><span class="p">[:,:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="n">einops</span><span class="o">.</span><span class="n">rearrange</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="s1">&#39;H W C (M N) -&gt; (H M) (W N) C&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">haar_conv</span><span class="p">,</span> <span class="n">in_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">out_axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">)(</span><span class="n">h</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">einops</span><span class="o">.</span><span class="n">rearrange</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="s1">&#39;H W (M N) C -&gt; (H M) (W N) C&#39;</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+  <span class="n">total_dim</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">list_prod</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+  <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">total_dim</span><span class="o">/</span><span class="mi">4</span>
+
+  <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="o">-</span><span class="n">log_det</span>
+  <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
 <h4 id="generax.flows.pac_flow.EmergingConv" class="doc doc-heading">
         <code>
-generax.flows.pac_flow.EmergingConv            (<a class="autorefs autorefs-internal" title="generax.flows.base.BijectiveTransform" href="../base/#generax.flows.base.BijectiveTransform">BijectiveTransform</a>)
+generax.flows.pac_flow.EmergingConv            (<a class="autorefs autorefs-internal" title="generax.flows.pac_flow.PACFlow" href="#generax.flows.pac_flow.PACFlow">PACFlow</a>)
         </code>
 
 
@@ -1892,7 +2247,15 @@ This is a special case of PAC flows</p>
 
     <div class="doc doc-contents ">
 
-      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.BijectiveTransform.data_dependent_init"><code>generax.flows.base.BijectiveTransform.data_dependent_init</code></a>.</p>
+      <p>Initialize the parameters of the layer based on the data.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The data to initialize the parameters with.</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+A new layer with the parameters initialized.</p>
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/pac_flow.py</code></summary>
@@ -1932,7 +2295,14 @@ This is a special case of PAC flows</p>
 
     <div class="doc doc-contents ">
 
-      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.BijectiveTransform.inverse"><code>generax.flows.base.BijectiveTransform.inverse</code></a>.</p>
+      <p>Apply the inverse transformation.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/pac_flow.py</code></summary>
@@ -1971,7 +2341,7 @@ This is a special case of PAC flows</p>
 
     <div class="doc doc-contents ">
 
-      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.BijectiveTransform.__call__"><code>generax.flows.base.BijectiveTransform.__call__</code></a>.</p>
+      <p>Inherited from <a class="autorefs autorefs-internal" href="#generax.flows.pac_flow.PACFlow.__call__"><code>generax.flows.pac_flow.PACFlow.__call__</code></a>.</p>
 
         <details class="quote">
           <summary>Source code in <code>generax/flows/pac_flow.py</code></summary>

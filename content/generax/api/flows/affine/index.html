@@ -401,14 +401,14 @@
       
       
         <label class="md-nav__link" for="__nav_2_2">
-          BijectiveTransforms
+          Transformations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="BijectiveTransforms" data-md-level="2">
+      <nav class="md-nav" aria-label="Transformations" data-md-level="2">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
-          BijectiveTransforms
+          Transformations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -467,6 +467,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#generax.flows.affine.Shift" class="md-nav__link">
+    Shift
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#generax.flows.affine.ShiftScale" class="md-nav__link">
     ShiftScale
   </a>
@@ -504,6 +511,13 @@
         <li class="md-nav__item">
   <a href="#generax.flows.affine.ConditionalOptionalTransport" class="md-nav__link">
     ConditionalOptionalTransport
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generax.flows.affine.TallDenseLinear" class="md-nav__link">
+    TallDenseLinear
   </a>
   
 </li>
@@ -581,6 +595,20 @@
     <li class="md-nav__item">
       <a href="../compositions/" class="md-nav__link">
         Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reshape/" class="md-nav__link">
+        Reshape
       </a>
     </li>
   
@@ -853,6 +881,326 @@
 
 
 
+<h4 id="generax.flows.affine.Shift" class="doc doc-heading">
+        <code>
+generax.flows.affine.Shift            (<a class="autorefs autorefs-internal" title="generax.flows.base.BijectiveTransform" href="../base/#generax.flows.base.BijectiveTransform">BijectiveTransform</a>)
+        </code>
+
+
+
+<a href="#generax.flows.affine.Shift" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>This represents a shift transformation
+This is NICE https://arxiv.org/pdf/1410.8516.pdf when used
+in a coupling layer.</p>
+<p><strong>Attributes</strong>:
+- <code>b</code>: The shift parameter.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Shift</span><span class="p">(</span><span class="n">BijectiveTransform</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;This represents a shift transformation</span>
+<span class="sd">  This is NICE https://arxiv.org/pdf/1410.8516.pdf when used</span>
+<span class="sd">  in a coupling layer.</span>
+
+<span class="sd">  **Attributes**:</span>
+<span class="sd">  - `b`: The shift parameter.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">b</span><span class="p">:</span> <span class="n">Array</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+               <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the parameters randomly</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                          <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `x`: The data to initialize the parameters with.</span>
+<span class="sd">    - `y`: The conditioning information</span>
+<span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    A new layer with the parameters initialized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;x must be batched&#39;</span>
+    <span class="n">mean</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">mean_and_std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the parameters so that z will have</span>
+    <span class="c1"># zero mean and unit variance</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">mean</span>
+
+    <span class="c1"># Turn the new parameters into a new module</span>
+    <span class="n">get_b</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">b</span>
+    <span class="n">updated_layer</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_b</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">updated_layer</span>
+
+  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `x`: The input to the transformation</span>
+<span class="sd">    - `y`: The conditioning information</span>
+<span class="sd">    - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    `(z, log_det)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+
+    <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+      <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+
+    <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.Shift.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.affine.Shift.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>input_shape</code>: The input shape.  Output size is the same as shape.</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="c1"># Initialize the parameters randomly</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.Shift.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span></code>
+
+
+<a href="#generax.flows.affine.Shift.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize the parameters of the layer based on the data.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The data to initialize the parameters with.</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+A new layer with the parameters initialized.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BijectiveTransform</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The data to initialize the parameters with.</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  A new layer with the parameters initialized.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;x must be batched&#39;</span>
+  <span class="n">mean</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">mean_and_std</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+  <span class="c1"># Initialize the parameters so that z will have</span>
+  <span class="c1"># zero mean and unit variance</span>
+  <span class="n">b</span> <span class="o">=</span> <span class="n">mean</span>
+
+  <span class="c1"># Turn the new parameters into a new module</span>
+  <span class="n">get_b</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">tree</span><span class="p">:</span> <span class="n">tree</span><span class="o">.</span><span class="n">b</span>
+  <span class="n">updated_layer</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="n">get_b</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">updated_layer</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.Shift.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.affine.Shift.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>inverse</code>: Whether to inverse the transformation</li>
+</ul>
+<p><strong>Returns</strong>:
+<code>(z, log_det)</code></p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  `(z, log_det)`</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+
+  <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span>
+
+  <span class="n">log_det</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.Shift.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.affine.Shift.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.BijectiveTransform.inverse"><code>generax.flows.base.BijectiveTransform.inverse</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
 <h4 id="generax.flows.affine.ShiftScale" class="doc doc-heading">
         <code>
 generax.flows.affine.ShiftScale            (<a class="autorefs autorefs-internal" title="generax.flows.base.BijectiveTransform" href="../base/#generax.flows.base.BijectiveTransform">BijectiveTransform</a>)
@@ -951,7 +1299,7 @@ in a coupling layer.</p>
     <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
 
     <span class="c1"># s must be strictly positive</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">square_plus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_unbounded</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-4</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">square_plus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_unbounded</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span><span class="c1"># + 1e-4</span>
     <span class="n">log_s</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
@@ -1014,6 +1362,45 @@ in a coupling layer.</p>
 
   <span class="c1"># Initialize the parameters randomly</span>
   <span class="bp">self</span><span class="o">.</span><span class="n">s_unbounded</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,)</span> <span class="o">+</span> <span class="n">input_shape</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.ShiftScale.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.affine.ShiftScale.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.BijectiveTransform.inverse"><code>generax.flows.base.BijectiveTransform.inverse</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -1125,7 +1512,7 @@ A new layer with the parameters initialized.</p>
   <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
 
   <span class="c1"># s must be strictly positive</span>
-  <span class="n">s</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">square_plus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_unbounded</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-4</span>
+  <span class="n">s</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">square_plus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_unbounded</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span><span class="c1"># + 1e-4</span>
   <span class="n">log_s</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
   <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
@@ -1139,45 +1526,6 @@ A new layer with the parameters initialized.</p>
     <span class="n">log_det</span> <span class="o">=</span> <span class="n">log_s</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
   <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
-<h5 id="generax.flows.affine.ShiftScale.inverse" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
-
-
-<a href="#generax.flows.affine.ShiftScale.inverse" class="headerlink" title="Permanent link">¤</a></h5>
-
-    <div class="doc doc-contents ">
-
-      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.BijectiveTransform.inverse"><code>generax.flows.base.BijectiveTransform.inverse</code></a>.</p>
-
-        <details class="quote">
-          <summary>Source code in <code>generax/flows/affine.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
-            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
-
-<span class="sd">  **Arguments**:</span>
-
-<span class="sd">  - `x`: The input to the transformation</span>
-<span class="sd">  - `y`: The conditioning information</span>
-
-<span class="sd">  **Returns**:</span>
-<span class="sd">  (z, log_det)</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -2770,6 +3118,371 @@ The vector field that samples evolve on at (t, x).</p>
   <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected y.shape (</span><span class="si">{</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">) to match x.shape (</span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">y</span> <span class="o">-</span> <span class="n">x</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h4 id="generax.flows.affine.TallDenseLinear" class="doc doc-heading">
+        <code>
+generax.flows.affine.TallDenseLinear            (<a class="autorefs autorefs-internal" title="generax.flows.base.InjectiveTransform" href="../base/#generax.flows.base.InjectiveTransform">InjectiveTransform</a>)
+        </code>
+
+
+
+<a href="#generax.flows.affine.TallDenseLinear" class="headerlink" title="Permanent link">¤</a></h4>
+
+    <div class="doc doc-contents first">
+
+      <p>Matrix vector product with a tall matrix.</p>
+<p><strong>Attributes</strong>:
+- <code>W</code>: The weight matrix</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TallDenseLinear</span><span class="p">(</span><span class="n">InjectiveTransform</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Matrix vector product with a tall matrix.</span>
+
+<span class="sd">  **Attributes**:</span>
+<span class="sd">  - `W`: The weight matrix</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">W</span><span class="p">:</span> <span class="n">Array</span>
+
+  <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+               <span class="n">output_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+               <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">    - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Only implemented for 1d data&#39;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                     <span class="n">output_shape</span><span class="o">=</span><span class="n">output_shape</span><span class="p">,</span>
+                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">dim_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dim_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">whiten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+               <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+               <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">    - `x`: The input to the transformation</span>
+<span class="sd">    - `y`: The conditioning information</span>
+<span class="sd">    - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    (z, log_det)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+
+    <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+      <span class="n">W_pinv</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+      <span class="n">z</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,...j-&gt;...i&#39;</span><span class="p">,</span> <span class="n">W_pinv</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">z</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,...j-&gt;...i&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="n">log_det</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">slogdet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">T</span><span class="nd">@self</span><span class="o">.</span><span class="n">W</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
+      <span class="n">log_det</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
+
+  <span class="k">def</span> <span class="nf">log_determinant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                      <span class="n">z</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute -0.5*log(det(J^TJ))</span>
+
+<span class="sd">    **Arguments**:</span>
+
+<span class="sd">    - `z`: An element of the base space</span>
+
+<span class="sd">    **Returns**:</span>
+<span class="sd">    The log determinant of (J^TJ)^0.5</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">slogdet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">T</span><span class="nd">@self</span><span class="o">.</span><span class="n">W</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">log_det</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.TallDenseLinear.data_dependent_init" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.affine.TallDenseLinear.data_dependent_init" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize the parameters of the layer based on the data.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The data to initialize the parameters with.</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+<p><strong>Returns</strong>:
+A new layer with the parameters initialized.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">data_dependent_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+                        <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                        <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Initialize the parameters of the layer based on the data.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The data to initialize the parameters with.</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  A new layer with the parameters initialized.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.TallDenseLinear.inverse" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.affine.TallDenseLinear.inverse" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Apply the inverse transformation.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Apply the inverse transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.TallDenseLinear.project" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.affine.TallDenseLinear.project" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p>Inherited from <a class="autorefs autorefs-internal" href="../base/#generax.flows.base.InjectiveTransform.project"><code>generax.flows.base.InjectiveTransform.project</code></a>.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+            <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Project a point onto the image of the transformation.</span>
+
+<span class="sd">  **Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  z</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="n">x_proj</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">x_proj</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.TallDenseLinear.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">output_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#generax.flows.affine.TallDenseLinear.__init__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>input_shape</code>: The input shape.  Output size is the same as shape.</li>
+<li><code>key</code>: A <code>jax.random.PRNGKey</code> for initialization</li>
+</ul>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+             <span class="n">output_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+             <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `input_shape`: The input shape.  Output size is the same as shape.</span>
+<span class="sd">  - `key`: A `jax.random.PRNGKey` for initialization</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Only implemented for 1d data&#39;</span>
+  <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">,</span>
+                   <span class="n">output_shape</span><span class="o">=</span><span class="n">output_shape</span><span class="p">,</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+  <span class="n">dim_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">dim_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">dim_in</span><span class="p">,</span> <span class="n">dim_out</span><span class="p">))</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">whiten</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h5 id="generax.flows.affine.TallDenseLinear.__call__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span></code>
+
+
+<a href="#generax.flows.affine.TallDenseLinear.__call__" class="headerlink" title="Permanent link">¤</a></h5>
+
+    <div class="doc doc-contents ">
+
+      <p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>x</code>: The input to the transformation</li>
+<li><code>y</code>: The conditioning information</li>
+<li><code>inverse</code>: Whether to inverse the transformation</li>
+</ul>
+<p><strong>Returns</strong>:
+(z, log_det)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>generax/flows/affine.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">x</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span>
+             <span class="n">y</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Array</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+             <span class="n">inverse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Array</span><span class="p">:</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;**Arguments**:</span>
+
+<span class="sd">  - `x`: The input to the transformation</span>
+<span class="sd">  - `y`: The conditioning information</span>
+<span class="sd">  - `inverse`: Whether to inverse the transformation</span>
+
+<span class="sd">  **Returns**:</span>
+<span class="sd">  (z, log_det)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_shape</span><span class="p">,</span> <span class="s1">&#39;Only works on unbatched data&#39;</span>
+
+  <span class="k">if</span> <span class="n">inverse</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="n">W_pinv</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,...j-&gt;...i&#39;</span><span class="p">,</span> <span class="n">W_pinv</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,...j-&gt;...i&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+  <span class="n">log_det</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">slogdet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">T</span><span class="nd">@self</span><span class="o">.</span><span class="n">W</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+  <span class="k">if</span> <span class="n">inverse</span><span class="p">:</span>
+    <span class="n">log_det</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
+
+  <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">log_det</span>
 </code></pre></div>
         </details>
     </div>

@@ -135,7 +135,7 @@ $$
 \begin{align}
   \partial \sigma_u &= \partial J_{ij}U_{iu} V_{ju} \\
   \partial U_u \cdot U_{v\neq u} &= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(\sigma_u U_{iv} V_{ju} + \sigma_v U_{iu} V_{jv}\right) \\
-  \partial V_u \cdot V_v &= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right)
+  \partial V_u \cdot V_{v\neq u} &= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(\sigma_v U_{iv} V_{ju} + \sigma_u U_{iu} V_{jv}\right)
 \end{align}
 $$
 
@@ -148,15 +148,23 @@ $$
 $$
 Because $U$ and $V$ are orthogonal, $\partial U_u \cdot U_u = \partial V_u \cdot V_u = 0$.
 
+We can also write the derivative in terms of $W_u = \sigma_u U_u$ (and its dual basis $\hat{W}_u = \sigma_u^{-1} U_u$):
+$$
+\begin{align}
+  \partial W_u \cdot \hat{W}_{v\neq u} &= \frac{\sigma_u^2}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(\hat{W}_{iv} V_{ju} + \hat{W}_{iu} V_{jv}\right) \\
+  \partial \log \sigma_u &= \partial J_{ij}\hat{W}_{iu} V_{ju} \\
+  \partial V_u \cdot V_{v\neq u} &= \frac{1}{\sigma_u^2 - \sigma_v^2} \partial J_{ij}\left(W_{iv} V_{ju} + W_{iu} V_{jv}\right)
+\end{align}
+$$
 
-# Lie derivative
-We can also see how the singular vectors and singular values evolve on the flow of the vector field:
+# Time derivative
+We can also see how the singular vectors and singular values evolve when we flow on the vector field:
 $$
 \begin{align}
   \frac{dx_t}{dt} = X_t(x_t)
 \end{align}
 $$
-i.e., we can evaluate the Lie derivative of the singular vectors and singular values with respect to $X_t$.  To do this, recall that we can write the time derivative of the components of $J$ as:
+To do this, recall that we can write the time derivative of the components of $J$ as:
 $$
 \begin{align}
   \frac{dJ}{dt} = \nabla X_t J
@@ -198,5 +206,76 @@ $$
   &= \frac{1}{\sigma_u^2 - \sigma_v^2} (\nabla X_t)_{ik}\left(\sigma_u\sigma_v U_{iv} U_{ku} + \sigma_u\sigma_v U_{iu} U_{kv}\right) \\
   &= \frac{\sigma_u \sigma_v}{\sigma_u^2 - \sigma_v^2}\left( U_v^T(\nabla X_t)U_u + U_u^T(\nabla X_t)U_v \right) \\
   &= \frac{\sigma_u \sigma_v}{\sigma_u^2 - \sigma_v^2} U_v^T(\nabla X_t + \nabla X_t^T)U_u
+\end{align}
+$$
+
+# Eigenvector derivatives
+
+$$
+\begin{align}
+    \Sigma_{ij} &= \lambda^\mu v_i^\mu v_j^\mu  \\
+    \Sigma_{ij} v_j^\mu  &= \lambda^\mu v_i^\mu
+\end{align}
+$$
+
+$$
+\begin{align}
+    \partial\Sigma_{ij} v_j^\mu  + \Sigma_{ij} \partial v_j^\mu  &= \partial\lambda^\mu v_i^\mu  + \lambda^\mu \partial v_i^\mu
+\end{align}
+$$
+$$
+\begin{align}
+    \partial\Sigma_{ij} v_j^\mu v_i^\mu  + \underbrace{\Sigma_{ij} \partial v_j^\mu v_i^\mu}_{\cancel{\lambda^\mu v_j^\mu \partial v_j^\mu}}   &= \partial\lambda^\mu \underbrace{v_i^\mu v_i^\mu}_{1}  + \cancel{\lambda^\mu \partial v_i^\mu v_i^\mu}
+\end{align}
+$$
+
+$$
+\begin{align}
+    \partial\lambda^\mu  &= \partial\Sigma_{ij} v_i^\mu v_j^\mu
+\end{align}
+$$
+
+Consider the eigenvector index $\nu \neq \mu$:
+$$
+\begin{align}
+    \underbrace{\partial\Sigma_{ij} v_j^\mu v_i^\nu}_{\partial\Sigma_{ij}v_i^\mu v_j^\nu}  + \underbrace{\Sigma_{ij} \partial v_j^\mu v_i^\nu}_{\lambda^\nu v_j^\nu \partial v_j^\mu}   &= \partial\lambda^\mu \underbrace{v_i^\mu v_i^\nu}_{0}  + \lambda^\mu \partial v_i^\mu v_i^\nu
+\end{align}
+$$
+$$
+\begin{align}
+    \partial v_i^\mu v_i^\nu  &= \frac{1}{\lambda^\mu - \lambda^\nu }\partial\Sigma_{ij} v_i^\mu v_j^\nu
+\end{align}
+$$
+
+## Variation formulas
+
+Next we can derive relationships between $J,\lambda$ and $V$.  First, we clearly have
+$$
+\begin{align}
+    \frac{\partial\lambda^\mu}{\partial \Sigma_{ij}}  &= v_i^\mu v_j^\mu \\
+    \frac{\partial v^\mu}{\partial\Sigma_{ij}}\cdot v^{\nu\neq \mu}  &= \frac{1}{\lambda^\mu - \lambda^\nu }v_i^\mu v_j^\nu
+\end{align}
+$$
+Next we can relate $\lambda$ and $V$ by solving for $\frac{\partial v_k^\mu}{\partial \lambda^\nu}$:
+$$
+\begin{align}
+    \frac{\partial v_k^\mu}{\partial \lambda^\nu} \frac{\partial\lambda^\nu}{\partial \Sigma_{ij}} &= \frac{\partial v_k^\mu}{\partial\Sigma_{ij}} \\
+    \frac{\partial v_k^\mu}{\partial \lambda^\nu} v_i^\nu v_j^\nu &= \sum_{\gamma \neq \mu}\frac{1}{\lambda^\mu - \lambda^\gamma }v_i^\mu v_j^\gamma v_k^\gamma \\
+    \frac{\partial v_k^\mu}{\partial \lambda^\nu} v_i^\nu v_j^\nu v_i^{\alpha} v_j^{\beta} &= \sum_{\gamma \neq \mu}\frac{1}{\lambda^\mu - \lambda^\gamma }v_i^\mu v_j^\gamma v_k^\gamma v_i^{\alpha} v_j^{\beta} \\
+    \frac{\partial v_k^\mu}{\partial \lambda^\nu} \delta^{\nu \alpha} \delta^{\nu \beta} &= \sum_{\gamma \neq \mu}\frac{1}{\lambda^\mu - \lambda^\gamma }\delta^{\mu \alpha}\delta^{\gamma \beta} v_k^\gamma \\
+    \frac{\partial v_k^\mu}{\partial \lambda^\alpha} \delta^{\alpha \beta} &= \frac{1}{\lambda^\mu - \lambda^{\beta \neq \mu} }\delta^{\mu \alpha} v_k^{\beta \neq \mu}
+\end{align}
+$$
+Next we can set $\alpha = \beta$ to get
+$$
+\begin{align}
+    \frac{\partial v_k^\mu}{\partial \lambda^\beta} &= \frac{1}{\lambda^\mu - \lambda^\beta }\delta^{\mu (\beta \neq \mu)} v_k^\beta \\
+    &= 0
+\end{align}
+$$
+With a similar derivation, we get $\frac{\partial \lambda^\nu}{\partial v_k^\mu} = 0$, so overall we have
+$$
+\begin{align}
+    \frac{\partial v_k^\mu}{\partial \lambda^\nu} = \frac{\partial \lambda^\nu}{\partial v_k^\mu} = 0
 \end{align}
 $$

@@ -81,17 +81,17 @@ $$
   0 &= \frac{d}{dt}\int_{f_t(D)} p_t \omega_g \\
   &=\frac{d}{dt}\int_D f_t^*\left(p_t \omega_g\right) \\
   &= \int_D \frac{d}{dt}f_t^*\left(p_t \omega_g\right) \\
-  &= \int_D f_t^* \mathcal{L}_{V_t}\left(p_t \omega_g\right) + f_t^*\frac{d p_t}{dt}\omega_g \\
-  &= \int_D f_t^* \left(d(V_t \lrcorner p_t \omega_g) + V_t \lrcorner \underbrace{d(p_t \omega_g)}_{0} + \frac{d p_t}{dt}\omega_g \right) \\
-  &= \int_D f_t^* \left(d(p_t V_t \lrcorner \omega_g) + \frac{d p_t}{dt}\omega_g \right) \\
-  &= \int_D f_t^* \left(\text{Div}(p_tV_t) + \frac{d p_t}{dt} \right) \omega_g \\
-  &= \int_{f_t(D)} \left(\text{Div}(p_tV_t) + \frac{d p_t}{dt} \right) \omega_g
+  &= \int_D f_t^* \mathcal{L}_{V_t}\left(p_t \omega_g\right) + f_t^*\frac{\partial p_t}{\partial t}\omega_g \\
+  &= \int_D f_t^* \left(d(V_t \lrcorner p_t \omega_g) + V_t \lrcorner \underbrace{d(p_t \omega_g)}_{0} + \frac{\partial p_t}{\partial t}\omega_g \right) \\
+  &= \int_D f_t^* \left(d(p_t V_t \lrcorner \omega_g) + \frac{\partial p_t}{\partial t}\omega_g \right) \\
+  &= \int_D f_t^* \left(\text{Div}(p_tV_t) + \frac{\partial p_t}{\partial t} \right) \omega_g \\
+  &= \int_{f_t(D)} \left(\text{Div}(p_tV_t) + \frac{\partial p_t}{\partial t} \right) \omega_g
 \end{align}
 $$
 The integrand of the last equation relates $p_t$ and $V_t$ and is called the continuity equation:
 $$
 \begin{align}
-  \frac{d p_t}{dt} + \text{Div}(p_tV_t) = 0
+  \frac{\partial p_t}{\partial t} + \text{Div}(p_tV_t) = 0
 \end{align}
 $$
 

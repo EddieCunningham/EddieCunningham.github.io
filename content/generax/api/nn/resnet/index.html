@@ -399,14 +399,14 @@
       
       
         <label class="md-nav__link" for="__nav_2_2">
-          BijectiveTransforms
+          Transformations
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="BijectiveTransforms" data-md-level="2">
+      <nav class="md-nav" aria-label="Transformations" data-md-level="2">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
-          BijectiveTransforms
+          Transformations
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -502,6 +502,20 @@
     <li class="md-nav__item">
       <a href="../../flows/compositions/" class="md-nav__link">
         Models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../flows/reshape/" class="md-nav__link">
+        Reshape
       </a>
     </li>
   
@@ -1038,7 +1052,7 @@ generax.nn.resnet.ResNet        </code>
 
 
 <h5 id="generax.nn.resnet.ResNet.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">working_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">filter_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">PjitFunction</span> <span class="n">of</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">silu</span> <span class="n">at</span> <span class="mh">0x7ff56ce627a0</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">working_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">filter_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">PjitFunction</span> <span class="n">of</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">silu</span> <span class="n">at</span> <span class="mh">0x7fd99f02dfc0</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.nn.resnet.ResNet.__init__" class="headerlink" title="Permanent link">¤</a></h5>
@@ -1420,7 +1434,7 @@ generax.nn.resnet.TimeDependentResNet            (<a class="autorefs autorefs-in
 
 
 <h5 id="generax.nn.resnet.TimeDependentResNet.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">working_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">filter_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">PjitFunction</span> <span class="n">of</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">silu</span> <span class="n">at</span> <span class="mh">0x7ff56ce627a0</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="n">embedding_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">out_features</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">working_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_blocks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">filter_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">cond_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">PjitFunction</span> <span class="n">of</span> <span class="o">&lt;</span><span class="n">function</span> <span class="n">silu</span> <span class="n">at</span> <span class="mh">0x7fd99f02dfc0</span><span class="o">&gt;&gt;</span><span class="p">,</span> <span class="n">embedding_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">out_features</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">PRNGKeyArray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#generax.nn.resnet.TimeDependentResNet.__init__" class="headerlink" title="Permanent link">¤</a></h5>
